@@ -61,16 +61,19 @@ function verifyToken(request) {
   }
 }
 
+/**
+ * Retorna horário atual de Brasília usando dayjs
+ * Sempre retorna America/Sao_Paulo (UTC-3)
+ */
 function getBrazilTime() {
-  // Pega horário UTC atual
-  const now = new Date();
-  
-  // Ajusta para Brasília (UTC-3): subtrai 3 horas do timestamp UTC
-  const brasiliaMs = now.getTime() - (3 * 60 * 60 * 1000);
-  
-  // Cria novo Date com o timestamp ajustado
-  // IMPORTANTE: usar getUTC* para extrair valores, pois o Date interno é UTC ajustado
-  return new Date(brasiliaMs);
+  return dayjs().tz('America/Sao_Paulo');
+}
+
+/**
+ * Converte um objeto dayjs para Date JavaScript
+ */
+function toJSDate(dayjsObj) {
+  return dayjsObj.toDate();
 }
 
 /**
