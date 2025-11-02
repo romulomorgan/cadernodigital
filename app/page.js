@@ -437,13 +437,13 @@ export default function App() {
       });
       
       if (res.ok) {
-        alert('Comprovante enviado com sucesso!');
+        toast.success('📎 Comprovante enviado com sucesso!');
         fetchEntries();
       } else {
-        alert('Erro ao enviar comprovante');
+        toast.error('❌ Erro ao enviar comprovante');
       }
     } catch (error) {
-      alert('Erro ao conectar com o servidor');
+      toast.error('❌ Erro ao conectar com o servidor');
     } finally {
       setUploadingReceipt(false);
     }
