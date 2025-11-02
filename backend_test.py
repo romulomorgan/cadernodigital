@@ -340,71 +340,62 @@ def verify_database_collections():
     log_test("   - month_status: documentos com closed: true/false", None)
     log_test("   - audit_logs: ações de close_month e reopen_month", None)
     log_test("   - entries: verificar se valores são editados ou não", None)
+def main():
+    """Função principal de teste"""
+    print("=" * 80)
+    print("IUDP SISTEMA - TESTE DE VERIFICAÇÃO DE MÊS FECHADO")
+    print("Testando se mês fechado bloqueia edições conforme especificado")
+    print("=" * 80)
     
-    def test_complete_flow(self):
-        """Test complete close -> reopen -> close flow"""
-        print("\n=== TESTING COMPLETE FLOW ===")
+    # Criar usuários de teste
+    master_token, user_token = create_test_users()
+    if not master_token or not user_token:
+        log_test("Falha ao criar usuários de teste. Abortando.", False)
+        return False
+    
+    # Executar cenários de teste
+    results = []
+    
+    try:
+        # Cenário 1: Fluxo completo
+        result1 = test_scenario_1_complete_flow(master_token, user_token)
+        results.append(("Cenário 1 - Fluxo Completo", result1))
         
-        headers = {"Authorization": f"Bearer {self.master_token}"}
-        test_data = {"month": 7, "year": 2025}  # Use different month for flow test
+        # Cenário 2: Unlock requests
+        result2 = test_scenario_2_unlock_requests(master_token, user_token)
+        results.append(("Cenário 2 - Unlock Requests", result2))
         
-        # Clear any existing data
-        try:
-            self.db.month_status.delete_one({"month": 7, "year": 2025})
-        except:
-            pass
+        # Cenário 3: Master approve unlock
+        result3 = test_scenario_3_master_approve_unlock(master_token, user_token)
+        results.append(("Cenário 3 - Master Approve Unlock", result3))
         
-        print("\n1. Step 1: Close month...")
-        try:
-            response = self.session.post(f"{API_BASE}/month/close", json=test_data, headers=headers)
-            if response.status_code == 200 and response.json().get("success"):
-                month_status = self.db.month_status.find_one({"month": 7, "year": 2025})
-                if month_status and month_status.get("closed") == True:
-                    print("✅ Step 1 passed: Month closed successfully")
-                else:
-                    print("❌ Step 1 failed: Month not closed in database")
-                    return False
-            else:
-                print(f"❌ Step 1 failed: API error {response.status_code}")
-                return False
-        except Exception as e:
-            print(f"❌ Step 1 failed: {e}")
-            return False
+        # Verificação de DB
+        verify_database_collections()
         
-        print("\n2. Step 2: Reopen month...")
-        try:
-            response = self.session.post(f"{API_BASE}/month/reopen", json=test_data, headers=headers)
-            if response.status_code == 200 and response.json().get("success"):
-                month_status = self.db.month_status.find_one({"month": 7, "year": 2025})
-                if month_status and month_status.get("closed") == False:
-                    print("✅ Step 2 passed: Month reopened successfully")
-                else:
-                    print("❌ Step 2 failed: Month not reopened in database")
-                    return False
-            else:
-                print(f"❌ Step 2 failed: API error {response.status_code}")
-                return False
-        except Exception as e:
-            print(f"❌ Step 2 failed: {e}")
-            return False
-        
-        print("\n3. Step 3: Close month again...")
-        try:
-            response = self.session.post(f"{API_BASE}/month/close", json=test_data, headers=headers)
-            if response.status_code == 200 and response.json().get("success"):
-                month_status = self.db.month_status.find_one({"month": 7, "year": 2025})
-                if month_status and month_status.get("closed") == True:
-                    print("✅ Step 3 passed: Month closed again successfully")
-                    return True
-                else:
-                    print("❌ Step 3 failed: Month not closed in database")
-                    return False
-            else:
-                print(f"❌ Step 3 failed: API error {response.status_code}")
-                return False
-        except Exception as e:
-            print(f"❌ Step 3 failed: {e}")
-            return False
+    except Exception as e:
+        log_test(f"Erro durante execução dos testes: {str(e)}", False)
+        return False
+    
+    # Resumo dos resultados
+    print("\n" + "=" * 80)
+    print("RESUMO DOS TESTES")
+    print("=" * 80)
+    
+    all_passed = True
+    for test_name, result in results:
+        status = "✅ PASSOU" if result else "❌ FALHOU"
+        print(f"{test_name}: {status}")
+        if not result:
+            all_passed = False
+    
+    print("=" * 80)
+    if all_passed:
+        print("🎉 TODOS OS TESTES PASSARAM - VERIFICAÇÃO DE MÊS FECHADO FUNCIONANDO!")
+    else:
+        print("⚠️  ALGUNS TESTES FALHARAM - VERIFICAR IMPLEMENTAÇÃO")
+    print("=" * 80)
+    
+    return all_passed
     
     def run_all_tests(self):
         """Run all tests and return summary"""
