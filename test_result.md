@@ -143,11 +143,11 @@ backend:
 
   - task: "POST /month/reopen - Reabrir mês (Master apenas)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -159,6 +159,20 @@ backend:
           - Registra audit_log com action 'reopen_month'
           - Retorna sucesso com mensagem
           Precisa testar: autenticação master, validação de mês/ano, persistência no DB, audit log
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO CORRETAMENTE
+          
+          Testes executados:
+          - ✅ Autenticação Master: Apenas usuários master podem acessar (403 para não-master)
+          - ✅ API Response: POST /api/month/reopen retorna success: true
+          - ✅ Persistência DB: month_status collection atualizada com closed: false
+          - ✅ Audit Log: Registro criado com action: 'reopen_month'
+          - ✅ Dados salvos: reopenedBy, reopenedAt corretamente preenchidos
+          - ✅ Fluxo completo: Close → Reopen → Close novamente funciona perfeitamente
+          
+          Endpoint duplicado no código mas ambos funcionam corretamente.
 
   - task: "Verificar se mês fechado bloqueia edições"
     implemented: false
