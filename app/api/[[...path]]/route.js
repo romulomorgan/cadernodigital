@@ -4,9 +4,13 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { format, addHours, isBefore, isAfter, differenceInMinutes } from 'date-fns';
 import { toZonedTime, fromZonedTime } from 'date-fns-tz';
+import { writeFile, mkdir, readFile } from 'fs/promises';
+import { existsSync } from 'fs';
+import path from 'path';
 
 const TIMEZONE = 'America/Sao_Paulo';
 const JWT_SECRET = process.env.JWT_SECRET || 'iudp-secret-key-2025';
+const UPLOAD_DIR = '/app/uploads/receipts';
 
 let cachedClient = null;
 let cachedDb = null;
@@ -51,10 +55,8 @@ function getTimeWindowEnd(timeSlot) {
 }
 
 function isEntryLocked(entry, currentTime) {
-  // Check time window lock
   if (entry.timeWindowLocked) return { locked: true, reason: 'time_window' };
   
-  // Check 1-hour edit lock
   if (entry.createdAt && entry.value !== null && entry.value !== undefined && entry.value !== '') {
     const createdTime = new Date(entry.createdAt);
     const oneHourLater = addHours(createdTime, 1);
@@ -106,7 +108,6 @@ export async function POST(request) {
       
       await db.collection('users').insertOne(user);
       
-      // Audit log
       await db.collection('audit_logs').insertOne({
         logId: crypto.randomUUID(),
         action: 'register',
@@ -148,7 +149,6 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Credenciais inválidas' }, { status: 401 });
       }
       
-      // Audit log
       await db.collection('audit_logs').insertOne({
         logId: crypto.randomUUID(),
         action: 'login',
@@ -176,6 +176,64 @@ export async function POST(request) {
       });
     }
     
+    // UPLOAD RECEIPT
+    if (path === 'upload/receipt') {
+      const user = verifyToken(request);
+      if (!user) {
+        return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+      }
+      
+      const formData = await request.formData();
+      const file = formData.get('file');
+      const entryId = formData.get('entryId');
+      
+      if (!file) {
+        return NextResponse.json({ error: 'Arquivo não enviado' }, { status: 400 });
+      }
+      
+      // Create upload directory if not exists
+      if (!existsSync(UPLOAD_DIR)) {
+        await mkdir(UPLOAD_DIR, { recursive: true });
+      }
+      
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      
+      const fileId = crypto.randomUUID();
+      const extension = file.name.split('.').pop();
+      const filename = `${fileId}.${extension}`;
+      const filepath = path.join(UPLOAD_DIR, filename);
+      
+      await writeFile(filepath, buffer);
+      
+      const receipt = {
+        receiptId: fileId,
+        filename: file.name,
+        filepath: filename,
+        fileType: file.type,
+        fileSize: file.size,
+        uploadedBy: user.userId,
+        uploadedAt: getBrazilTime().toISOString()
+      };
+      
+      // Add receipt to entry
+      await db.collection('entries').updateOne(
+        { entryId },
+        { $push: { receipts: receipt } }
+      );
+      
+      // Audit log
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'upload_receipt',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { entryId, filename: file.name }
+      });
+      
+      return NextResponse.json({ success: true, receipt });
+    }
+    
     // SAVE ENTRY
     if (path === 'entries/save') {
       const user = verifyToken(request);
@@ -190,7 +248,6 @@ export async function POST(request) {
       
       const existing = await db.collection('entries').findOne({ entryId });
       
-      // Check if editing existing entry
       if (existing && existing.value !== null) {
         const lockStatus = isEntryLocked(existing, currentTime);
         if (lockStatus.locked) {
@@ -226,7 +283,6 @@ export async function POST(request) {
         { upsert: true }
       );
       
-      // Audit log
       await db.collection('audit_logs').insertOne({
         logId: crypto.randomUUID(),
         action: existing ? 'edit_entry' : 'create_entry',
@@ -255,7 +311,6 @@ export async function POST(request) {
         })
         .toArray();
       
-      // Check and update time window locks
       const currentTime = getBrazilTime();
       const currentHour = currentTime.getHours();
       const currentMinute = currentTime.getMinutes();
@@ -270,11 +325,9 @@ export async function POST(request) {
           
           let shouldLock = false;
           
-          // If entry is from a past day, lock it
           if (isBefore(entryDate, todayDate)) {
             shouldLock = true;
           }
-          // If entry is from today, check time window
           else if (entry.day === currentDay && entry.month === currentMonth && entry.year === currentYear) {
             const windowEnd = getTimeWindowEnd(entry.timeSlot);
             if (windowEnd) {
@@ -301,6 +354,38 @@ export async function POST(request) {
       return NextResponse.json({ entries });
     }
     
+    // COMPARE MONTHS
+    if (path === 'compare/months') {
+      const user = verifyToken(request);
+      if (!user) {
+        return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+      }
+      
+      const { month1, year1, month2, year2 } = await request.json();
+      
+      const entries1 = await db.collection('entries')
+        .find({ month: parseInt(month1), year: parseInt(year1) })
+        .toArray();
+      
+      const entries2 = await db.collection('entries')
+        .find({ month: parseInt(month2), year: parseInt(year2) })
+        .toArray();
+      
+      const total1 = entries1.reduce((sum, e) => sum + (e.value || 0), 0);
+      const total2 = entries2.reduce((sum, e) => sum + (e.value || 0), 0);
+      
+      const difference = total2 - total1;
+      const percentChange = total1 > 0 ? ((difference / total1) * 100) : 0;
+      
+      return NextResponse.json({
+        period1: { month: month1, year: year1, total: total1, entries: entries1.length },
+        period2: { month: month2, year: year2, total: total2, entries: entries2.length },
+        difference,
+        percentChange,
+        analysis: percentChange > 0 ? 'crescimento' : percentChange < 0 ? 'queda' : 'estável'
+      });
+    }
+    
     // REQUEST UNLOCK
     if (path === 'unlock/request') {
       const user = verifyToken(request);
@@ -314,6 +399,7 @@ export async function POST(request) {
         requestId: crypto.randomUUID(),
         entryId,
         requesterId: user.userId,
+        requesterName: user.email,
         reason: reason || '',
         status: 'pending',
         createdAt: getBrazilTime().toISOString()
@@ -321,7 +407,6 @@ export async function POST(request) {
       
       await db.collection('unlock_requests').insertOne(request_record);
       
-      // Audit log
       await db.collection('audit_logs').insertOne({
         logId: crypto.randomUUID(),
         action: 'request_unlock',
@@ -333,7 +418,7 @@ export async function POST(request) {
       return NextResponse.json({ success: true });
     }
     
-    // GET UNLOCK REQUESTS (Master only)
+    // GET UNLOCK REQUESTS
     if (path === 'unlock/requests') {
       const user = verifyToken(request);
       if (!user || user.role !== 'master') {
@@ -348,7 +433,7 @@ export async function POST(request) {
       return NextResponse.json({ requests });
     }
     
-    // APPROVE UNLOCK (Master only)
+    // APPROVE UNLOCK
     if (path === 'unlock/approve') {
       const user = verifyToken(request);
       if (!user || user.role !== 'master') {
@@ -357,7 +442,6 @@ export async function POST(request) {
       
       const { requestId, entryId, durationMinutes } = await request.json();
       
-      // Update entry to unlock
       await db.collection('entries').updateOne(
         { entryId },
         { 
@@ -368,7 +452,6 @@ export async function POST(request) {
         }
       );
       
-      // Update request status
       await db.collection('unlock_requests').updateOne(
         { requestId },
         { 
@@ -380,7 +463,6 @@ export async function POST(request) {
         }
       );
       
-      // Audit log
       await db.collection('audit_logs').insertOne({
         logId: crypto.randomUUID(),
         action: 'approve_unlock',
@@ -392,7 +474,7 @@ export async function POST(request) {
       return NextResponse.json({ success: true });
     }
     
-    // GET AUDIT LOGS (Master only)
+    // GET AUDIT LOGS
     if (path === 'audit/logs') {
       const user = verifyToken(request);
       if (!user || user.role !== 'master') {
@@ -411,6 +493,121 @@ export async function POST(request) {
       return NextResponse.json({ logs });
     }
     
+    // GET ALL USERS (Master only)
+    if (path === 'users/list') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const users = await db.collection('users')
+        .find({}, { projection: { password: 0 } })
+        .sort({ createdAt: -1 })
+        .toArray();
+      
+      return NextResponse.json({ users });
+    }
+    
+    // UPDATE USER PERMISSIONS (Master only)
+    if (path === 'users/permissions') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const { userId, permissions } = await request.json();
+      
+      await db.collection('users').updateOne(
+        { userId },
+        { $set: { permissions } }
+      );
+      
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'update_permissions',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { targetUserId: userId, permissions }
+      });
+      
+      return NextResponse.json({ success: true });
+    }
+    
+    // EXPORT CSV
+    if (path === 'export/csv') {
+      const user = verifyToken(request);
+      if (!user) {
+        return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+      }
+      
+      const userData = await db.collection('users').findOne({ userId: user.userId });
+      if (!userData?.permissions?.canExport && user.role !== 'master') {
+        return NextResponse.json({ error: 'Sem permissão para exportar' }, { status: 403 });
+      }
+      
+      const { month, year } = await request.json();
+      
+      const entries = await db.collection('entries')
+        .find({ month: parseInt(month), year: parseInt(year) })
+        .sort({ day: 1, timeSlot: 1 })
+        .toArray();
+      
+      let csv = 'Dia,Horário,Valor,Observações,Data de Criação\n';
+      
+      for (const entry of entries) {
+        csv += `${entry.day},${entry.timeSlot},${entry.value},"${entry.notes || ''}",${entry.createdAt}\n`;
+      }
+      
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'export_csv',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { month, year }
+      });
+      
+      return new NextResponse(csv, {
+        headers: {
+          'Content-Type': 'text/csv',
+          'Content-Disposition': `attachment; filename="iudp-${year}-${month}.csv"`
+        }
+      });
+    }
+    
+    // GET STATISTICS (Master only)
+    if (path === 'stats/overview') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const totalUsers = await db.collection('users').countDocuments();
+      const totalEntries = await db.collection('entries').countDocuments();
+      const pendingRequests = await db.collection('unlock_requests').countDocuments({ status: 'pending' });
+      const totalAuditLogs = await db.collection('audit_logs').countDocuments();
+      
+      // Get current month total
+      const now = getBrazilTime();
+      const currentMonth = now.getMonth() + 1;
+      const currentYear = now.getFullYear();
+      
+      const currentMonthEntries = await db.collection('entries')
+        .find({ month: currentMonth, year: currentYear })
+        .toArray();
+      
+      const currentMonthTotal = currentMonthEntries.reduce((sum, e) => sum + (e.value || 0), 0);
+      
+      return NextResponse.json({
+        totalUsers,
+        totalEntries,
+        pendingRequests,
+        totalAuditLogs,
+        currentMonthTotal,
+        currentMonth,
+        currentYear
+      });
+    }
+    
     return NextResponse.json({ error: 'Endpoint não encontrado' }, { status: 404 });
     
   } catch (error) {
@@ -426,12 +623,31 @@ export async function GET(request) {
   try {
     const db = await connectDB();
     
-    // GET CURRENT TIME (Brazil)
+    // GET CURRENT TIME
     if (path === 'time/current') {
       const currentTime = getBrazilTime();
       return NextResponse.json({ 
         time: currentTime.toISOString(),
         formatted: format(currentTime, 'dd/MM/yyyy HH:mm:ss')
+      });
+    }
+    
+    // DOWNLOAD RECEIPT
+    if (path.startsWith('download/receipt/')) {
+      const filename = path.replace('download/receipt/', '');
+      const filepath = `/app/uploads/receipts/${filename}`;
+      
+      if (!existsSync(filepath)) {
+        return NextResponse.json({ error: 'Arquivo não encontrado' }, { status: 404 });
+      }
+      
+      const fileBuffer = await readFile(filepath);
+      
+      return new NextResponse(fileBuffer, {
+        headers: {
+          'Content-Type': 'application/octet-stream',
+          'Content-Disposition': `attachment; filename="${filename}"`
+        }
       });
     }
     
