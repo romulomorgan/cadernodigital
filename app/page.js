@@ -504,11 +504,11 @@ export default function App() {
       });
       
       if (res.ok) {
-        alert('Permissões atualizadas!');
+        toast.success('✅ Permissões atualizadas!');
         fetchAllUsers();
       }
     } catch (error) {
-      alert('Erro ao atualizar permissões');
+      toast.error('❌ Erro ao atualizar permissões');
     }
   };
   
