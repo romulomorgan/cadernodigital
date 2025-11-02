@@ -871,8 +871,8 @@ export async function GET(request) {
       return NextResponse.json({ requests });
     }
     
-    if (path.startsWith('download/receipt/')) {
-      const filename = path.replace('download/receipt/', '');
+    if (endpoint.startsWith('download/receipt/')) {
+      const filename = endpoint.replace('download/receipt/', '');
       const filepath = `/app/uploads/receipts/${filename}`;
       
       if (!existsSync(filepath)) {
