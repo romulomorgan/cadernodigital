@@ -103,33 +103,94 @@ def create_test_users():
             return master_token, None
     
     return master_token, user_token
+def test_scenario_1_complete_flow(master_token, user_token):
+    """
+    Cenário 1: Fluxo Completo de Fechamento
+    1. Criar entry no mês 6/2025 com usuário comum
+    2. Com Master: Fechar mês 6/2025
+    3. Com usuário comum: Tentar editar entry (deve retornar 403)
+    4. Com Master: Reabrir mês 6/2025
+    5. Com usuário comum: Tentar editar entry novamente (deve funcionar)
+    """
+    log_test("=== CENÁRIO 1: FLUXO COMPLETO DE FECHAMENTO ===")
     
-    def create_test_tokens(self):
-        """Create JWT tokens for testing"""
-        try:
-            # Master user token
-            master_payload = {
-                "userId": "master-test-user-id",
-                "email": "master@iudp.com",
-                "role": "master",
-                "exp": datetime.utcnow() + timedelta(hours=1)
-            }
-            self.master_token = jwt.encode(master_payload, JWT_SECRET, algorithm="HS256")
-            
-            # Regular user token
-            regular_payload = {
-                "userId": "regular-test-user-id", 
-                "email": "pastor@iudp.com",
-                "role": "pastor",
-                "exp": datetime.utcnow() + timedelta(hours=1)
-            }
-            self.regular_token = jwt.encode(regular_payload, JWT_SECRET, algorithm="HS256")
-            
-            print("✅ Test tokens created successfully")
-            return True
-        except Exception as e:
-            print(f"❌ Token creation failed: {e}")
-            return False
+    # Headers para requisições
+    user_headers = {"Authorization": f"Bearer {user_token}"}
+    master_headers = {"Authorization": f"Bearer {master_token}"}
+    
+    # 1. Criar entry com usuário comum
+    log_test("1. Criando entry no mês 6/2025 com usuário comum...")
+    entry_data = {
+        "month": 6,
+        "year": 2025,
+        "day": 15,
+        "timeSlot": "10:00",
+        "value": 150.75,
+        "notes": "Oferta da manhã - Culto de Domingo"
+    }
+    
+    create_response = make_request("POST", "entries/save", entry_data, user_headers)
+    if create_response['success']:
+        log_test("Entry criado com sucesso", True)
+        entry_id = f"2025-06-15-10:00"
+    else:
+        log_test(f"Erro ao criar entry: {create_response['data']}", False)
+        return False
+    
+    # 2. Fechar mês com Master
+    log_test("2. Fechando mês 6/2025 com Master...")
+    close_response = make_request("POST", "month/close", {"month": 6, "year": 2025}, master_headers)
+    if close_response['success']:
+        log_test("Mês fechado com sucesso", True)
+    else:
+        log_test(f"Erro ao fechar mês: {close_response['data']}", False)
+        return False
+    
+    # 3. Tentar editar entry com usuário comum (deve falhar)
+    log_test("3. Tentando editar entry com usuário comum (deve ser bloqueado)...")
+    edit_data = {
+        "month": 6,
+        "year": 2025,
+        "day": 15,
+        "timeSlot": "10:00",
+        "value": 200.50,
+        "notes": "Tentativa de edição em mês fechado"
+    }
+    
+    edit_response = make_request("POST", "entries/save", edit_data, user_headers)
+    if edit_response['status_code'] == 403 and 'fechado' in str(edit_response['data']).lower():
+        log_test("✅ CORRETO: Entry bloqueado em mês fechado (403)", True)
+    else:
+        log_test(f"❌ ERRO: Entry deveria ser bloqueado. Response: {edit_response}", False)
+        return False
+    
+    # 4. Reabrir mês com Master
+    log_test("4. Reabrindo mês 6/2025 com Master...")
+    reopen_response = make_request("POST", "month/reopen", {"month": 6, "year": 2025}, master_headers)
+    if reopen_response['success']:
+        log_test("Mês reaberto com sucesso", True)
+    else:
+        log_test(f"Erro ao reabrir mês: {reopen_response['data']}", False)
+        return False
+    
+    # 5. Tentar editar entry novamente (deve funcionar)
+    log_test("5. Tentando editar entry novamente após reabrir mês...")
+    edit_data2 = {
+        "month": 6,
+        "year": 2025,
+        "day": 15,
+        "timeSlot": "10:00",
+        "value": 175.25,
+        "notes": "Edição após reabertura do mês"
+    }
+    
+    edit_response2 = make_request("POST", "entries/save", edit_data2, user_headers)
+    if edit_response2['success']:
+        log_test("✅ CORRETO: Entry editado com sucesso após reabertura", True)
+        return True
+    else:
+        log_test(f"❌ ERRO: Entry deveria ser editável após reabertura. Response: {edit_response2}", False)
+        return False
     
     def test_authentication_scenarios(self):
         """Test authentication and authorization for month closure endpoints"""
