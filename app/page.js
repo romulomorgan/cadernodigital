@@ -1059,12 +1059,81 @@ export default function App() {
                         <CardTitle className="text-lg text-blue-900">
                           Dia {String(day).padStart(2, '0')}
                         </CardTitle>
-                        <Badge className="bg-yellow-500 text-blue-900 text-base px-3">
-                          Subtotal: R$ {dayTotal.toFixed(2).replace('.', ',')}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 px-2 text-xs"
+                            onClick={() => {
+                              const obs = getDayObservation(day);
+                              setEditingDayObs({ day });
+                              setDayObsText(obs?.observation || '');
+                            }}
+                          >
+                            <FileText className="w-4 h-4 mr-1" />
+                            {getDayObservation(day) ? 'Ver Obs' : '+ Obs'}
+                          </Button>
+                          <Badge className="bg-yellow-500 text-blue-900 text-base px-3">
+                            Subtotal: R$ {dayTotal.toFixed(2).replace('.', ',')}
+                          </Badge>
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent className="pt-4">
+                      {/* Day Observation Editor */}
+                      {editingDayObs?.day === day && (
+                        <div className="mb-4 p-4 border-2 border-blue-300 rounded-lg bg-blue-50">
+                          <div className="flex items-center justify-between mb-2">
+                            <Label className="font-semibold text-blue-900">
+                              📝 Observação do Dia {day}
+                            </Label>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                setEditingDayObs(null);
+                                setDayObsText('');
+                              }}
+                            >
+                              ✕
+                            </Button>
+                          </div>
+                          <Textarea
+                            value={dayObsText}
+                            onChange={(e) => setDayObsText(e.target.value)}
+                            placeholder="Adicione uma observação para este dia..."
+                            className="min-h-[100px] mb-2"
+                            maxLength={1000}
+                          />
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-gray-600">
+                              {dayObsText.length}/1000 caracteres
+                            </span>
+                            <Button
+                              size="sm"
+                              onClick={() => handleSaveDayObservation(day)}
+                              className="bg-blue-600 hover:bg-blue-700"
+                            >
+                              <Save className="w-4 h-4 mr-1" />
+                              Salvar
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Show day observation if exists and not editing */}
+                      {!editingDayObs && getDayObservation(day) && (
+                        <div className="mb-4 p-3 border border-blue-200 rounded-lg bg-blue-50">
+                          <div className="flex items-center gap-2 mb-1">
+                            <FileText className="w-4 h-4 text-blue-600" />
+                            <span className="text-xs font-semibold text-blue-900">Observação do Dia:</span>
+                          </div>
+                          <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                            {getDayObservation(day).observation}
+                          </p>
+                        </div>
+                      )}
+                      
                       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                         {timeSlots.map(timeSlot => {
                           const entry = getEntry(day, timeSlot);
