@@ -829,16 +829,64 @@ export default function App() {
                     <ChevronRight className="w-4 h-4 ml-2" />
                   </Button>
                 </div>
-                <div className="mt-4 flex items-center justify-between">
-                  <p className="text-3xl font-bold text-yellow-600">
-                    Total: R$ {monthTotal.toFixed(2).replace('.', ',')}
-                  </p>
-                  {(user?.permissions?.canExport || user?.role === 'master') && (
-                    <Button onClick={handleExportCSV} className="bg-green-600 hover:bg-green-700">
-                      <Download className="w-4 h-4 mr-2" />
-                      Exportar CSV
-                    </Button>
-                  )}
+                <div className="mt-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <p className="text-3xl font-bold text-yellow-600">
+                        Total: R$ {monthTotal.toFixed(2).replace('.', ',')}
+                      </p>
+                      {monthClosed && (
+                        <Badge className="bg-red-500 text-white px-3 py-1 text-base">
+                          <LockIcon className="w-4 h-4 mr-1" />
+                          MÊS FECHADO
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      {(user?.permissions?.canExport || user?.role === 'master') && (
+                        <Button onClick={handleExportCSV} className="bg-green-600 hover:bg-green-700">
+                          <Download className="w-4 h-4 mr-2" />
+                          Exportar CSV
+                        </Button>
+                      )}
+                      {user?.role === 'master' && (
+                        <>
+                          {!monthClosed ? (
+                            <Button onClick={handleCloseMonth} className="bg-red-600 hover:bg-red-700">
+                              <LockIcon className="w-4 h-4 mr-2" />
+                              Fechar Mês
+                            </Button>
+                          ) : (
+                            <Button onClick={handleReopenMonth} className="bg-orange-600 hover:bg-orange-700">
+                              <LockOpen className="w-4 h-4 mr-2" />
+                              Reabrir Mês
+                            </Button>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Month Observation */}
+                  <div className="border-t pt-4">
+                    <Label htmlFor="month-obs" className="text-base font-semibold">
+                      📝 Observação do Mês
+                    </Label>
+                    <div className="flex gap-2 mt-2">
+                      <Textarea
+                        id="month-obs"
+                        value={monthObservation}
+                        onChange={(e) => setMonthObservation(e.target.value)}
+                        placeholder="Adicione observações gerais sobre este mês..."
+                        rows={2}
+                        className="flex-1"
+                      />
+                      <Button onClick={handleSaveMonthObservation} className="bg-blue-600 hover:bg-blue-700">
+                        <Save className="w-4 h-4 mr-2" />
+                        Salvar
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
