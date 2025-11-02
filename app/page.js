@@ -120,6 +120,9 @@ export default function App() {
       const data = await res.json();
       if (data.entries) {
         setEntries(data.entries);
+        setMonthClosed(data.monthClosed || false);
+        setDayObservations(data.dayObservations || []);
+        setMonthObservation(data.monthObservation || '');
       }
     } catch (error) {
       console.error('Error fetching entries:', error);
