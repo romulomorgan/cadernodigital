@@ -139,3 +139,49 @@ code {
     @apply bg-background text-foreground;
     }
 }
+
+/* Print Styles - FASE 4 */
+@media print {
+  /* Hide navigation, buttons, and non-essential elements */
+  button, .no-print, nav, header, footer, [role="navigation"] {
+    display: none !important;
+  }
+  
+  /* Reset colors for better print */
+  * {
+    color: black !important;
+    background: white !important;
+  }
+  
+  /* Optimize layout */
+  body {
+    margin: 0;
+    padding: 20px;
+  }
+  
+  /* Page breaks */
+  .page-break {
+    page-break-after: always;
+  }
+  
+  /* Tables and cards */
+  table, .print-section {
+    page-break-inside: avoid;
+  }
+  
+  /* Show print-only content */
+  .print-only {
+    display: block !important;
+  }
+  
+  /* Typography for print */
+  h1, h2, h3 {
+    color: black !important;
+    page-break-after: avoid;
+  }
+  
+  p, li {
+    orphans: 3;
+    widows: 3;
+  }
+}
