@@ -1728,6 +1728,81 @@ export default function App() {
                   </CardContent>
                 </Card>
                 
+                {/* Month Governance - FASE 2 */}
+                <Card className="border-2 border-amber-400">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <LockIcon className="w-6 h-6" />
+                      Governança de Mês
+                    </CardTitle>
+                    <CardDescription>
+                      Fechar ou reabrir meses para controle de edições
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {/* Month Status Indicator */}
+                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div>
+                          <p className="font-semibold">
+                            {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Mês atual visualizado
+                          </p>
+                        </div>
+                        <Badge className={monthClosed ? 'bg-red-500' : 'bg-green-500'}>
+                          {monthClosed ? (
+                            <>
+                              <LockIcon className="w-4 h-4 mr-1" />
+                              FECHADO
+                            </>
+                          ) : (
+                            <>
+                              <LockOpen className="w-4 h-4 mr-1" />
+                              ABERTO
+                            </>
+                          )}
+                        </Badge>
+                      </div>
+                      
+                      {/* Action Buttons */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <Button
+                          variant={monthClosed ? "outline" : "default"}
+                          className={!monthClosed ? "bg-red-500 hover:bg-red-600" : ""}
+                          disabled={monthClosed}
+                          onClick={handleCloseMonth}
+                        >
+                          <LockIcon className="w-4 h-4 mr-2" />
+                          Fechar Mês
+                        </Button>
+                        
+                        <Button
+                          variant={!monthClosed ? "outline" : "default"}
+                          className={monthClosed ? "bg-green-500 hover:bg-green-600" : ""}
+                          disabled={!monthClosed}
+                          onClick={handleReopenMonth}
+                        >
+                          <LockOpen className="w-4 h-4 mr-2" />
+                          Reabrir Mês
+                        </Button>
+                      </div>
+                      
+                      {/* Info Box */}
+                      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p className="text-sm text-blue-900 flex items-start gap-2">
+                          <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <span>
+                            <strong>Atenção:</strong> Ao fechar um mês, nenhum usuário (exceto você) poderá editar lançamentos daquele período. 
+                            Use "Reabrir Mês" com cuidado e apenas quando necessário para correções importantes.
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                
                 {/* User Management */}
                 <Card>
                   <CardHeader>
