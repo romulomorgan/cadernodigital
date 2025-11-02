@@ -1012,6 +1012,158 @@ export default function App() {
             </div>
           </TabsContent>
           
+          
+          {/* DASHBOARD TAB */}
+          <TabsContent value="dashboard">
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="w-6 h-6" />
+                  Dashboard Financeiro - {format(currentDate, 'MMMM yyyy', { locale: ptBR })}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {!dashboardData ? (
+                  <div className="text-center py-8">
+                    <Button onClick={() => { fetchDashboard(); fetchEntries(); }}>
+                      Carregar Dashboard
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {/* Statistics Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <Card>
+                        <CardContent className="pt-6">
+                          <div className="text-center">
+                            <p className="text-sm text-gray-600">Total do Mês</p>
+                            <p className="text-2xl font-bold text-green-600">
+                              R$ {dashboardData.total?.toFixed(2).replace('.', ',')}
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardContent className="pt-6">
+                          <div className="text-center">
+                            <p className="text-sm text-gray-600">Média por Entrada</p>
+                            <p className="text-2xl font-bold text-blue-600">
+                              R$ {dashboardData.average?.toFixed(2).replace('.', ',')}
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardContent className="pt-6">
+                          <div className="text-center">
+                            <p className="text-sm text-gray-600">Total de Entradas</p>
+                            <p className="text-2xl font-bold text-purple-600">
+                              {dashboardData.entryCount}
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardContent className="pt-6">
+                          <div className="text-center">
+                            <p className="text-sm text-gray-600">Dias com Lançamentos</p>
+                            <p className="text-2xl font-bold text-orange-600">
+                              {dashboardData.dailyData?.length || 0}
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                    
+                    {/* Daily Chart */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Arrecadação por Dia</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={dashboardData.dailyData || []}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="day" label={{ value: 'Dia do Mês', position: 'insideBottom', offset: -5 }} />
+                            <YAxis label={{ value: 'Valor (R$)', angle: -90, position: 'insideLeft' }} />
+                            <Tooltip formatter={(value) => `R$ ${value.toFixed(2)}`} />
+                            <Legend />
+                            <Bar dataKey="total" fill="#3b82f6" name="Total" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+                    
+                    {/* Time Slot Distribution */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Distribuição por Horário</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <ResponsiveContainer width="100%" height={300}>
+                            <PieChart>
+                              <Pie
+                                data={dashboardData.timeSlotData || []}
+                                dataKey="total"
+                                nameKey="timeSlot"
+                                cx="50%"
+                                cy="50%"
+                                outerRadius={100}
+                                label={(entry) => `${entry.timeSlot}: R$ ${entry.total.toFixed(2)}`}
+                              >
+                                {(dashboardData.timeSlotData || []).map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'][index % 5]} />
+                                ))}
+                              </Pie>
+                              <Tooltip formatter={(value) => `R$ ${value.toFixed(2)}`} />
+                            </PieChart>
+                          </ResponsiveContainer>
+                          
+                          <div className="space-y-3">
+                            {(dashboardData.timeSlotData || []).map((slot, idx) => (
+                              <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                                <div className="flex items-center gap-2">
+                                  <div 
+                                    className="w-4 h-4 rounded" 
+                                    style={{ backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'][idx % 5] }}
+                                  ></div>
+                                  <span className="font-semibold">{slot.timeSlot}</span>
+                                </div>
+                                <span className="text-green-600 font-bold">
+                                  R$ {slot.total.toFixed(2).replace('.', ',')}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    {/* Trend Line */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Tendência do Mês</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <LineChart data={dashboardData.dailyData || []}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="day" label={{ value: 'Dia do Mês', position: 'insideBottom', offset: -5 }} />
+                            <YAxis label={{ value: 'Valor (R$)', angle: -90, position: 'insideLeft' }} />
+                            <Tooltip formatter={(value) => `R$ ${value.toFixed(2)}`} />
+                            <Legend />
+                            <Line type="monotone" dataKey="total" stroke="#10b981" strokeWidth={2} name="Arrecadação" />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* COMPARISON TAB */}
           <TabsContent value="compare">
             <Card>
