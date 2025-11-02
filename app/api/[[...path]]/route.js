@@ -85,13 +85,13 @@ function canUserAccessEntry(user, entry) {
 
 export async function POST(request) {
   const url = new URL(request.url);
-  const path = url.pathname.replace('/api/', '');
+  const endpoint = url.pathname.replace('/api/', '');
   
   try {
     const db = await connectDB();
     
     // REGISTER
-    if (path === 'auth/register') {
+    if (endpoint === 'auth/register') {
       const { name, email, password, role, church, region, state } = await request.json();
       
       const existing = await db.collection('users').findOne({ email });
