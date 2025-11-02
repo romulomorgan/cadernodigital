@@ -1351,6 +1351,269 @@ export default function App() {
             </Card>
           </TabsContent>
           
+          
+          {/* GESTÃO: ACESSO & PERMISSÕES TAB */}
+          {user?.role === 'master' && (
+            <TabsContent value="gestao">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    👥 Acesso & Permissões
+                  </CardTitle>
+                  <CardDescription>Gerencie usuários, permissões e acessos</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {/* Criar Novo Usuário */}
+                    <Card className="border-2 border-green-200">
+                      <CardHeader>
+                        <CardTitle className="text-lg">➕ Criar Novo Usuário</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <Input placeholder="Nome completo" />
+                          <Input placeholder="Email" type="email" />
+                          <Input placeholder="Senha inicial" type="password" />
+                          <Select>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Função" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="secretaria">Secretária</SelectItem>
+                              <SelectItem value="tesoureira">Tesoureira</SelectItem>
+                              <SelectItem value="estadual">Estadual</SelectItem>
+                              <SelectItem value="regional">Regional</SelectItem>
+                              <SelectItem value="pastor">Pastor</SelectItem>
+                              <SelectItem value="lideranca">Liderança</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Select>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Escopo" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="global">GLOBAL (todas igrejas)</SelectItem>
+                              <SelectItem value="state">ESTADO</SelectItem>
+                              <SelectItem value="region">REGIÃO</SelectItem>
+                              <SelectItem value="church">IGREJA específica</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Input placeholder="Igreja (se específica)" />
+                          <Input placeholder="Estado" />
+                          <Input placeholder="Região" />
+                        </div>
+                        <Button className="mt-4 w-full bg-green-600 hover:bg-green-700">
+                          ✅ Criar Usuário
+                        </Button>
+                      </CardContent>
+                    </Card>
+
+                    {/* Lista de Usuários */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg">👥 Usuários Cadastrados</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {allUsers.length === 0 ? (
+                          <Button onClick={fetchAllUsers}>Carregar Usuários</Button>
+                        ) : (
+                          <div className="space-y-3">
+                            {allUsers.map(u => (
+                              <Card key={u.userId} className="border border-gray-200">
+                                <CardContent className="pt-4">
+                                  <div className="flex items-start justify-between">
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <p className="font-semibold text-lg">{u.name}</p>
+                                        {!u.active && (
+                                          <Badge className="bg-red-500">BLOQUEADO</Badge>
+                                        )}
+                                      </div>
+                                      <p className="text-sm text-gray-600">{u.email}</p>
+                                      <div className="flex gap-2 mt-2">
+                                        <Badge>{u.role}</Badge>
+                                        <Badge variant="outline">{u.scope}</Badge>
+                                        {u.church && <Badge className="bg-blue-100 text-blue-800">🏛️ {u.church}</Badge>}
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="space-y-2 ml-4">
+                                      <div className="text-xs font-semibold text-gray-700 mb-2">Permissões:</div>
+                                      <div className="flex items-center gap-2 text-sm">
+                                        <Switch
+                                          checked={u.permissions?.canPrint}
+                                          onCheckedChange={(checked) => {
+                                            handleUpdatePermissions(u.userId, { ...u.permissions, canPrint: checked });
+                                          }}
+                                        />
+                                        <Label className="text-xs">🖨️ Imprimir</Label>
+                                      </div>
+                                      <div className="flex items-center gap-2 text-sm">
+                                        <Switch
+                                          checked={u.permissions?.canExport}
+                                          onCheckedChange={(checked) => {
+                                            handleUpdatePermissions(u.userId, { ...u.permissions, canExport: checked });
+                                          }}
+                                        />
+                                        <Label className="text-xs">📥 Exportar</Label>
+                                      </div>
+                                      <div className="flex items-center gap-2 text-sm">
+                                        <Switch
+                                          checked={u.permissions?.canShare}
+                                          onCheckedChange={(checked) => {
+                                            handleUpdatePermissions(u.userId, { ...u.permissions, canShare: checked });
+                                          }}
+                                        />
+                                        <Label className="text-xs">🔗 Compartilhar</Label>
+                                      </div>
+                                      
+                                      <div className="border-t pt-2 mt-2 space-y-2">
+                                        <Button size="sm" variant="outline" className="w-full text-xs">
+                                          🔑 Resetar Senha
+                                        </Button>
+                                        <Button 
+                                          size="sm" 
+                                          variant={u.active ? "destructive" : "default"}
+                                          className="w-full text-xs"
+                                        >
+                                          {u.active ? '🚫 Bloquear' : '✅ Desbloquear'}
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+
+          {/* IGREJAS TAB */}
+          {user?.role === 'master' && (
+            <TabsContent value="igrejas">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    🏛️ Cadastro de Igrejas
+                  </CardTitle>
+                  <CardDescription>Gerencie igrejas e pastores</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {/* Criar Nova Igreja */}
+                    <Card className="border-2 border-blue-200">
+                      <CardHeader>
+                        <CardTitle className="text-lg">➕ Cadastrar Nova Igreja</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="col-span-2">
+                            <Label>Nome da Igreja</Label>
+                            <Input placeholder="Ex: Igreja Central - IUDP" className="mt-1" />
+                          </div>
+                          <div className="col-span-2">
+                            <Label>Endereço Completo</Label>
+                            <Textarea placeholder="Rua, número, bairro, cidade" rows={2} className="mt-1" />
+                          </div>
+                          <div>
+                            <Label>Estado</Label>
+                            <Input placeholder="Ex: SP" className="mt-1" />
+                          </div>
+                          <div>
+                            <Label>Região</Label>
+                            <Input placeholder="Ex: Zona Sul" className="mt-1" />
+                          </div>
+                          <div>
+                            <Label>WhatsApp</Label>
+                            <Input placeholder="(11) 99999-9999" className="mt-1" />
+                          </div>
+                          <div>
+                            <Label>Foto da Igreja</Label>
+                            <Input type="file" accept="image/*" className="mt-1" />
+                          </div>
+                        </div>
+                        
+                        <div className="border-t mt-4 pt-4">
+                          <h3 className="font-semibold mb-3">Pastor Responsável</h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <Label>Nome do Pastor</Label>
+                              <Input placeholder="Nome completo" className="mt-1" />
+                            </div>
+                            <div>
+                              <Label>Foto do Pastor</Label>
+                              <Input type="file" accept="image/*" className="mt-1" />
+                            </div>
+                            <div>
+                              <Label>Email</Label>
+                              <Input type="email" placeholder="pastor@igreja.com" className="mt-1" />
+                            </div>
+                            <div>
+                              <Label>WhatsApp</Label>
+                              <Input placeholder="(11) 99999-9999" className="mt-1" />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <Button className="mt-4 w-full bg-blue-600 hover:bg-blue-700">
+                          ✅ Cadastrar Igreja
+                        </Button>
+                      </CardContent>
+                    </Card>
+
+                    {/* Lista de Igrejas */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg">🏛️ Igrejas Cadastradas</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          {/* Exemplo de igreja */}
+                          <Card className="border-2 border-blue-200">
+                            <CardContent className="pt-4">
+                              <div className="flex gap-4">
+                                <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
+                                  <span className="text-4xl">🏛️</span>
+                                </div>
+                                <div className="flex-1">
+                                  <h3 className="text-lg font-bold">Igreja Central</h3>
+                                  <p className="text-sm text-gray-600">São Paulo - SP • Zona Centro</p>
+                                  <p className="text-xs text-gray-500 mt-1">📍 Rua Exemplo, 123</p>
+                                  <p className="text-xs text-gray-500">📱 (11) 99999-9999</p>
+                                  
+                                  <div className="mt-3 pt-3 border-t">
+                                    <div className="flex items-center gap-3">
+                                      <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                                        <span className="text-xl">👤</span>
+                                      </div>
+                                      <div>
+                                        <p className="font-semibold text-sm">Pastor João Silva</p>
+                                        <p className="text-xs text-gray-500">pastor@igreja.com</p>
+                                      </div>
+                                      <Button size="sm" variant="outline" className="ml-auto">
+                                        🔄 Trocar Pastor
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+
           {/* MASTER PANEL TAB */}
           {user?.role === 'master' && (
             <TabsContent value="panel">
