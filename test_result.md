@@ -209,18 +209,40 @@ backend:
 
 frontend:
   - task: "UI para Fechar/Reabrir mês no painel Master"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "/app/app/page.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
         comment: |
           Ainda não implementado. Precisa adicionar botões "Fechar Mês" e "Reabrir Mês"
           no painel Master com confirmação dupla para reabrir.
+      - working: "NA"
+        agent: "main"
+        comment: |
+          ✅ IMPLEMENTADO - UI completo para Governança de Mês:
+          
+          1. Card "Governança de Mês" no Master Panel (linha ~1732):
+             - Indicador visual de status (ABERTO/FECHADO) com badge colorido
+             - Botão "Fechar Mês" (desabilitado se já fechado)
+             - Botão "Reabrir Mês" (desabilitado se já aberto)
+             - Info box com explicação sobre a funcionalidade
+          
+          2. Função handleCloseMonth (linha 275):
+             - Confirmação simples antes de fechar
+             - Toast de sucesso/erro
+             - Atualiza entries após fechar
+          
+          3. Função handleReopenMonth (linha 304):
+             - ✅ DUPLA CONFIRMAÇÃO implementada
+             - Toast de sucesso/erro com descrições
+             - Atualiza entries após reabrir
+          
+          Precisa testar: Fluxo completo na UI, verificar se badges atualizam corretamente
 
 metadata:
   created_by: "main_agent"
