@@ -1165,9 +1165,18 @@ export async function GET(request) {
     
     if (endpoint === 'time/current') {
       const currentTime = getBrazilTime();
+      
+      // Formatação manual para garantir timezone correto
+      const day = String(currentTime.getDate()).padStart(2, '0');
+      const month = String(currentTime.getMonth() + 1).padStart(2, '0');
+      const year = currentTime.getFullYear();
+      const hours = String(currentTime.getHours()).padStart(2, '0');
+      const minutes = String(currentTime.getMinutes()).padStart(2, '0');
+      const seconds = String(currentTime.getSeconds()).padStart(2, '0');
+      
       return NextResponse.json({ 
         time: currentTime.toISOString(),
-        formatted: format(currentTime, 'dd/MM/yyyy HH:mm:ss')
+        formatted: `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`
       });
     }
     
