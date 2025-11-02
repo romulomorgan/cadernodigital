@@ -923,21 +923,31 @@ export default function App() {
                   
                   {/* Month Observation */}
                   <div className="border-t pt-4">
-                    <Label htmlFor="month-obs" className="text-base font-semibold">
-                      📝 Observação do Mês
-                    </Label>
-                    <div className="flex gap-2 mt-2">
+                    <div className="flex items-center justify-between mb-2">
+                      <Label htmlFor="month-obs" className="text-base font-semibold">
+                        📝 Observação do Mês
+                      </Label>
+                      <span className="text-xs text-gray-500">
+                        {monthObservation.length} / {MAX_OBSERVATION_LENGTH} caracteres
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
                       <Textarea
                         id="month-obs"
                         value={monthObservation}
                         onChange={(e) => setMonthObservation(e.target.value)}
                         placeholder="Adicione observações gerais sobre este mês..."
-                        rows={2}
+                        rows={3}
                         className="flex-1"
+                        maxLength={MAX_OBSERVATION_LENGTH}
                       />
-                      <Button onClick={handleSaveMonthObservation} className="bg-blue-600 hover:bg-blue-700">
+                      <Button 
+                        onClick={handleSaveMonthObservation} 
+                        className="bg-blue-600 hover:bg-blue-700"
+                        disabled={uploadingReceipt}
+                      >
                         <Save className="w-4 h-4 mr-2" />
-                        Salvar
+                        {uploadingReceipt ? 'Salvando...' : 'Salvar'}
                       </Button>
                     </div>
                   </div>
