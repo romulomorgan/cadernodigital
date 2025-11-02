@@ -413,6 +413,78 @@ export async function POST(request) {
     
     // GET MONTH DATA (with observations)
     if (endpoint === 'entries/month') {
+    
+    // CLOSE MONTH - FASE 2
+    if (endpoint === 'month/close') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Apenas o Líder Máximo pode fechar meses' }, { status: 403 });
+      }
+      
+      const { month, year } = await request.json();
+      
+      await db.collection('month_status').updateOne(
+        { month: parseInt(month), year: parseInt(year) },
+        { 
+          $set: { 
+            month: parseInt(month),
+            year: parseInt(year),
+            closed: true,
+            closedBy: user.userId,
+            closedAt: getBrazilTime().toISOString()
+          } 
+        },
+        { upsert: true }
+      );
+      
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'close_month',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { month, year }
+      });
+      
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Mês fechado com sucesso!' 
+      });
+    }
+    
+    // REOPEN MONTH - FASE 2
+    if (endpoint === 'month/reopen') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Apenas o Líder Máximo pode reabrir meses' }, { status: 403 });
+      }
+      
+      const { month, year } = await request.json();
+      
+      await db.collection('month_status').updateOne(
+        { month: parseInt(month), year: parseInt(year) },
+        { 
+          $set: { 
+            closed: false,
+            reopenedBy: user.userId,
+            reopenedAt: getBrazilTime().toISOString()
+          } 
+        }
+      );
+      
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'reopen_month',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { month, year }
+      });
+      
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Mês reaberto com sucesso!' 
+      });
+    }
+
       const user = verifyToken(request);
       if (!user) {
         return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
