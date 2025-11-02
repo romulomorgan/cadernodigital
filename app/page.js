@@ -1526,6 +1526,27 @@ export default function App() {
                                           size="sm" 
                                           variant={u.active ? "destructive" : "default"}
                                           className="w-full text-xs"
+                                          onClick={async () => {
+                                            try {
+                                              const res = await fetch('/api/users/status', {
+                                                method: 'POST',
+                                                headers: {
+                                                  'Content-Type': 'application/json',
+                                                  'Authorization': `Bearer ${token}`
+                                                },
+                                                body: JSON.stringify({
+                                                  userId: u.userId,
+                                                  active: !u.active
+                                                })
+                                              });
+                                              if (res.ok) {
+                                                toast.success(u.active ? '🚫 Usuário bloqueado!' : '✅ Usuário desbloqueado!');
+                                                fetchAllUsers();
+                                              }
+                                            } catch (error) {
+                                              toast.error('❌ Erro ao alterar status');
+                                            }
+                                          }}
                                         >
                                           {u.active ? '🚫 Bloquear' : '✅ Desbloquear'}
                                         </Button>
