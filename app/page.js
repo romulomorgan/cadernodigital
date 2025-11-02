@@ -124,7 +124,21 @@ export default function App() {
         setEntries(data.entries);
         setMonthClosed(data.monthClosed || false);
         setDayObservations(data.dayObservations || []);
-        setMonthObservation(data.monthObservation || '');
+        
+        // Restaurar do backup local se servidor estiver vazio
+        const backupKey = `obs_${currentDate.getFullYear()}_${currentDate.getMonth() + 1}`;
+        const localBackup = localStorage.getItem(backupKey);
+        
+        if (data.monthObservation) {
+          setMonthObservation(data.monthObservation);
+        } else if (localBackup) {
+          setMonthObservation(localBackup);
+          toast.info('📝 Rascunho local restaurado', {
+            description: 'Clique em Salvar para sincronizar'
+          });
+        } else {
+          setMonthObservation('');
+        }
       }
     } catch (error) {
       console.error('Error fetching entries:', error);
