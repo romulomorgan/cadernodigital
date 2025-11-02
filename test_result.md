@@ -211,8 +211,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "POST /month/close - Fechar mês (Master apenas)"
-    - "POST /month/reopen - Reabrir mês (Master apenas)"
+    - "Verificar se mês fechado bloqueia edições"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
