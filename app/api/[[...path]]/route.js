@@ -94,7 +94,7 @@ async function validateEntryTiming(db, {
   createdAt = null,
   entryId = null
 }) {
-  const now = getBrazilTime();
+  const now = getBrazilTime(); // dayjs com timezone Brasília
   
   // 1. VERIFICAR OVERRIDE DE TEMPO (PRIORIDADE MÁXIMA)
   const override = await db.collection('time_overrides').findOne({
@@ -120,10 +120,11 @@ async function validateEntryTiming(db, {
       }
     });
     
+    const expiresTime = dayjs(override.expiresAt).tz('America/Sao_Paulo');
     return {
       allowed: true,
       reason: 'OVERRIDE_ACTIVE',
-      message: `Liberado pelo Master até ${format(new Date(override.expiresAt), 'HH:mm', { timeZone: TIMEZONE })}`
+      message: `Liberado pelo Master até ${expiresTime.format('HH:mm')}`
     };
   }
   
@@ -149,8 +150,9 @@ async function validateEntryTiming(db, {
   
   // 3. VERIFICAR TRAVA DE 1H PARA EDIÇÕES
   if (isEdit && createdAt) {
-    const oneHourLater = addHours(new Date(createdAt), 1);
-    const isLocked = now > oneHourLater;
+    const createdTime = dayjs(createdAt).tz('America/Sao_Paulo');
+    const oneHourLater = createdTime.add(1, 'hour');
+    const isLocked = now.isAfter(oneHourLater);
     
     if (isLocked) {
       // Verificar se há override de edição
@@ -178,7 +180,6 @@ async function validateEntryTiming(db, {
   }
   
   // 4. VERIFICAR JANELA DE CULTO COM TOLERÂNCIA
-  const entryDate = new Date(year, month - 1, day);
   const slotConfig = TIME_SLOTS[timeSlot];
   
   if (!slotConfig) {
@@ -189,17 +190,17 @@ async function validateEntryTiming(db, {
     };
   }
   
-  // Construir horários de início e fim da janela
+  // Construir horários de início e fim da janela usando dayjs
   const [startHour, startMinute] = slotConfig.start.split(':').map(Number);
   const [endHour, endMinute] = slotConfig.end.split(':').map(Number);
   
-  const windowStart = new Date(year, month - 1, day, startHour, startMinute, 0);
-  const windowEnd = new Date(year, month - 1, day, endHour, endMinute, 0);
+  const windowStart = dayjs.tz(`${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')} ${slotConfig.start}`, 'America/Sao_Paulo');
+  const windowEnd = dayjs.tz(`${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')} ${slotConfig.end}`, 'America/Sao_Paulo');
   
   // Adicionar tolerância de 59 segundos ao fim da janela
-  const effectiveCutoff = addSeconds(windowEnd, TOLERANCE_SECONDS);
+  const effectiveCutoff = windowEnd.add(TOLERANCE_SECONDS, 'second');
   
-  const isInWindow = now >= windowStart && now <= effectiveCutoff;
+  const isInWindow = now.isAfter(windowStart) && now.isBefore(effectiveCutoff);
   
   if (!isInWindow) {
     await logTimeValidationFail(db, {
@@ -208,14 +209,14 @@ async function validateEntryTiming(db, {
       nowISO: now.toISOString(),
       startISO: windowStart.toISOString(),
       cutoffISO: effectiveCutoff.toISOString(),
-      tz: TIMEZONE
+      tz: 'America/Sao_Paulo'
     });
     
     return {
       allowed: false,
       reason: 'WINDOW_CLOSED',
-      message: `Janela encerrada às ${format(windowEnd, 'HH:mm')} (Horário de Brasília). Clique em Solicitar liberação para registrar este culto.`,
-      windowEnd: format(windowEnd, 'HH:mm')
+      message: `Janela encerrada às ${windowEnd.format('HH:mm')} (Horário de Brasília). Clique em Solicitar liberação para registrar este culto.`,
+      windowEnd: windowEnd.format('HH:mm')
     };
   }
   
