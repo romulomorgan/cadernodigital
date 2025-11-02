@@ -302,7 +302,10 @@ export default function App() {
   };
   
   const handleReopenMonth = async () => {
-    if (!confirm('Deseja realmente REABRIR este mês?')) return;
+    // DUPLA CONFIRMAÇÃO para reabrir mês
+    if (!confirm('⚠️ ATENÇÃO: Deseja realmente REABRIR este mês?')) return;
+    
+    if (!confirm('🔐 CONFIRMAÇÃO FINAL: Isso permitirá que usuários editem lançamentos novamente. Continuar?')) return;
     
     try {
       const res = await fetch('/api/month/reopen', {
@@ -318,11 +321,20 @@ export default function App() {
       });
       
       if (res.ok) {
-        toast.success('✅ Mês reaberto com sucesso!');
+        toast.success('✅ Mês reaberto com sucesso!', {
+          description: 'Usuários podem editar lançamentos novamente.'
+        });
         fetchEntries();
+      } else {
+        const error = await res.json();
+        toast.error('❌ Erro ao reabrir mês', {
+          description: error.error || 'Tente novamente'
+        });
       }
     } catch (error) {
-      toast.error('❌ Erro ao reabrir mês');
+      toast.error('❌ Erro ao reabrir mês', {
+        description: 'Falha na comunicação com o servidor'
+      });
     }
   };
   
