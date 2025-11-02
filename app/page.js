@@ -237,6 +237,100 @@ export default function App() {
     setIsAuthenticated(false);
   };
   
+  const fetchDashboard = async () => {
+    try {
+      const res = await fetch('/api/dashboard/data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          month: currentDate.getMonth() + 1,
+          year: currentDate.getFullYear()
+        })
+      });
+      const data = await res.json();
+      setDashboardData(data);
+    } catch (error) {
+      console.error('Error fetching dashboard:', error);
+    }
+  };
+  
+  const handleCloseMonth = async () => {
+    if (!confirm('Deseja realmente FECHAR este mês? Todos os lançamentos serão travados permanentemente.')) return;
+    
+    try {
+      const res = await fetch('/api/month/close', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          month: currentDate.getMonth() + 1,
+          year: currentDate.getFullYear()
+        })
+      });
+      
+      if (res.ok) {
+        alert('Mês fechado com sucesso!');
+        fetchEntries();
+      }
+    } catch (error) {
+      alert('Erro ao fechar mês');
+    }
+  };
+  
+  const handleReopenMonth = async () => {
+    if (!confirm('Deseja realmente REABRIR este mês?')) return;
+    
+    try {
+      const res = await fetch('/api/month/reopen', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          month: currentDate.getMonth() + 1,
+          year: currentDate.getFullYear()
+        })
+      });
+      
+      if (res.ok) {
+        alert('Mês reaberto com sucesso!');
+        fetchEntries();
+      }
+    } catch (error) {
+      alert('Erro ao reabrir mês');
+    }
+  };
+  
+  const handleSaveMonthObservation = async () => {
+    try {
+      const res = await fetch('/api/observations/month', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          month: currentDate.getMonth() + 1,
+          year: currentDate.getFullYear(),
+          observation: monthObservation
+        })
+      });
+      
+      if (res.ok) {
+        alert('Observação do mês salva!');
+      }
+    } catch (error) {
+      alert('Erro ao salvar observação');
+    }
+  };
+
+  
   const getDaysInMonth = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
