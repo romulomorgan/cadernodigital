@@ -191,53 +191,59 @@ def test_scenario_1_complete_flow(master_token, user_token):
     else:
         log_test(f"❌ ERRO: Entry deveria ser editável após reabertura. Response: {edit_response2}", False)
         return False
+def test_scenario_2_unlock_requests(master_token, user_token):
+    """
+    Cenário 2: Unlock Requests em Mês Fechado
+    1. Com Master: Fechar mês 6/2025
+    2. Com usuário comum: Tentar solicitar unlock (deve retornar 403)
+    3. Com Master: Reabrir mês
+    4. Com usuário comum: Solicitar unlock novamente (deve funcionar)
+    """
+    log_test("=== CENÁRIO 2: UNLOCK REQUESTS EM MÊS FECHADO ===")
     
-    def test_authentication_scenarios(self):
-        """Test authentication and authorization for month closure endpoints"""
-        print("\n=== TESTING AUTHENTICATION & AUTHORIZATION ===")
-        
-        test_data = {"month": 6, "year": 2025}
-        
-        # Test 1: No token (should return 401)
-        print("\n1. Testing without authentication token...")
-        try:
-            response = self.session.post(f"{API_BASE}/month/close", json=test_data)
-            if response.status_code == 401:
-                print("✅ Correctly rejected request without token (401)")
-            else:
-                print(f"❌ Expected 401, got {response.status_code}: {response.text}")
-        except Exception as e:
-            print(f"❌ Request failed: {e}")
-        
-        # Test 2: Regular user token (should return 403)
-        print("\n2. Testing with regular user token...")
-        try:
-            headers = {"Authorization": f"Bearer {self.regular_token}"}
-            response = self.session.post(f"{API_BASE}/month/close", json=test_data, headers=headers)
-            if response.status_code == 403:
-                print("✅ Correctly rejected regular user (403)")
-            else:
-                print(f"❌ Expected 403, got {response.status_code}: {response.text}")
-        except Exception as e:
-            print(f"❌ Request failed: {e}")
-        
-        # Test 3: Master user token (should work)
-        print("\n3. Testing with master user token...")
-        try:
-            headers = {"Authorization": f"Bearer {self.master_token}"}
-            response = self.session.post(f"{API_BASE}/month/close", json=test_data, headers=headers)
-            if response.status_code == 200:
-                result = response.json()
-                if result.get("success"):
-                    print("✅ Master user successfully authorized")
-                    return True
-                else:
-                    print(f"❌ Success flag not set: {result}")
-            else:
-                print(f"❌ Expected 200, got {response.status_code}: {response.text}")
-        except Exception as e:
-            print(f"❌ Request failed: {e}")
-        
+    user_headers = {"Authorization": f"Bearer {user_token}"}
+    master_headers = {"Authorization": f"Bearer {master_token}"}
+    
+    # 1. Fechar mês com Master
+    log_test("1. Fechando mês 6/2025 com Master...")
+    close_response = make_request("POST", "month/close", {"month": 6, "year": 2025}, master_headers)
+    if close_response['success']:
+        log_test("Mês fechado com sucesso", True)
+    else:
+        log_test(f"Erro ao fechar mês: {close_response['data']}", False)
+        return False
+    
+    # 2. Tentar solicitar unlock com usuário comum (deve falhar)
+    log_test("2. Tentando solicitar unlock em mês fechado (deve ser bloqueado)...")
+    unlock_data = {
+        "entryId": "2025-06-15-10:00",
+        "reason": "Preciso corrigir valor da oferta"
+    }
+    
+    unlock_response = make_request("POST", "unlock/request", unlock_data, user_headers)
+    if unlock_response['status_code'] == 403 and 'fechado' in str(unlock_response['data']).lower():
+        log_test("✅ CORRETO: Unlock request bloqueado em mês fechado (403)", True)
+    else:
+        log_test(f"❌ ERRO: Unlock request deveria ser bloqueado. Response: {unlock_response}", False)
+        return False
+    
+    # 3. Reabrir mês com Master
+    log_test("3. Reabrindo mês 6/2025 com Master...")
+    reopen_response = make_request("POST", "month/reopen", {"month": 6, "year": 2025}, master_headers)
+    if reopen_response['success']:
+        log_test("Mês reaberto com sucesso", True)
+    else:
+        log_test(f"Erro ao reabrir mês: {reopen_response['data']}", False)
+        return False
+    
+    # 4. Solicitar unlock novamente (deve funcionar)
+    log_test("4. Tentando solicitar unlock após reabertura...")
+    unlock_response2 = make_request("POST", "unlock/request", unlock_data, user_headers)
+    if unlock_response2['success']:
+        log_test("✅ CORRETO: Unlock request aceito após reabertura", True)
+        return True
+    else:
+        log_test(f"❌ ERRO: Unlock request deveria funcionar após reabertura. Response: {unlock_response2}", False)
         return False
     
     def test_close_month_functionality(self):
