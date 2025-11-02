@@ -396,61 +396,6 @@ def main():
     print("=" * 80)
     
     return all_passed
-    
-    def run_all_tests(self):
-        """Run all tests and return summary"""
-        print("🚀 STARTING IUDP MONTH CLOSURE BACKEND TESTS")
-        print("=" * 60)
-        
-        # Setup
-        if not self.setup_database_connection():
-            return False
-        
-        if not self.create_test_tokens():
-            return False
-        
-        # Run tests
-        results = {
-            "authentication": self.test_authentication_scenarios(),
-            "close_month": self.test_close_month_functionality(),
-            "reopen_month": self.test_reopen_month_functionality(),
-            "complete_flow": self.test_complete_flow()
-        }
-        
-        # Summary
-        print("\n" + "=" * 60)
-        print("📊 TEST RESULTS SUMMARY")
-        print("=" * 60)
-        
-        passed = sum(results.values())
-        total = len(results)
-        
-        for test_name, result in results.items():
-            status = "✅ PASSED" if result else "❌ FAILED"
-            print(f"{test_name.replace('_', ' ').title()}: {status}")
-        
-        print(f"\nOverall: {passed}/{total} tests passed")
-        
-        if passed == total:
-            print("🎉 ALL TESTS PASSED! Month closure functionality is working correctly.")
-            return True
-        else:
-            print("⚠️ Some tests failed. Please check the detailed output above.")
-            return False
-    
-    def cleanup(self):
-        """Cleanup resources"""
-        if self.mongo_client:
-            self.mongo_client.close()
-
-def main():
-    tester = IUDPTester()
-    try:
-        success = tester.run_all_tests()
-        return success
-    finally:
-        tester.cleanup()
-
 if __name__ == "__main__":
     success = main()
-    exit(0 if success else 1)
+    sys.exit(0 if success else 1)
