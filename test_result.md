@@ -175,18 +175,37 @@ backend:
           Endpoint duplicado no código mas ambos funcionam corretamente.
 
   - task: "Verificar se mês fechado bloqueia edições"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
         comment: |
           Ainda não implementado. Após testar endpoints de close/reopen, precisamos verificar
           se os endpoints de edição de entries respeitam o status de mês fechado.
+      - working: "NA"
+        agent: "main"
+        comment: |
+          ✅ IMPLEMENTADO - Verificações adicionadas:
+          
+          1. POST /api/entries/save (linha 293-299):
+             - Já verificava mês fechado, bloqueia não-Master
+          
+          2. POST /api/unlock/request (linha 727-744):
+             - Adicionada verificação de mês fechado
+             - Bloqueia solicitação de unlock se mês está fechado
+             - Retorna 403 com mensagem informativa
+          
+          3. POST /api/unlock/approve (linha 784-795):
+             - Master pode aprovar unlock mesmo em mês fechado
+             - Registra no audit_log se mês estava fechado
+             - Retorna warning se mês está fechado
+          
+          Precisa testar: Fluxo completo de fechar mês → tentar editar → verificar bloqueio
 
 frontend:
   - task: "UI para Fechar/Reabrir mês no painel Master"
