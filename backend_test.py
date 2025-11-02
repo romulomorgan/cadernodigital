@@ -42,17 +42,67 @@ def make_request(method, endpoint, data=None, headers=None):
             'data': {'error': str(e)},
             'success': False
         }
-        
-    def setup_database_connection(self):
-        """Setup MongoDB connection for direct DB verification"""
-        try:
-            self.mongo_client = MongoClient(MONGO_URL)
-            self.db = self.mongo_client[DB_NAME]
-            print("✅ Database connection established")
-            return True
-        except Exception as e:
-            print(f"❌ Database connection failed: {e}")
-            return False
+def create_test_users():
+    """Criar usuários de teste: Master e usuário comum"""
+    log_test("=== CRIANDO USUÁRIOS DE TESTE ===")
+    
+    # Usuário Master
+    master_data = {
+        "name": "João Silva - Líder Máximo",
+        "email": "joao.silva@iudp.org.br",
+        "password": "LiderMaximo2025!",
+        "role": "master",
+        "church": "Igreja Central IUDP",
+        "region": "Região Sul",
+        "state": "São Paulo"
+    }
+    
+    master_response = make_request("POST", "auth/register", master_data)
+    if master_response['success']:
+        log_test("Usuário Master criado com sucesso", True)
+        master_token = master_response['data']['token']
+    else:
+        # Tentar login se já existe
+        login_response = make_request("POST", "auth/login", {
+            "email": master_data["email"],
+            "password": master_data["password"]
+        })
+        if login_response['success']:
+            log_test("Usuário Master já existe - fazendo login", True)
+            master_token = login_response['data']['token']
+        else:
+            log_test(f"Erro ao criar/logar Master: {master_response['data']}", False)
+            return None, None
+    
+    # Usuário comum
+    user_data = {
+        "name": "Maria Santos - Pastora",
+        "email": "maria.santos@iudp.org.br", 
+        "password": "Pastora2025!",
+        "role": "pastor",
+        "church": "Igreja Filial IUDP",
+        "region": "Região Norte",
+        "state": "São Paulo"
+    }
+    
+    user_response = make_request("POST", "auth/register", user_data)
+    if user_response['success']:
+        log_test("Usuário comum criado com sucesso", True)
+        user_token = user_response['data']['token']
+    else:
+        # Tentar login se já existe
+        login_response = make_request("POST", "auth/login", {
+            "email": user_data["email"],
+            "password": user_data["password"]
+        })
+        if login_response['success']:
+            log_test("Usuário comum já existe - fazendo login", True)
+            user_token = login_response['data']['token']
+        else:
+            log_test(f"Erro ao criar/logar usuário comum: {user_response['data']}", False)
+            return master_token, None
+    
+    return master_token, user_token
     
     def create_test_tokens(self):
         """Create JWT tokens for testing"""
