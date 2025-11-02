@@ -2201,17 +2201,17 @@ export default function App() {
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="text-center p-4 bg-blue-50 rounded-lg">
                           <Users className="w-8 h-8 mx-auto mb-2 text-blue-600" />
-                          <p className="text-2xl font-bold">{stats.totalUsers}</p>
+                          <p className="text-2xl font-bold">{stats?.totalUsers || 0}</p>
                           <p className="text-sm text-gray-600">Usuários</p>
                         </div>
                         <div className="text-center p-4 bg-green-50 rounded-lg">
                           <FileText className="w-8 h-8 mx-auto mb-2 text-green-600" />
-                          <p className="text-2xl font-bold">{stats.totalEntries}</p>
+                          <p className="text-2xl font-bold">{stats?.totalEntries || 0}</p>
                           <p className="text-sm text-gray-600">Lançamentos</p>
                         </div>
                         <div className="text-center p-4 bg-red-50 rounded-lg">
                           <Bell className="w-8 h-8 mx-auto mb-2 text-red-600" />
-                          <p className="text-2xl font-bold">{stats.pendingRequests}</p>
+                          <p className="text-2xl font-bold">{stats?.pendingRequests || 0}</p>
                           <p className="text-sm text-gray-600">Pendentes</p>
                         </div>
                         <div className="text-center p-4 bg-yellow-50 rounded-lg">
