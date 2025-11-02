@@ -760,6 +760,35 @@ export async function POST(request) {
       return NextResponse.json({ success: true });
     }
     
+    // TOGGLE USER ACTIVE STATUS - PATCH 2
+    if (endpoint === 'users/status') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const { userId, active } = await request.json();
+      
+      await db.collection('users').updateOne(
+        { userId },
+        { $set: { active: active === true } }
+      );
+      
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: active ? 'activate_user' : 'deactivate_user',
+        userId: user.userId,
+        timestamp: currentTime.toISOString(),
+        details: { targetUserId: userId }
+      });
+      
+      return NextResponse.json({ 
+        success: true, 
+        message: active ? 'Usuário desbloqueado!' : 'Usuário bloqueado!' 
+      });
+    }
+
+    
     // EXPORT CSV
     if (endpoint === 'export/csv') {
       const user = verifyToken(request);
