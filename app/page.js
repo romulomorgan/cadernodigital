@@ -403,16 +403,21 @@ export default function App() {
         setEditingEntry(null);
         setEntryValue('');
         setEntryNotes('');
+        toast.success('✅ Lançamento salvo com sucesso!');
         fetchEntries();
       } else {
         if (data.locked) {
-          alert(data.error);
+          toast.error('🔒 Entrada bloqueada', {
+            description: data.error
+          });
         } else {
-          alert(data.error || 'Erro ao salvar lançamento');
+          toast.error('❌ Erro ao salvar', {
+            description: data.error || 'Tente novamente'
+          });
         }
       }
     } catch (error) {
-      alert('Erro ao conectar com o servidor');
+      toast.error('❌ Erro ao conectar com o servidor');
     }
   };
   
