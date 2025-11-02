@@ -58,15 +58,9 @@ function getBrazilTime() {
   // Obtém horário UTC atual
   const now = new Date();
   
-  // Offset configurável via .env (padrão: -3 horas para Brasília)
-  const offsetHours = parseInt(process.env.TIMEZONE_OFFSET_HOURS || '-3');
-  const offsetMinutes = parseInt(process.env.TIMEZONE_OFFSET_MINUTES || '0');
-  
-  // Calcula offset total em milissegundos
-  const totalOffsetMs = (offsetHours * 60 * 60 * 1000) + (offsetMinutes * 60 * 1000);
-  
-  // Aplica o offset para obter horário de Brasília
-  const brasiliaTime = new Date(now.getTime() + totalOffsetMs);
+  // Brasília é UTC-3 (sempre, sem horário de verão desde 2019)
+  // Para converter: UTC - 3 horas = Brasília
+  const brasiliaTime = new Date(now.getTime() - (3 * 60 * 60 * 1000));
   
   return brasiliaTime;
 }
