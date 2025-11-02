@@ -8,6 +8,13 @@ import { writeFile, mkdir, readFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js';
+
+// Configurar dayjs com timezone
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 // FIXAR TIMEZONE DO SERVIDOR PARA AMERICA/SAO_PAULO
 process.env.TZ = 'America/Sao_Paulo';
