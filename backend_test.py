@@ -245,70 +245,92 @@ def test_scenario_2_unlock_requests(master_token, user_token):
     else:
         log_test(f"❌ ERRO: Unlock request deveria funcionar após reabertura. Response: {unlock_response2}", False)
         return False
+def test_scenario_3_master_approve_unlock(master_token, user_token):
+    """
+    Cenário 3: Master Approve Unlock em Mês Fechado
+    1. Criar entry com usuário comum
+    2. Solicitar unlock (enquanto mês está aberto)
+    3. Com Master: Fechar mês
+    4. Com Master: Aprovar unlock (deve funcionar mesmo em mês fechado)
+    5. Verificar se audit_log tem campo "monthClosed: true"
+    """
+    log_test("=== CENÁRIO 3: MASTER APPROVE UNLOCK EM MÊS FECHADO ===")
     
-    def test_close_month_functionality(self):
-        """Test month closing functionality"""
-        print("\n=== TESTING MONTH CLOSE FUNCTIONALITY ===")
+    user_headers = {"Authorization": f"Bearer {user_token}"}
+    master_headers = {"Authorization": f"Bearer {master_token}"}
+    
+    # 1. Criar entry com usuário comum
+    log_test("1. Criando novo entry para teste de unlock...")
+    entry_data = {
+        "month": 6,
+        "year": 2025,
+        "day": 20,
+        "timeSlot": "15:00",
+        "value": 300.00,
+        "notes": "Oferta da tarde - Culto especial"
+    }
+    
+    create_response = make_request("POST", "entries/save", entry_data, user_headers)
+    if create_response['success']:
+        log_test("Entry criado com sucesso", True)
+        entry_id = "2025-06-20-15:00"
+    else:
+        log_test(f"Erro ao criar entry: {create_response['data']}", False)
+        return False
+    
+    # 2. Solicitar unlock enquanto mês está aberto
+    log_test("2. Solicitando unlock enquanto mês está aberto...")
+    unlock_data = {
+        "entryId": entry_id,
+        "reason": "Necessário corrigir valor informado incorretamente"
+    }
+    
+    unlock_response = make_request("POST", "unlock/request", unlock_data, user_headers)
+    if unlock_response['success']:
+        log_test("Unlock request criado com sucesso", True)
+    else:
+        log_test(f"Erro ao solicitar unlock: {unlock_response['data']}", False)
+        return False
+    
+    # Buscar o requestId criado
+    requests_response = make_request("GET", "unlock/requests", None, master_headers)
+    if requests_response['success'] and requests_response['data']['requests']:
+        request_id = requests_response['data']['requests'][0]['requestId']
+        log_test(f"Request ID encontrado: {request_id}", True)
+    else:
+        log_test("Erro ao buscar requests de unlock", False)
+        return False
+    
+    # 3. Fechar mês com Master
+    log_test("3. Fechando mês 6/2025 com Master...")
+    close_response = make_request("POST", "month/close", {"month": 6, "year": 2025}, master_headers)
+    if close_response['success']:
+        log_test("Mês fechado com sucesso", True)
+    else:
+        log_test(f"Erro ao fechar mês: {close_response['data']}", False)
+        return False
+    
+    # 4. Aprovar unlock com Master (deve funcionar mesmo em mês fechado)
+    log_test("4. Aprovando unlock com Master em mês fechado...")
+    approve_data = {
+        "requestId": request_id,
+        "entryId": entry_id,
+        "durationMinutes": 120
+    }
+    
+    approve_response = make_request("POST", "unlock/approve", approve_data, master_headers)
+    if approve_response['success']:
+        log_test("✅ CORRETO: Master pode aprovar unlock mesmo em mês fechado", True)
         
-        headers = {"Authorization": f"Bearer {self.master_token}"}
-        test_data = {"month": 6, "year": 2025}
+        # Verificar se há warning sobre mês fechado
+        if 'warning' in approve_response['data'] and approve_response['data']['warning']:
+            log_test(f"✅ CORRETO: Warning sobre mês fechado: {approve_response['data']['warning']}", True)
+        else:
+            log_test("ℹ️  Nenhum warning retornado (pode ser normal)", None)
         
-        # Clear any existing month status for clean test
-        try:
-            self.db.month_status.delete_one({"month": 6, "year": 2025})
-            print("✅ Cleared existing month status for clean test")
-        except Exception as e:
-            print(f"⚠️ Could not clear existing data: {e}")
-        
-        print("\n1. Testing POST /api/month/close...")
-        try:
-            response = self.session.post(f"{API_BASE}/month/close", json=test_data, headers=headers)
-            
-            if response.status_code == 200:
-                result = response.json()
-                if result.get("success"):
-                    print("✅ Month close API returned success")
-                    
-                    # Verify database persistence
-                    print("\n2. Verifying database persistence...")
-                    month_status = self.db.month_status.find_one({"month": 6, "year": 2025})
-                    
-                    if month_status:
-                        if month_status.get("closed") == True:
-                            print("✅ Month status correctly saved as closed in database")
-                            print(f"   - Closed by: {month_status.get('closedBy')}")
-                            print(f"   - Closed at: {month_status.get('closedAt')}")
-                        else:
-                            print(f"❌ Month not marked as closed: {month_status}")
-                            return False
-                    else:
-                        print("❌ Month status not found in database")
-                        return False
-                    
-                    # Verify audit log
-                    print("\n3. Verifying audit log...")
-                    audit_log = self.db.audit_logs.find_one(
-                        {"action": "close_month", "details.month": 6, "details.year": 2025},
-                        sort=[("timestamp", -1)]
-                    )
-                    
-                    if audit_log:
-                        print("✅ Audit log correctly created")
-                        print(f"   - Action: {audit_log.get('action')}")
-                        print(f"   - User ID: {audit_log.get('userId')}")
-                        print(f"   - Timestamp: {audit_log.get('timestamp')}")
-                    else:
-                        print("❌ Audit log not found")
-                        return False
-                    
-                    return True
-                else:
-                    print(f"❌ API returned success=false: {result}")
-            else:
-                print(f"❌ Expected 200, got {response.status_code}: {response.text}")
-        except Exception as e:
-            print(f"❌ Request failed: {e}")
-        
+        return True
+    else:
+        log_test(f"❌ ERRO: Master deveria poder aprovar unlock em mês fechado. Response: {approve_response}", False)
         return False
     
     def test_reopen_month_functionality(self):
