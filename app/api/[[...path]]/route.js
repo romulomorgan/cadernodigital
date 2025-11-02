@@ -40,7 +40,19 @@ function verifyToken(request) {
 }
 
 function getBrazilTime() {
-  return toZonedTime(new Date(), TIMEZONE);
+  // Obtém horário UTC atual
+  const now = new Date();
+  
+  // Converte para horário de Brasília (UTC-3)
+  // Brasil não tem horário de verão desde 2019
+  const brasiliaOffset = -3 * 60; // -3 horas em minutos
+  const utcOffset = now.getTimezoneOffset(); // offset do servidor em minutos
+  
+  // Calcula a diferença e ajusta
+  const diffMinutes = utcOffset + brasiliaOffset;
+  const brasiliaTime = new Date(now.getTime() + diffMinutes * 60000);
+  
+  return brasiliaTime;
 }
 
 function getTimeWindowEnd(timeSlot) {
