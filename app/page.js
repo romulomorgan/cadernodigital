@@ -393,6 +393,46 @@ export default function App() {
     }
   };
   
+  const handleSaveDayObservation = async (day) => {
+    try {
+      const res = await fetch('/api/observations/day', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          month: currentDate.getMonth() + 1,
+          year: currentDate.getFullYear(),
+          day: day,
+          observation: dayObsText
+        })
+      });
+      
+      if (res.ok) {
+        toast.success('📝 Observação do dia salva!');
+        setEditingDayObs(null);
+        setDayObsText('');
+        fetchEntries(); // Recarregar para atualizar dayObservations
+      } else {
+        const error = await res.json();
+        toast.error('❌ Erro ao salvar', {
+          description: error.error
+        });
+      }
+    } catch (error) {
+      toast.error('❌ Erro de conexão');
+    }
+  };
+  
+  const getDayObservation = (day) => {
+    return dayObservations.find(obs => 
+      obs.day === day && 
+      obs.month === (currentDate.getMonth() + 1) && 
+      obs.year === currentDate.getFullYear()
+    );
+  };
+  
   const MAX_OBSERVATION_LENGTH = 10000;
 
   
