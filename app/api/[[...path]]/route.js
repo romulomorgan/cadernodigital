@@ -482,34 +482,34 @@ export async function POST(request) {
       
       const userData = await db.collection('users').findOne({ userId: user.userId });
       const { month, year, day, timeSlot, value, notes } = await request.json();
-      const currentTime = getBrazilTime();
       
-      // Check if month is closed
-      const monthStatus = await db.collection('month_status').findOne({ month, year });
-      if (monthStatus?.closed && user.role !== 'master') {
+      const entryId = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}-${timeSlot}`;
+      const existing = await db.collection('entries').findOne({ entryId });
+      const isEdit = existing && existing.value !== null;
+      
+      // VALIDAÇÃO COMPLETA COM NOVA FUNÇÃO
+      const validation = await validateEntryTiming(db, {
+        userId: user.userId,
+        churchId: userData.church,
+        month,
+        year,
+        day,
+        timeSlot,
+        isEdit,
+        createdAt: existing?.createdAt,
+        entryId
+      });
+      
+      if (!validation.allowed) {
         return NextResponse.json({ 
-          error: 'Mês fechado. Apenas o Líder Máximo pode reabrir.',
-          locked: true
+          error: validation.message,
+          locked: true,
+          reason: validation.reason,
+          windowEnd: validation.windowEnd
         }, { status: 403 });
       }
       
-      const entryId = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}-${timeSlot}`;
-      
-      const existing = await db.collection('entries').findOne({ entryId });
-      
-      if (existing && existing.value !== null) {
-        const lockStatus = isEntryLocked(existing, currentTime);
-        if (lockStatus.locked) {
-          return NextResponse.json({ 
-            error: lockStatus.reason === 'time_window' 
-              ? 'Horário de lançamento encerrado. Solicite liberação ao Líder.' 
-              : 'Prazo de 1 hora para edição expirado. Solicite liberação ao Líder.',
-            locked: true,
-            reason: lockStatus.reason
-          }, { status: 403 });
-        }
-      }
-      
+      const currentTime = getBrazilTime();
       const entry = {
         entryId,
         month,
@@ -530,6 +530,7 @@ export async function POST(request) {
         receipts: existing?.receipts || []
       };
       
+      // Transação: valida e grava
       await db.collection('entries').updateOne(
         { entryId },
         { $set: entry },
@@ -538,13 +539,22 @@ export async function POST(request) {
       
       await db.collection('audit_logs').insertOne({
         logId: crypto.randomUUID(),
-        action: existing ? 'edit_entry' : 'create_entry',
+        action: isEdit ? 'ENTRY_UPDATED' : 'ENTRY_CREATED',
         userId: user.userId,
         timestamp: currentTime.toISOString(),
-        details: { entryId, value, timeSlot }
+        details: { 
+          entryId, 
+          value, 
+          timeSlot,
+          validationReason: validation.reason
+        }
       });
       
-      return NextResponse.json({ success: true, entry });
+      return NextResponse.json({ 
+        success: true, 
+        entry,
+        message: validation.message
+      });
     }
     
     // SAVE DAY OBSERVATION
