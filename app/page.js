@@ -698,6 +698,155 @@ export default function App() {
     }
   };
   
+  const handlePrint = () => {
+    // FASE 4: Impressão de relatório
+    const printWindow = window.open('', '_blank');
+    const monthName = format(currentDate, 'MMMM yyyy', { locale: ptBR });
+    const total = calculateMonthTotal();
+    
+    let printHTML = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Relatório - ${monthName}</title>
+        <style>
+          @media print {
+            @page { margin: 2cm; }
+          }
+          body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: black;
+          }
+          .header {
+            text-align: center;
+            border-bottom: 2px solid #1e40af;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+          }
+          .header h1 {
+            color: #1e40af;
+            margin: 10px 0;
+          }
+          .header p {
+            color: #666;
+            margin: 5px 0;
+          }
+          .summary {
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+          }
+          .summary h3 {
+            margin-top: 0;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+          }
+          th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+          }
+          th {
+            background-color: #1e40af;
+            color: white;
+          }
+          tr:nth-child(even) {
+            background-color: #f9fafb;
+          }
+          .total-row {
+            font-weight: bold;
+            background-color: #fef3c7 !important;
+          }
+          .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 12px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>Caderno de Controle Online - IUDP</h1>
+          <h2>Igreja Unida Deus Proverá</h2>
+          <p>Relatório Financeiro - ${monthName.toUpperCase()}</p>
+          <p>Gerado em: ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</p>
+        </div>
+        
+        <div class="summary">
+          <h3>Resumo do Período</h3>
+          <p><strong>Total Arrecadado:</strong> R$ ${total.toFixed(2).replace('.', ',')}</p>
+          <p><strong>Período:</strong> ${monthName}</p>
+          ${filterState ? `<p><strong>Estado:</strong> ${filterState}</p>` : ''}
+          ${filterRegion ? `<p><strong>Região:</strong> ${filterRegion}</p>` : ''}
+          ${filterChurch ? `<p><strong>Igreja:</strong> ${filterChurch}</p>` : ''}
+        </div>
+        
+        <table>
+          <thead>
+            <tr>
+              <th>Dia</th>
+              <th>08:00</th>
+              <th>10:00</th>
+              <th>12:00</th>
+              <th>15:00</th>
+              <th>19:30</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+    
+    const days = getDaysInMonth();
+    for (let day = 1; day <= days; day++) {
+      const dayTotal = calculateDayTotal(day);
+      printHTML += `<tr>`;
+      printHTML += `<td><strong>${String(day).padStart(2, '0')}</strong></td>`;
+      
+      timeSlots.forEach(slot => {
+        const entry = getEntry(day, slot);
+        const value = entry && entry.value ? `R$ ${parseFloat(entry.value).toFixed(2).replace('.', ',')}` : '-';
+        printHTML += `<td>${value}</td>`;
+      });
+      
+      printHTML += `<td><strong>R$ ${dayTotal.toFixed(2).replace('.', ',')}</strong></td>`;
+      printHTML += `</tr>`;
+    }
+    
+    printHTML += `
+          </tbody>
+          <tfoot>
+            <tr class="total-row">
+              <td colspan="6"><strong>TOTAL DO MÊS</strong></td>
+              <td><strong>R$ ${total.toFixed(2).replace('.', ',')}</strong></td>
+            </tr>
+          </tfoot>
+        </table>
+        
+        <div class="footer">
+          <p>Este documento foi gerado automaticamente pelo sistema Caderno de Controle Online - IUDP</p>
+          <p>Para dúvidas ou mais informações, entre em contato com a administração</p>
+        </div>
+      </body>
+      </html>
+    `;
+    
+    printWindow.document.write(printHTML);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+      toast.success('🖨️ Relatório preparado para impressão');
+    }, 250);
+  };
+  
   const calculateDayTotal = (day) => {
     let total = 0;
     timeSlots.forEach(slot => {
