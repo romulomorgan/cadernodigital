@@ -278,7 +278,8 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "UI para Fechar/Reabrir mês no painel Master"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
