@@ -424,6 +424,36 @@ export default function App() {
     }
   };
   
+  const handleTimezoneNoticeConfirm = async () => {
+    try {
+      // Salvar no localStorage
+      localStorage.setItem(`timezone_notice_${user.userId}`, 'true');
+      
+      // Registrar no audit log
+      await fetch('/api/audit/log', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          action: 'timezone_notice_confirmed',
+          details: {
+            message: 'Mensagem atualização horário Brasília confirmada pelo usuário'
+          }
+        })
+      });
+      
+      setShowTimezoneNotice(false);
+      toast.success('✅ Confirmado', {
+        description: 'Horário de Brasília será usado em todos os registros'
+      });
+    } catch (error) {
+      console.error('Erro ao registrar confirmação:', error);
+      setShowTimezoneNotice(false);
+    }
+  };
+  
   const handleSaveMonthObservation = async () => {
     if (monthObservation.length > MAX_OBSERVATION_LENGTH) {
       toast.error(`❌ Texto muito longo (máx ${MAX_OBSERVATION_LENGTH} caracteres)`);
