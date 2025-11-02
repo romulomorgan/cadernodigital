@@ -70,6 +70,173 @@ function getBrazilTime() {
   return brasiliaTime;
 }
 
+/**
+ * Valida se um lançamento pode ser salvo considerando:
+ * - Override de tempo (prioridade 1)
+ * - Mês fechado (prioridade 2)
+ * - Janela de culto com tolerância (prioridade 3)
+ * - Trava de 1h para edições (prioridade 4)
+ */
+async function validateEntryTiming(db, {
+  userId,
+  churchId,
+  month,
+  year,
+  day,
+  timeSlot,
+  isEdit = false,
+  createdAt = null,
+  entryId = null
+}) {
+  const now = getBrazilTime();
+  
+  // 1. VERIFICAR OVERRIDE DE TEMPO (PRIORIDADE MÁXIMA)
+  const override = await db.collection('time_overrides').findOne({
+    churchId,
+    month: parseInt(month),
+    year: parseInt(year),
+    day: parseInt(day),
+    timeSlot,
+    expiresAt: { $gt: now.toISOString() }
+  });
+  
+  if (override) {
+    // Override ativo - permitir e logar
+    await db.collection('audit_logs').insertOne({
+      logId: crypto.randomUUID(),
+      action: 'TIME_OVERRIDE_USED',
+      userId,
+      timestamp: now.toISOString(),
+      details: {
+        overrideId: override.overrideId,
+        entryId: entryId || 'new',
+        expiresAt: override.expiresAt
+      }
+    });
+    
+    return {
+      allowed: true,
+      reason: 'OVERRIDE_ACTIVE',
+      message: `Liberado pelo Master até ${format(new Date(override.expiresAt), 'HH:mm', { timeZone: TIMEZONE })}`
+    };
+  }
+  
+  // 2. VERIFICAR MÊS FECHADO
+  const monthStatus = await db.collection('month_status').findOne({
+    month: parseInt(month),
+    year: parseInt(year)
+  });
+  
+  if (monthStatus?.closed) {
+    await logTimeValidationFail(db, {
+      userId, churchId, month, year, day, timeSlot,
+      reason: 'MONTH_CLOSED',
+      nowISO: now.toISOString()
+    });
+    
+    return {
+      allowed: false,
+      reason: 'MONTH_CLOSED',
+      message: 'Mês fechado. Contate o Líder Máximo para reabrir.'
+    };
+  }
+  
+  // 3. VERIFICAR TRAVA DE 1H PARA EDIÇÕES
+  if (isEdit && createdAt) {
+    const oneHourLater = addHours(new Date(createdAt), 1);
+    const isLocked = now > oneHourLater;
+    
+    if (isLocked) {
+      // Verificar se há override de edição
+      const editOverride = await db.collection('edit_overrides').findOne({
+        entryId,
+        expiresAt: { $gt: now.toISOString() }
+      });
+      
+      if (!editOverride) {
+        await logTimeValidationFail(db, {
+          userId, churchId, month, year, day, timeSlot,
+          reason: 'EDIT_LOCKED',
+          nowISO: now.toISOString(),
+          createdAt,
+          oneHourExpiry: oneHourLater.toISOString()
+        });
+        
+        return {
+          allowed: false,
+          reason: 'EDIT_LOCKED',
+          message: 'Lançamento travado após 1h. Peça liberação ao Master para correção.'
+        };
+      }
+    }
+  }
+  
+  // 4. VERIFICAR JANELA DE CULTO COM TOLERÂNCIA
+  const entryDate = new Date(year, month - 1, day);
+  const slotConfig = TIME_SLOTS[timeSlot];
+  
+  if (!slotConfig) {
+    return {
+      allowed: false,
+      reason: 'INVALID_TIMESLOT',
+      message: 'Horário de culto inválido.'
+    };
+  }
+  
+  // Construir horários de início e fim da janela
+  const [startHour, startMinute] = slotConfig.start.split(':').map(Number);
+  const [endHour, endMinute] = slotConfig.end.split(':').map(Number);
+  
+  const windowStart = new Date(year, month - 1, day, startHour, startMinute, 0);
+  const windowEnd = new Date(year, month - 1, day, endHour, endMinute, 0);
+  
+  // Adicionar tolerância de 59 segundos ao fim da janela
+  const effectiveCutoff = addSeconds(windowEnd, TOLERANCE_SECONDS);
+  
+  const isInWindow = now >= windowStart && now <= effectiveCutoff;
+  
+  if (!isInWindow) {
+    await logTimeValidationFail(db, {
+      userId, churchId, month, year, day, timeSlot,
+      reason: 'WINDOW_CLOSED',
+      nowISO: now.toISOString(),
+      startISO: windowStart.toISOString(),
+      cutoffISO: effectiveCutoff.toISOString(),
+      tz: TIMEZONE
+    });
+    
+    return {
+      allowed: false,
+      reason: 'WINDOW_CLOSED',
+      message: `Janela encerrada às ${format(windowEnd, 'HH:mm')} (Horário de Brasília). Clique em Solicitar liberação para registrar este culto.`,
+      windowEnd: format(windowEnd, 'HH:mm')
+    };
+  }
+  
+  // TUDO OK - PERMITIR
+  return {
+    allowed: true,
+    reason: 'IN_WINDOW',
+    message: 'Lançamento permitido dentro da janela de culto.'
+  };
+}
+
+/**
+ * Registra falha de validação de tempo no audit log
+ */
+async function logTimeValidationFail(db, details) {
+  try {
+    await db.collection('audit_logs').insertOne({
+      logId: crypto.randomUUID(),
+      action: 'TIME_VALIDATION_FAIL',
+      timestamp: getBrazilTime().toISOString(),
+      details
+    });
+  } catch (error) {
+    console.error('Erro ao logar validação de tempo:', error);
+  }
+}
+
 function getTimeWindowEnd(timeSlot) {
   const windows = {
     '08:00': '10:00',
