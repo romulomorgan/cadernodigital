@@ -192,7 +192,7 @@ export async function POST(request) {
     }
     
     // UPLOAD RECEIPT
-    if (path === 'upload/receipt') {
+    if (endpoint === 'upload/receipt') {
       const user = verifyToken(request);
       if (!user) {
         return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
