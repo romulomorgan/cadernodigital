@@ -63,6 +63,14 @@ export default function App() {
   const [compareYear2, setCompareYear2] = useState(new Date().getFullYear());
   const [comparisonResult, setComparisonResult] = useState(null);
   
+  // Filter states - FASE 3
+  const [filterState, setFilterState] = useState('');
+  const [filterRegion, setFilterRegion] = useState('');
+  const [filterChurch, setFilterChurch] = useState('');
+  const [availableStates, setAvailableStates] = useState([]);
+  const [availableRegions, setAvailableRegions] = useState([]);
+  const [availableChurches, setAvailableChurches] = useState([]);
+  
   const timeSlots = ['08:00', '10:00', '12:00', '15:00', '19:30'];
   const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
   
