@@ -328,10 +328,10 @@ export default function App() {
       });
       
       if (res.ok) {
-        alert('Observação do mês salva!');
+        toast.success('💾 Observação do mês salva!');
       }
     } catch (error) {
-      alert('Erro ao salvar observação');
+      toast.error('❌ Erro ao salvar observação');
     }
   };
 
