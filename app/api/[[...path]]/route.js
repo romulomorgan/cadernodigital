@@ -726,6 +726,24 @@ export async function POST(request) {
       
       const { entryId, reason } = await request.json();
       
+      // Buscar entry para verificar o mês
+      const entry = await db.collection('entries').findOne({ entryId });
+      if (!entry) {
+        return NextResponse.json({ error: 'Lançamento não encontrado' }, { status: 404 });
+      }
+      
+      // Verificar se mês está fechado (Master pode aprovar unlock mesmo em mês fechado)
+      const monthStatus = await db.collection('month_status').findOne({ 
+        month: entry.month, 
+        year: entry.year 
+      });
+      if (monthStatus?.closed) {
+        return NextResponse.json({ 
+          error: 'Mês fechado. Não é possível solicitar liberação. Contate o Líder Máximo.',
+          locked: true
+        }, { status: 403 });
+      }
+      
       const request_record = {
         requestId: crypto.randomUUID(),
         entryId,
