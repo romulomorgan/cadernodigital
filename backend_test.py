@@ -1,23 +1,16 @@
 #!/usr/bin/env python3
 """
-IUDP Sistema - Backend Testing for Month Closure Functionality
-Testing POST /api/month/close and POST /api/month/reopen endpoints
+IUDP Sistema - Teste de Verificação de Mês Fechado
+Testa se mês fechado bloqueia edições conforme especificado
 """
 
 import requests
 import json
-import jwt
-import time
-from datetime import datetime, timedelta
-from pymongo import MongoClient
-import os
+import sys
+from datetime import datetime
 
-# Configuration
-BASE_URL = "https://iudp-ledger.preview.emergentagent.com"
-API_BASE = f"{BASE_URL}/api"
-JWT_SECRET = "iudp-secret-key-2025"
-MONGO_URL = "mongodb://localhost:27017"
-DB_NAME = "iudp_control"
+# Configuração da API
+BASE_URL = "https://iudp-ledger.preview.emergentagent.com/api"
 
 class IUDPTester:
     def __init__(self):
