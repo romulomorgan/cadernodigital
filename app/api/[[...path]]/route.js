@@ -2,15 +2,29 @@ import { NextResponse } from 'next/server';
 import { MongoClient, ObjectId } from 'mongodb';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { format, addHours, isBefore, isAfter, differenceInMinutes } from 'date-fns';
+import { format, addHours, isBefore, isAfter, differenceInMinutes, addSeconds } from 'date-fns';
 import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 import { writeFile, mkdir, readFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 
+// FIXAR TIMEZONE DO SERVIDOR PARA AMERICA/SAO_PAULO
+process.env.TZ = 'America/Sao_Paulo';
+
 const TIMEZONE = 'America/Sao_Paulo';
 const JWT_SECRET = process.env.JWT_SECRET || 'iudp-secret-key-2025';
 const UPLOAD_DIR = '/app/uploads/receipts';
+
+// DEFINIÇÃO DAS JANELAS DE CULTO
+const TIME_SLOTS = {
+  '08:00': { start: '08:00', end: '10:00' },
+  '10:00': { start: '10:00', end: '12:00' },
+  '12:00': { start: '12:00', end: '15:00' },
+  '15:00': { start: '15:00', end: '19:30' },
+  '19:30': { start: '19:30', end: '22:00' }
+};
+
+const TOLERANCE_SECONDS = 59; // Tolerância para latência de rede
 
 let cachedClient = null;
 let cachedDb = null;
