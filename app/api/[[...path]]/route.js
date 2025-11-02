@@ -151,7 +151,7 @@ export async function POST(request) {
     }
     
     // LOGIN
-    if (path === 'auth/login') {
+    if (endpoint === 'auth/login') {
       const { email, password } = await request.json();
       
       const user = await db.collection('users').findOne({ email });
