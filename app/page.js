@@ -2375,18 +2375,18 @@ export default function App() {
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               <span>📎 Visualizar Comprovante</span>
-              {viewingReceipts && viewingReceipts.receipts.length > 1 && (
+              {viewingReceipts && viewingReceipts.receipts && viewingReceipts.receipts.length > 1 && (
                 <Badge variant="outline">
-                  {viewingReceipts.currentIndex + 1} de {viewingReceipts.receipts.length}
+                  {(viewingReceipts.currentIndex || 0) + 1} de {viewingReceipts.receipts.length}
                 </Badge>
               )}
             </DialogTitle>
             <DialogDescription>
-              {viewingReceipts && viewingReceipts.receipts[viewingReceipts.currentIndex]?.filename}
+              {viewingReceipts && viewingReceipts.receipts && viewingReceipts.receipts[viewingReceipts.currentIndex || 0]?.filename}
             </DialogDescription>
           </DialogHeader>
           
-          {viewingReceipts && (
+          {viewingReceipts && viewingReceipts.receipts && viewingReceipts.receipts.length > 0 && (
             <div className="space-y-4">
               {/* Receipt Display */}
               <div className="relative border-2 border-gray-200 rounded-lg overflow-hidden bg-gray-50 min-h-[400px] flex items-center justify-center">
