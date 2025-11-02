@@ -45,6 +45,8 @@ export default function App() {
   const [unlockRequests, setUnlockRequests] = useState([]);
   const [currentBrazilTime, setCurrentBrazilTime] = useState(null);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
+  const [editingDayObs, setEditingDayObs] = useState(null); // { day: number }
+  const [dayObsText, setDayObsText] = useState('');
   
   // Dashboard states
   const [dashboardData, setDashboardData] = useState(null);
