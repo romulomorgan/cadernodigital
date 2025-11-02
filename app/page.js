@@ -560,11 +560,12 @@ export default function App() {
         document.body.appendChild(a);
         a.click();
         a.remove();
+        toast.success('📥 CSV exportado com sucesso!');
       } else {
-        alert('Erro ao exportar CSV');
+        toast.error('❌ Erro ao exportar CSV');
       }
     } catch (error) {
-      alert('Erro ao exportar CSV');
+      toast.error('❌ Erro ao exportar CSV');
     }
   };
   
