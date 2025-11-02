@@ -967,6 +967,80 @@ export default function App() {
                     <ChevronRight className="w-4 h-4 ml-2" />
                   </Button>
                 </div>
+                
+                {/* Filtros Hierárquicos - FASE 3 */}
+                {(user?.role === 'master' || user?.scope === 'global') && (availableStates.length > 0 || availableRegions.length > 0 || availableChurches.length > 0) && (
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Badge className="bg-blue-600">🔍 Filtros Hierárquicos</Badge>
+                      {(filterState || filterRegion || filterChurch) && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            setFilterState('');
+                            setFilterRegion('');
+                            setFilterChurch('');
+                          }}
+                          className="h-6 text-xs"
+                        >
+                          Limpar Filtros ✕
+                        </Button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      {availableStates.length > 0 && (
+                        <div>
+                          <Label className="text-xs text-gray-600 mb-1 block">Estado</Label>
+                          <Select value={filterState} onValueChange={setFilterState}>
+                            <SelectTrigger className="h-9">
+                              <SelectValue placeholder="Todos os Estados" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="">Todos</SelectItem>
+                              {availableStates.map(state => (
+                                <SelectItem key={state} value={state}>{state}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+                      {availableRegions.length > 0 && (
+                        <div>
+                          <Label className="text-xs text-gray-600 mb-1 block">Região</Label>
+                          <Select value={filterRegion} onValueChange={setFilterRegion}>
+                            <SelectTrigger className="h-9">
+                              <SelectValue placeholder="Todas as Regiões" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="">Todas</SelectItem>
+                              {availableRegions.map(region => (
+                                <SelectItem key={region} value={region}>{region}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+                      {availableChurches.length > 0 && (
+                        <div>
+                          <Label className="text-xs text-gray-600 mb-1 block">Igreja</Label>
+                          <Select value={filterChurch} onValueChange={setFilterChurch}>
+                            <SelectTrigger className="h-9">
+                              <SelectValue placeholder="Todas as Igrejas" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="">Todas</SelectItem>
+                              {availableChurches.map(church => (
+                                <SelectItem key={church} value={church}>{church}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
                 <div className="mt-4 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
