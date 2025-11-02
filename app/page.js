@@ -483,12 +483,12 @@ export default function App() {
       });
       
       if (res.ok) {
-        alert('Liberação concedida por 1 hora!');
+        toast.success('✅ Liberação concedida por 1 hora!');
         fetchUnlockRequests();
         fetchEntries();
       }
     } catch (error) {
-      alert('Erro ao aprovar liberação');
+      toast.error('❌ Erro ao aprovar liberação');
     }
   };
   
