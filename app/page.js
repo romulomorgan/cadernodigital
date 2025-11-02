@@ -45,6 +45,8 @@ export default function App() {
   const [entryNotes, setEntryNotes] = useState('');
   const [unlockRequests, setUnlockRequests] = useState([]);
   const [currentBrazilTime, setCurrentBrazilTime] = useState(null);
+  const [liveClockTime, setLiveClockTime] = useState(null); // Relógio digital tempo real
+  const [clockSyncError, setClockSyncError] = useState(false);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
   const [editingDayObs, setEditingDayObs] = useState(null); // { day: number }
   const [dayObsText, setDayObsText] = useState('');
