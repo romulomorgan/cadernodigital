@@ -2216,7 +2216,7 @@ export default function App() {
                         </div>
                         <div className="text-center p-4 bg-yellow-50 rounded-lg">
                           <TrendingUp className="w-8 h-8 mx-auto mb-2 text-yellow-600" />
-                          <p className="text-2xl font-bold">R$ {stats.currentMonthTotal.toFixed(2)}</p>
+                          <p className="text-2xl font-bold">R$ {(stats?.currentMonthTotal || 0).toFixed(2)}</p>
                           <p className="text-sm text-gray-600">Mês Atual</p>
                         </div>
                       </div>
