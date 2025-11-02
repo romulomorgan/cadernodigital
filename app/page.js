@@ -2199,6 +2199,155 @@ export default function App() {
           </Card>
         </div>
       )}
+      
+      {/* Receipt Viewer Modal - FASE 4 */}
+      <Dialog open={!!viewingReceipts} onOpenChange={() => setViewingReceipts(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>📎 Visualizar Comprovante</span>
+              {viewingReceipts && viewingReceipts.receipts.length > 1 && (
+                <Badge variant="outline">
+                  {viewingReceipts.currentIndex + 1} de {viewingReceipts.receipts.length}
+                </Badge>
+              )}
+            </DialogTitle>
+            <DialogDescription>
+              {viewingReceipts && viewingReceipts.receipts[viewingReceipts.currentIndex]?.filename}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {viewingReceipts && (
+            <div className="space-y-4">
+              {/* Receipt Display */}
+              <div className="relative border-2 border-gray-200 rounded-lg overflow-hidden bg-gray-50 min-h-[400px] flex items-center justify-center">
+                {viewingReceipts.receipts[viewingReceipts.currentIndex]?.fileType?.includes('pdf') ? (
+                  <div className="text-center p-8">
+                    <FileText className="w-16 h-16 mx-auto mb-4 text-red-600" />
+                    <p className="font-semibold mb-2">Arquivo PDF</p>
+                    <p className="text-sm text-gray-600 mb-4">
+                      {viewingReceipts.receipts[viewingReceipts.currentIndex]?.filename}
+                    </p>
+                    <Button
+                      onClick={() => {
+                        const receipt = viewingReceipts.receipts[viewingReceipts.currentIndex];
+                        window.open(`/uploads/receipts/${receipt.filepath}`, '_blank');
+                      }}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      Abrir PDF em Nova Aba
+                    </Button>
+                  </div>
+                ) : (
+                  <img
+                    src={`/uploads/receipts/${viewingReceipts.receipts[viewingReceipts.currentIndex]?.filepath}`}
+                    alt="Comprovante"
+                    className="max-w-full max-h-[600px] object-contain"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'block';
+                    }}
+                  />
+                )}
+                <div style={{ display: 'none' }} className="text-center p-8">
+                  <AlertCircle className="w-16 h-16 mx-auto mb-4 text-orange-600" />
+                  <p className="font-semibold">Erro ao carregar arquivo</p>
+                  <p className="text-sm text-gray-600 mt-2">
+                    O arquivo pode estar corrompido ou não estar disponível
+                  </p>
+                </div>
+              </div>
+              
+              {/* Navigation and Actions */}
+              <div className="flex items-center justify-between">
+                <div className="flex gap-2">
+                  {viewingReceipts.receipts.length > 1 && (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setViewingReceipts({
+                            ...viewingReceipts,
+                            currentIndex: Math.max(0, viewingReceipts.currentIndex - 1)
+                          });
+                        }}
+                        disabled={viewingReceipts.currentIndex === 0}
+                      >
+                        <ArrowLeft className="w-4 h-4 mr-1" />
+                        Anterior
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setViewingReceipts({
+                            ...viewingReceipts,
+                            currentIndex: Math.min(viewingReceipts.receipts.length - 1, viewingReceipts.currentIndex + 1)
+                          });
+                        }}
+                        disabled={viewingReceipts.currentIndex === viewingReceipts.receipts.length - 1}
+                      >
+                        Próximo
+                        <ArrowRight className="w-4 h-4 ml-1" />
+                      </Button>
+                    </>
+                  )}
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      const receipt = viewingReceipts.receipts[viewingReceipts.currentIndex];
+                      const link = document.createElement('a');
+                      link.href = `/uploads/receipts/${receipt.filepath}`;
+                      link.download = receipt.filename;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                      toast.success('📥 Download iniciado');
+                    }}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    <Download className="w-4 h-4 mr-1" />
+                    Download
+                  </Button>
+                  
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setViewingReceipts(null)}
+                  >
+                    <X className="w-4 h-4 mr-1" />
+                    Fechar
+                  </Button>
+                </div>
+              </div>
+              
+              {/* File Info */}
+              <div className="p-3 bg-gray-50 rounded border border-gray-200 text-sm">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <span className="font-semibold">Arquivo:</span> {viewingReceipts.receipts[viewingReceipts.currentIndex]?.filename}
+                  </div>
+                  <div>
+                    <span className="font-semibold">Tipo:</span> {viewingReceipts.receipts[viewingReceipts.currentIndex]?.fileType}
+                  </div>
+                  <div>
+                    <span className="font-semibold">Tamanho:</span> {(viewingReceipts.receipts[viewingReceipts.currentIndex]?.fileSize / 1024).toFixed(2)} KB
+                  </div>
+                  <div>
+                    <span className="font-semibold">Upload:</span> {viewingReceipts.receipts[viewingReceipts.currentIndex]?.uploadedAt ? new Date(viewingReceipts.receipts[viewingReceipts.currentIndex].uploadedAt).toLocaleString('pt-BR') : 'N/A'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
