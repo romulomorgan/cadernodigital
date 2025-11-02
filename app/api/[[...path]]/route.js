@@ -55,15 +55,15 @@ function verifyToken(request) {
 }
 
 function getBrazilTime() {
-  // Cria um objeto Date em UTC
+  // Pega horário UTC atual
   const now = new Date();
   
-  // Converte para string em formato ISO e ajusta para Brasília (UTC-3)
-  const utcTime = now.getTime();
-  const brasiliaOffset = -3 * 60 * 60 * 1000; // -3 horas em ms
-  const brasiliaTime = new Date(utcTime + brasiliaOffset);
+  // Ajusta para Brasília (UTC-3): subtrai 3 horas do timestamp UTC
+  const brasiliaMs = now.getTime() - (3 * 60 * 60 * 1000);
   
-  return brasiliaTime;
+  // Cria novo Date com o timestamp ajustado
+  // IMPORTANTE: usar getUTC* para extrair valores, pois o Date interno é UTC ajustado
+  return new Date(brasiliaMs);
 }
 
 /**
