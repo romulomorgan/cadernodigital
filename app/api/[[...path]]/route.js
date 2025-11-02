@@ -766,6 +766,27 @@ export async function POST(request) {
       });
     }
     
+    // POST AUDIT LOG (para qualquer usuário registrar ação)
+    if (endpoint === 'audit/log') {
+      const user = verifyToken(request);
+      if (!user) {
+        return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+      }
+      
+      const { action, details } = await request.json();
+      
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action,
+        userId: user.userId,
+        userEmail: user.email,
+        timestamp: getBrazilTime().toISOString(),
+        details: details || {}
+      });
+      
+      return NextResponse.json({ success: true });
+    }
+    
     // GET AUDIT LOGS
     if (endpoint === 'audit/logs') {
       const user = verifyToken(request);
