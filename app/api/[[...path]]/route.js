@@ -43,14 +43,9 @@ function getBrazilTime() {
   // Obtém horário UTC atual
   const now = new Date();
   
-  // Converte para horário de Brasília (UTC-3)
-  // Brasil não tem horário de verão desde 2019
-  const brasiliaOffset = -3 * 60; // -3 horas em minutos
-  const utcOffset = now.getTimezoneOffset(); // offset do servidor em minutos
-  
-  // Calcula a diferença e ajusta
-  const diffMinutes = utcOffset + brasiliaOffset;
-  const brasiliaTime = new Date(now.getTime() + diffMinutes * 60000);
+  // Brasil está sempre em UTC-3 (sem horário de verão desde 2019)
+  // Adiciona -3 horas ao UTC para obter horário de Brasília
+  const brasiliaTime = new Date(now.getTime() - (3 * 60 * 60 * 1000));
   
   return brasiliaTime;
 }
