@@ -118,22 +118,39 @@ export default function App() {
   
   const fetchEntries = async () => {
     try {
+      const body = {
+        month: currentDate.getMonth() + 1,
+        year: currentDate.getFullYear()
+      };
+      
+      // Adicionar filtros se definidos (FASE 3)
+      if (filterState) body.state = filterState;
+      if (filterRegion) body.region = filterRegion;
+      if (filterChurch) body.church = filterChurch;
+      
       const res = await fetch('/api/entries/month', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          month: currentDate.getMonth() + 1,
-          year: currentDate.getFullYear()
-        })
+        body: JSON.stringify(body)
       });
       const data = await res.json();
       if (data.entries) {
         setEntries(data.entries);
         setMonthClosed(data.monthClosed || false);
         setDayObservations(data.dayObservations || []);
+        
+        // Extrair estados/regiões/igrejas únicos para filtros
+        if (user?.role === 'master' || user?.scope === 'global') {
+          const states = [...new Set(data.entries.map(e => e.state).filter(Boolean))];
+          const regions = [...new Set(data.entries.map(e => e.region).filter(Boolean))];
+          const churches = [...new Set(data.entries.map(e => e.church).filter(Boolean))];
+          setAvailableStates(states);
+          setAvailableRegions(regions);
+          setAvailableChurches(churches);
+        }
         
         // Restaurar do backup local se servidor estiver vazio
         const backupKey = `obs_${currentDate.getFullYear()}_${currentDate.getMonth() + 1}`;
