@@ -101,3 +101,108 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: |
+  Sistema de gestão financeira ministerial "Caderno de Controle Online — IUDP" com hierarquia robusta, 
+  controle administrativo, bloqueio de edição, auditoria, comparações e governança. Sistema Next.js + MongoDB.
+  Atualmente em FASE 2 - Governança de período e fechamento.
+
+backend:
+  - task: "POST /month/close - Fechar mês (Master apenas)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Endpoint implementado nas linhas 418-452 e 577-607 (duplicado).
+          Funcionalidade: 
+          - Verifica se usuário é master
+          - Atualiza collection 'month_status' com closed: true
+          - Registra audit_log com action 'close_month'
+          - Retorna sucesso com mensagem
+          Precisa testar: autenticação master, validação de mês/ano, persistência no DB, audit log
+
+  - task: "POST /month/reopen - Reabrir mês (Master apenas)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Endpoint implementado nas linhas 455-486 e 611-638 (duplicado).
+          Funcionalidade:
+          - Verifica se usuário é master
+          - Atualiza collection 'month_status' com closed: false
+          - Registra audit_log com action 'reopen_month'
+          - Retorna sucesso com mensagem
+          Precisa testar: autenticação master, validação de mês/ano, persistência no DB, audit log
+
+  - task: "Verificar se mês fechado bloqueia edições"
+    implemented: false
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Ainda não implementado. Após testar endpoints de close/reopen, precisamos verificar
+          se os endpoints de edição de entries respeitam o status de mês fechado.
+
+frontend:
+  - task: "UI para Fechar/Reabrir mês no painel Master"
+    implemented: false
+    working: "NA"
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Ainda não implementado. Precisa adicionar botões "Fechar Mês" e "Reabrir Mês"
+          no painel Master com confirmação dupla para reabrir.
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "POST /month/close - Fechar mês (Master apenas)"
+    - "POST /month/reopen - Reabrir mês (Master apenas)"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: |
+      Implementados endpoints de fechar/reabrir mês. Endpoints estão duplicados no código
+      (aparecem 2 vezes), mas isso será corrigido após confirmar que funcionam.
+      
+      Para testar, o agente precisará:
+      1. Criar um usuário master ou usar credenciais existentes
+      2. Fazer login e obter token JWT
+      3. Testar POST /api/month/close com { month: X, year: 2025 }
+      4. Verificar que mês foi marcado como fechado no DB (collection month_status)
+      5. Testar POST /api/month/reopen com mesmos parâmetros
+      6. Verificar que mês foi marcado como reaberto no DB
+      7. Verificar logs de auditoria (collection audit_logs)
+      8. Testar negação de acesso com usuário não-master
+      
+      Aguardando teste do backend antes de implementar UI e lógica de bloqueio de edições.
