@@ -247,7 +247,7 @@ export async function POST(request) {
     }
     
     // SAVE ENTRY
-    if (path === 'entries/save') {
+    if (endpoint === 'entries/save') {
       const user = verifyToken(request);
       if (!user) {
         return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
@@ -321,7 +321,7 @@ export async function POST(request) {
     }
     
     // SAVE DAY OBSERVATION
-    if (path === 'observations/day') {
+    if (endpoint === 'observations/day') {
       const user = verifyToken(request);
       if (!user) {
         return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
@@ -351,7 +351,7 @@ export async function POST(request) {
     }
     
     // SAVE MONTH OBSERVATION
-    if (path === 'observations/month') {
+    if (endpoint === 'observations/month') {
       const user = verifyToken(request);
       if (!user) {
         return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
@@ -380,7 +380,7 @@ export async function POST(request) {
     }
     
     // GET MONTH DATA (with observations)
-    if (path === 'entries/month') {
+    if (endpoint === 'entries/month') {
       const user = verifyToken(request);
       if (!user) {
         return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
@@ -470,7 +470,7 @@ export async function POST(request) {
     }
     
     // CLOSE MONTH
-    if (path === 'month/close') {
+    if (endpoint === 'month/close') {
       const user = verifyToken(request);
       if (!user || user.role !== 'master') {
         return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
@@ -504,7 +504,7 @@ export async function POST(request) {
     }
     
     // REOPEN MONTH
-    if (path === 'month/reopen') {
+    if (endpoint === 'month/reopen') {
       const user = verifyToken(request);
       if (!user || user.role !== 'master') {
         return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
@@ -535,7 +535,7 @@ export async function POST(request) {
     }
     
     // COMPARE MONTHS
-    if (path === 'compare/months') {
+    if (endpoint === 'compare/months') {
       const user = verifyToken(request);
       if (!user) {
         return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
@@ -567,7 +567,7 @@ export async function POST(request) {
     }
     
     // GET DASHBOARD DATA
-    if (path === 'dashboard/data') {
+    if (endpoint === 'dashboard/data') {
       const user = verifyToken(request);
       if (!user) {
         return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
@@ -614,7 +614,7 @@ export async function POST(request) {
     }
     
     // REQUEST UNLOCK
-    if (path === 'unlock/request') {
+    if (endpoint === 'unlock/request') {
       const user = verifyToken(request);
       if (!user) {
         return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
@@ -646,7 +646,7 @@ export async function POST(request) {
     }
     
     // GET UNLOCK REQUESTS
-    if (path === 'unlock/requests') {
+    if (endpoint === 'unlock/requests') {
       const user = verifyToken(request);
       if (!user || user.role !== 'master') {
         return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
@@ -661,7 +661,7 @@ export async function POST(request) {
     }
     
     // APPROVE UNLOCK
-    if (path === 'unlock/approve') {
+    if (endpoint === 'unlock/approve') {
       const user = verifyToken(request);
       if (!user || user.role !== 'master') {
         return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
@@ -702,7 +702,7 @@ export async function POST(request) {
     }
     
     // GET AUDIT LOGS
-    if (path === 'audit/logs') {
+    if (endpoint === 'audit/logs') {
       const user = verifyToken(request);
       if (!user || user.role !== 'master') {
         return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
@@ -721,7 +721,7 @@ export async function POST(request) {
     }
     
     // GET ALL USERS
-    if (path === 'users/list') {
+    if (endpoint === 'users/list') {
       const user = verifyToken(request);
       if (!user || user.role !== 'master') {
         return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
@@ -736,7 +736,7 @@ export async function POST(request) {
     }
     
     // UPDATE USER PERMISSIONS
-    if (path === 'users/permissions') {
+    if (endpoint === 'users/permissions') {
       const user = verifyToken(request);
       if (!user || user.role !== 'master') {
         return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
@@ -761,7 +761,7 @@ export async function POST(request) {
     }
     
     // EXPORT CSV
-    if (path === 'export/csv') {
+    if (endpoint === 'export/csv') {
       const user = verifyToken(request);
       if (!user) {
         return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
@@ -802,7 +802,7 @@ export async function POST(request) {
     }
     
     // GET STATISTICS
-    if (path === 'stats/overview') {
+    if (endpoint === 'stats/overview') {
       const user = verifyToken(request);
       if (!user || user.role !== 'master') {
         return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
@@ -849,7 +849,7 @@ export async function GET(request) {
   try {
     const db = await connectDB();
     
-    if (path === 'time/current') {
+    if (endpoint === 'time/current') {
       const currentTime = getBrazilTime();
       return NextResponse.json({ 
         time: currentTime.toISOString(),
@@ -857,7 +857,7 @@ export async function GET(request) {
       });
     }
     
-    if (path === 'unlock/requests') {
+    if (endpoint === 'unlock/requests') {
       const user = verifyToken(request);
       if (!user || user.role !== 'master') {
         return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
