@@ -48,6 +48,9 @@ export default function App() {
   const [editingDayObs, setEditingDayObs] = useState(null); // { day: number }
   const [dayObsText, setDayObsText] = useState('');
   
+  // Receipt viewer - FASE 4
+  const [viewingReceipts, setViewingReceipts] = useState(null); // { entryId, receipts: [], currentIndex: 0 }
+  
   // Dashboard states
   const [dashboardData, setDashboardData] = useState(null);
   
