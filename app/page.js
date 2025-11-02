@@ -1180,7 +1180,6 @@ export default function App() {
                               <SelectValue placeholder="Todas as Igrejas" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="">Todas</SelectItem>
                               {availableChurches.map(church => (
                                 <SelectItem key={church} value={church}>{church}</SelectItem>
                               ))}
