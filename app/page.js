@@ -34,12 +34,18 @@ export default function App() {
   // Calendar states
   const [currentDate, setCurrentDate] = useState(new Date());
   const [entries, setEntries] = useState([]);
+  const [monthClosed, setMonthClosed] = useState(false);
+  const [monthObservation, setMonthObservation] = useState('');
+  const [dayObservations, setDayObservations] = useState([]);
   const [editingEntry, setEditingEntry] = useState(null);
   const [entryValue, setEntryValue] = useState('');
   const [entryNotes, setEntryNotes] = useState('');
   const [unlockRequests, setUnlockRequests] = useState([]);
   const [currentBrazilTime, setCurrentBrazilTime] = useState(null);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
+  
+  // Dashboard states
+  const [dashboardData, setDashboardData] = useState(null);
   
   // Master panel states
   const [allUsers, setAllUsers] = useState([]);
