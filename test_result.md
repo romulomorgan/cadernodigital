@@ -176,11 +176,11 @@ backend:
 
   - task: "Verificar se mês fechado bloqueia edições"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -206,6 +206,33 @@ backend:
              - Retorna warning se mês está fechado
           
           Precisa testar: Fluxo completo de fechar mês → tentar editar → verificar bloqueio
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - VERIFICAÇÃO DE MÊS FECHADO FUNCIONANDO PERFEITAMENTE
+          
+          🎯 CENÁRIO 1 - FLUXO COMPLETO DE FECHAMENTO: ✅ PASSOU
+          - ✅ Entry criado no mês 6/2025 com usuário comum
+          - ✅ Mês fechado com Master (POST /api/month/close)
+          - ✅ Edição bloqueada corretamente (403) para usuário comum em mês fechado
+          - ✅ Mês reaberto com Master (POST /api/month/reopen)
+          - ✅ Edição permitida após reabertura do mês
+          
+          🎯 CENÁRIO 2 - UNLOCK REQUESTS EM MÊS FECHADO: ✅ PASSOU
+          - ✅ Unlock request bloqueado corretamente (403) em mês fechado
+          - ✅ Unlock request permitido após reabertura do mês
+          
+          🎯 CENÁRIO 3 - MASTER APPROVE UNLOCK EM MÊS FECHADO: ✅ PASSOU
+          - ✅ Master pode aprovar unlock mesmo em mês fechado
+          - ✅ Warning correto retornado: "Atenção: Mês está fechado. Liberação concedida pelo Master."
+          - ✅ Audit log registra monthClosed: true conforme esperado
+          
+          🔍 VERIFICAÇÕES DE SEGURANÇA:
+          - ✅ POST /api/entries/save: Bloqueia não-Master em mês fechado
+          - ✅ POST /api/unlock/request: Bloqueia solicitações em mês fechado
+          - ✅ POST /api/unlock/approve: Master pode aprovar mesmo em mês fechado
+          - ✅ Mensagens de erro apropriadas (403 com texto explicativo)
+          - ✅ Collections do DB atualizadas corretamente (month_status, audit_logs, entries)
 
 frontend:
   - task: "UI para Fechar/Reabrir mês no painel Master"
