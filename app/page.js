@@ -1087,6 +1087,27 @@ export default function App() {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              {/* Relógio Digital - Horário de Brasília */}
+              <div className="hidden md:flex flex-col items-end bg-blue-800/50 px-4 py-2 rounded-lg border border-yellow-500/30">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-yellow-400" />
+                  {liveClockTime && !clockSyncError ? (
+                    <span className="text-lg font-mono font-bold text-yellow-300">
+                      {format(liveClockTime, "dd/MM/yyyy — HH:mm:ss", { locale: ptBR })}
+                    </span>
+                  ) : clockSyncError ? (
+                    <span className="text-sm text-orange-300 animate-pulse">
+                      Sincronizando com Brasil — aguarde…
+                    </span>
+                  ) : (
+                    <span className="text-sm text-gray-300">Carregando...</span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-300 mt-0.5">
+                  Horário Oficial de Brasília (GMT-3)
+                </p>
+              </div>
+              
               <div className="text-right">
                 <p className="text-sm font-semibold">{user?.name}</p>
                 <Badge className="bg-yellow-500 text-blue-900 hover:bg-yellow-400">
