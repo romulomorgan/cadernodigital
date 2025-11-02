@@ -273,7 +273,7 @@ export default function App() {
   };
   
   const handleCloseMonth = async () => {
-    if (!confirm('Deseja realmente FECHAR este mês? Todos os lançamentos serão travados permanentemente.')) return;
+    if (!confirm('⚠️ Deseja realmente FECHAR este mês? Todos os lançamentos serão travados permanentemente.')) return;
     
     try {
       const res = await fetch('/api/month/close', {
@@ -293,10 +293,15 @@ export default function App() {
           description: 'Todos os lançamentos foram travados permanentemente.'
         });
         fetchEntries();
+      } else {
+        const error = await res.json();
+        toast.error('❌ Erro ao fechar mês', {
+          description: error.error || 'Tente novamente'
+        });
       }
     } catch (error) {
       toast.error('❌ Erro ao fechar mês', {
-        description: 'Tente novamente ou contate o suporte.'
+        description: 'Falha na comunicação com o servidor. Tente novamente ou contate o suporte.'
       });
     }
   };
