@@ -1271,9 +1271,21 @@ export default function App() {
                                     </p>
                                   )}
                                   {entry.receipts && entry.receipts.length > 0 && (
-                                    <Badge className="mt-2 bg-blue-100 text-blue-700 text-xs">
-                                      📎 {entry.receipts.length} arquivo(s)
-                                    </Badge>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="w-full mt-2 bg-blue-50 border-blue-300 hover:bg-blue-100 text-blue-700"
+                                      onClick={() => {
+                                        setViewingReceipts({
+                                          entryId: entry.entryId,
+                                          receipts: entry.receipts,
+                                          currentIndex: 0
+                                        });
+                                      }}
+                                    >
+                                      <Eye className="w-3 h-3 mr-1" />
+                                      Ver {entry.receipts.length} Comprovante{entry.receipts.length > 1 ? 's' : ''}
+                                    </Button>
                                   )}
                                   {lockStatus.locked && (
                                     <div className="mt-2">
