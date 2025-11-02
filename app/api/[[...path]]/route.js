@@ -206,7 +206,7 @@ export async function POST(request) {
       });
     }
     
-    // UPLOAD RECEIPT
+    // UPLOAD RECEIPT - PATCH 3: Validação robusta
     if (endpoint === 'upload/receipt') {
       const user = verifyToken(request);
       if (!user) {
@@ -219,6 +219,23 @@ export async function POST(request) {
       
       if (!file) {
         return NextResponse.json({ error: 'Arquivo não enviado' }, { status: 400 });
+      }
+      
+      // PATCH 3: Validar tipo e tamanho
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+      if (!allowedTypes.includes(file.type)) {
+        return NextResponse.json({ 
+          error: '❌ Formato não suportado',
+          details: 'Use: JPEG, PNG, WEBP ou PDF'
+        }, { status: 400 });
+      }
+      
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        return NextResponse.json({ 
+          error: '❌ Arquivo muito grande',
+          details: `Tamanho: ${(file.size / 1024 / 1024).toFixed(2)}MB. Máximo: 5MB`
+        }, { status: 400 });
       }
       
       if (!existsSync(UPLOAD_DIR)) {
