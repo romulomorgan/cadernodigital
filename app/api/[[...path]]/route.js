@@ -778,7 +778,7 @@ export async function POST(request) {
         logId: crypto.randomUUID(),
         action: active ? 'activate_user' : 'deactivate_user',
         userId: user.userId,
-        timestamp: currentTime.toISOString(),
+        timestamp: getBrazilTime().toISOString(),
         details: { targetUserId: userId }
       });
       
