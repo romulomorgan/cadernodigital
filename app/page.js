@@ -1209,10 +1209,18 @@ export default function App() {
                     </div>
                     <div className="flex gap-2">
                       {(user?.permissions?.canExport || user?.role === 'master') && (
-                        <Button onClick={handleExportCSV} className="bg-green-600 hover:bg-green-700">
-                          <Download className="w-4 h-4 mr-2" />
-                          Exportar CSV
-                        </Button>
+                        <>
+                          <Button onClick={handleExportCSV} className="bg-green-600 hover:bg-green-700">
+                            <Download className="w-4 h-4 mr-2" />
+                            Exportar CSV
+                          </Button>
+                          {(user?.permissions?.canPrint || user?.role === 'master') && (
+                            <Button onClick={handlePrint} className="bg-purple-600 hover:bg-purple-700">
+                              <Printer className="w-4 h-4 mr-2" />
+                              Imprimir
+                            </Button>
+                          )}
+                        </>
                       )}
                       {user?.role === 'master' && (
                         <>
