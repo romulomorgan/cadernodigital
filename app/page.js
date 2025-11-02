@@ -110,6 +110,41 @@ export default function App() {
     }
   }, [isAuthenticated, currentDate, filterState, filterRegion, filterChurch]);
   
+  // Relógio Digital - atualiza a cada segundo
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
+    const updateClock = async () => {
+      try {
+        const res = await fetch('/api/time/current');
+        const data = await res.json();
+        if (data.time) {
+          setLiveClockTime(new Date(data.time));
+          setClockSyncError(false);
+        }
+      } catch (error) {
+        setClockSyncError(true);
+      }
+    };
+    
+    // Atualização inicial
+    updateClock();
+    
+    // Atualizar a cada segundo (local) e sincronizar com servidor a cada 30s
+    const tickInterval = setInterval(() => {
+      if (liveClockTime) {
+        setLiveClockTime(new Date(liveClockTime.getTime() + 1000));
+      }
+    }, 1000);
+    
+    const syncInterval = setInterval(updateClock, 30000);
+    
+    return () => {
+      clearInterval(tickInterval);
+      clearInterval(syncInterval);
+    };
+  }, [isAuthenticated]);
+  
   const fetchCurrentTime = async () => {
     try {
       const res = await fetch('/api/time/current');
