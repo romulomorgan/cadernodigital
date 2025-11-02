@@ -533,7 +533,7 @@ export default function App() {
         setComparisonResult(data);
       }
     } catch (error) {
-      alert('Erro ao comparar períodos');
+      toast.error('❌ Erro ao comparar períodos');
     }
   };
   
