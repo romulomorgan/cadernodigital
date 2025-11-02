@@ -304,11 +304,11 @@ export default function App() {
       });
       
       if (res.ok) {
-        alert('Mês reaberto com sucesso!');
+        toast.success('✅ Mês reaberto com sucesso!');
         fetchEntries();
       }
     } catch (error) {
-      alert('Erro ao reabrir mês');
+      toast.error('❌ Erro ao reabrir mês');
     }
   };
   
