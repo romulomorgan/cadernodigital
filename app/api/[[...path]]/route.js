@@ -55,12 +55,27 @@ function getTimeWindowEnd(timeSlot) {
 }
 
 function isEntryLocked(entry, currentTime) {
+  // PATCH 2: Verificar override PRIMEIRO (antes de qualquer bloqueio)
+  if (entry.masterUnlocked) {
+    // Verificar se ainda está dentro do prazo de override
+    if (entry.unlockedUntil) {
+      const unlockExpiry = new Date(entry.unlockedUntil);
+      if (isAfter(currentTime, unlockExpiry)) {
+        // Override expirou
+        return { locked: true, reason: 'override_expired' };
+      }
+    }
+    // Override ativo - permitir edição
+    return { locked: false, reason: 'override_active' };
+  }
+  
+  // Se não tem override, aplicar regras normais
   if (entry.timeWindowLocked) return { locked: true, reason: 'time_window' };
   
   if (entry.createdAt && entry.value !== null && entry.value !== undefined && entry.value !== '') {
     const createdTime = new Date(entry.createdAt);
     const oneHourLater = addHours(createdTime, 1);
-    if (isAfter(currentTime, oneHourLater) && !entry.masterUnlocked) {
+    if (isAfter(currentTime, oneHourLater)) {
       return { locked: true, reason: 'one_hour_edit' };
     }
   }
