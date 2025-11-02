@@ -12,13 +12,36 @@ from datetime import datetime
 # Configuração da API
 BASE_URL = "https://iudp-ledger.preview.emergentagent.com/api"
 
-class IUDPTester:
-    def __init__(self):
-        self.session = requests.Session()
-        self.master_token = None
-        self.regular_token = None
-        self.mongo_client = None
-        self.db = None
+def log_test(message, success=None):
+    """Log de teste com formatação"""
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    if success is True:
+        print(f"[{timestamp}] ✅ {message}")
+    elif success is False:
+        print(f"[{timestamp}] ❌ {message}")
+    else:
+        print(f"[{timestamp}] ℹ️  {message}")
+
+def make_request(method, endpoint, data=None, headers=None):
+    """Fazer requisição HTTP com tratamento de erro"""
+    url = f"{BASE_URL}/{endpoint}"
+    try:
+        if method == "POST":
+            response = requests.post(url, json=data, headers=headers, timeout=10)
+        elif method == "GET":
+            response = requests.get(url, headers=headers, timeout=10)
+        
+        return {
+            'status_code': response.status_code,
+            'data': response.json() if response.headers.get('content-type', '').startswith('application/json') else response.text,
+            'success': response.status_code < 400
+        }
+    except Exception as e:
+        return {
+            'status_code': 0,
+            'data': {'error': str(e)},
+            'success': False
+        }
         
     def setup_database_connection(self):
         """Setup MongoDB connection for direct DB verification"""
