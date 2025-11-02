@@ -54,6 +54,9 @@ export default function App() {
   // Receipt viewer - FASE 4
   const [viewingReceipts, setViewingReceipts] = useState(null); // { entryId, receipts: [], currentIndex: 0 }
   
+  // Timezone notification - Aviso Institucional
+  const [showTimezoneNotice, setShowTimezoneNotice] = useState(false);
+  
   // Dashboard states
   const [dashboardData, setDashboardData] = useState(null);
   
