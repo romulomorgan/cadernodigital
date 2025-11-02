@@ -464,10 +464,10 @@ export default function App() {
       });
       
       if (res.ok) {
-        alert('Solicitação enviada ao Líder Máximo!');
+        toast.success('📨 Solicitação enviada ao Líder Máximo!');
       }
     } catch (error) {
-      alert('Erro ao enviar solicitação');
+      toast.error('❌ Erro ao enviar solicitação');
     }
   };
   
