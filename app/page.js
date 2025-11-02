@@ -275,11 +275,15 @@ export default function App() {
       });
       
       if (res.ok) {
-        alert('Mês fechado com sucesso!');
+        toast.success('✅ Mês fechado com sucesso!', {
+          description: 'Todos os lançamentos foram travados permanentemente.'
+        });
         fetchEntries();
       }
     } catch (error) {
-      alert('Erro ao fechar mês');
+      toast.error('❌ Erro ao fechar mês', {
+        description: 'Tente novamente ou contate o suporte.'
+      });
     }
   };
   
