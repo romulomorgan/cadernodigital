@@ -791,6 +791,13 @@ export async function POST(request) {
       
       const { requestId, entryId, durationMinutes } = await request.json();
       
+      // Buscar entry para verificar se mês está fechado (apenas para info no audit)
+      const entry = await db.collection('entries').findOne({ entryId });
+      const monthStatus = await db.collection('month_status').findOne({ 
+        month: entry?.month, 
+        year: entry?.year 
+      });
+      
       await db.collection('entries').updateOne(
         { entryId },
         { 
@@ -817,10 +824,18 @@ export async function POST(request) {
         action: 'approve_unlock',
         userId: user.userId,
         timestamp: getBrazilTime().toISOString(),
-        details: { requestId, entryId, durationMinutes }
+        details: { 
+          requestId, 
+          entryId, 
+          durationMinutes,
+          monthClosed: monthStatus?.closed || false
+        }
       });
       
-      return NextResponse.json({ success: true });
+      return NextResponse.json({ 
+        success: true,
+        warning: monthStatus?.closed ? 'Atenção: Mês está fechado. Liberação concedida pelo Master.' : null
+      });
     }
     
     // GET AUDIT LOGS
