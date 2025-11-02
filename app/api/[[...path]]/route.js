@@ -844,7 +844,7 @@ export async function POST(request) {
 
 export async function GET(request) {
   const url = new URL(request.url);
-  const path = url.pathname.replace('/api/', '');
+  const endpoint = url.pathname.replace('/api/', '');
   
   try {
     const db = await connectDB();
