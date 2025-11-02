@@ -102,7 +102,7 @@ export default function App() {
       
       return () => clearInterval(interval);
     }
-  }, [isAuthenticated, currentDate]);
+  }, [isAuthenticated, currentDate, filterState, filterRegion, filterChurch]);
   
   const fetchCurrentTime = async () => {
     try {
