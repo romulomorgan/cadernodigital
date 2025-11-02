@@ -785,7 +785,8 @@ export default function App() {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6">
             <TabsTrigger value="calendar">📅 Calendário</TabsTrigger>
-            <TabsTrigger value="compare">📊 Comparações</TabsTrigger>
+            <TabsTrigger value="dashboard">📊 Dashboard</TabsTrigger>
+            <TabsTrigger value="compare">📈 Comparações</TabsTrigger>
             {user?.role === 'master' && (
               <>
                 <TabsTrigger value="panel">⚙️ Painel Master</TabsTrigger>
