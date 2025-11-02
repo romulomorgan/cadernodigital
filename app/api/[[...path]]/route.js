@@ -68,6 +68,21 @@ function isEntryLocked(entry, currentTime) {
   return { locked: false };
 }
 
+function canUserAccessEntry(user, entry) {
+  if (user.role === 'master') return true;
+  if (user.scope === 'global') return true;
+  
+  if (user.scope === 'state') {
+    return entry.state === user.state;
+  } else if (user.scope === 'region') {
+    return entry.region === user.region && entry.state === user.state;
+  } else if (user.scope === 'church') {
+    return entry.church === user.church;
+  }
+  
+  return false;
+}
+
 export async function POST(request) {
   const url = new URL(request.url);
   const path = url.pathname.replace('/api/', '');
@@ -191,7 +206,6 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Arquivo não enviado' }, { status: 400 });
       }
       
-      // Create upload directory if not exists
       if (!existsSync(UPLOAD_DIR)) {
         await mkdir(UPLOAD_DIR, { recursive: true });
       }
@@ -216,13 +230,11 @@ export async function POST(request) {
         uploadedAt: getBrazilTime().toISOString()
       };
       
-      // Add receipt to entry
       await db.collection('entries').updateOne(
         { entryId },
         { $push: { receipts: receipt } }
       );
       
-      // Audit log
       await db.collection('audit_logs').insertOne({
         logId: crypto.randomUUID(),
         action: 'upload_receipt',
@@ -241,8 +253,18 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
       }
       
+      const userData = await db.collection('users').findOne({ userId: user.userId });
       const { month, year, day, timeSlot, value, notes } = await request.json();
       const currentTime = getBrazilTime();
+      
+      // Check if month is closed
+      const monthStatus = await db.collection('month_status').findOne({ month, year });
+      if (monthStatus?.closed && user.role !== 'master') {
+        return NextResponse.json({ 
+          error: 'Mês fechado. Apenas o Líder Máximo pode reabrir.',
+          locked: true
+        }, { status: 403 });
+      }
       
       const entryId = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}-${timeSlot}`;
       
@@ -270,6 +292,10 @@ export async function POST(request) {
         value: parseFloat(value) || 0,
         notes: notes || '',
         userId: user.userId,
+        userName: userData.name,
+        church: userData.church,
+        region: userData.region,
+        state: userData.state,
         createdAt: existing?.createdAt || currentTime.toISOString(),
         updatedAt: currentTime.toISOString(),
         timeWindowLocked: false,
@@ -294,22 +320,106 @@ export async function POST(request) {
       return NextResponse.json({ success: true, entry });
     }
     
-    // GET ENTRIES FOR MONTH
+    // SAVE DAY OBSERVATION
+    if (path === 'observations/day') {
+      const user = verifyToken(request);
+      if (!user) {
+        return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+      }
+      
+      const { month, year, day, observation } = await request.json();
+      
+      const obsId = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      
+      await db.collection('day_observations').updateOne(
+        { obsId },
+        { 
+          $set: { 
+            obsId,
+            month,
+            year,
+            day,
+            observation,
+            updatedBy: user.userId,
+            updatedAt: getBrazilTime().toISOString()
+          } 
+        },
+        { upsert: true }
+      );
+      
+      return NextResponse.json({ success: true });
+    }
+    
+    // SAVE MONTH OBSERVATION
+    if (path === 'observations/month') {
+      const user = verifyToken(request);
+      if (!user) {
+        return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+      }
+      
+      const { month, year, observation } = await request.json();
+      
+      const obsId = `${year}-${String(month).padStart(2, '0')}`;
+      
+      await db.collection('month_observations').updateOne(
+        { obsId },
+        { 
+          $set: { 
+            obsId,
+            month,
+            year,
+            observation,
+            updatedBy: user.userId,
+            updatedAt: getBrazilTime().toISOString()
+          } 
+        },
+        { upsert: true }
+      );
+      
+      return NextResponse.json({ success: true });
+    }
+    
+    // GET MONTH DATA (with observations)
     if (path === 'entries/month') {
       const user = verifyToken(request);
       if (!user) {
         return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
       }
       
+      const userData = await db.collection('users').findOne({ userId: user.userId });
       const body = await request.json();
       const { month, year } = body;
       
-      const entries = await db.collection('entries')
-        .find({ 
-          month: parseInt(month), 
-          year: parseInt(year) 
-        })
+      // Build filter based on user scope
+      let filter = { 
+        month: parseInt(month), 
+        year: parseInt(year) 
+      };
+      
+      if (userData.role !== 'master' && userData.scope !== 'global') {
+        if (userData.scope === 'state') {
+          filter.state = userData.state;
+        } else if (userData.scope === 'region') {
+          filter.region = userData.region;
+          filter.state = userData.state;
+        } else if (userData.scope === 'church') {
+          filter.church = userData.church;
+        }
+      }
+      
+      const entries = await db.collection('entries').find(filter).toArray();
+      
+      // Get month status
+      const monthStatus = await db.collection('month_status').findOne({ month: parseInt(month), year: parseInt(year) });
+      
+      // Get day observations
+      const dayObservations = await db.collection('day_observations')
+        .find({ month: parseInt(month), year: parseInt(year) })
         .toArray();
+      
+      // Get month observation
+      const monthObservation = await db.collection('month_observations')
+        .findOne({ month: parseInt(month), year: parseInt(year) });
       
       const currentTime = getBrazilTime();
       const currentHour = currentTime.getHours();
@@ -319,7 +429,7 @@ export async function POST(request) {
       const currentYear = currentTime.getFullYear();
       
       for (const entry of entries) {
-        if (!entry.timeWindowLocked && !entry.masterUnlocked) {
+        if (!entry.timeWindowLocked && !entry.masterUnlocked && !monthStatus?.closed) {
           const entryDate = new Date(entry.year, entry.month - 1, entry.day);
           const todayDate = new Date(currentYear, currentMonth - 1, currentDay);
           
@@ -351,7 +461,77 @@ export async function POST(request) {
         }
       }
       
-      return NextResponse.json({ entries });
+      return NextResponse.json({ 
+        entries, 
+        monthClosed: monthStatus?.closed || false,
+        dayObservations,
+        monthObservation: monthObservation?.observation || ''
+      });
+    }
+    
+    // CLOSE MONTH
+    if (path === 'month/close') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const { month, year } = await request.json();
+      
+      await db.collection('month_status').updateOne(
+        { month, year },
+        { 
+          $set: { 
+            month,
+            year,
+            closed: true,
+            closedBy: user.userId,
+            closedAt: getBrazilTime().toISOString()
+          } 
+        },
+        { upsert: true }
+      );
+      
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'close_month',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { month, year }
+      });
+      
+      return NextResponse.json({ success: true });
+    }
+    
+    // REOPEN MONTH
+    if (path === 'month/reopen') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const { month, year } = await request.json();
+      
+      await db.collection('month_status').updateOne(
+        { month, year },
+        { 
+          $set: { 
+            closed: false,
+            reopenedBy: user.userId,
+            reopenedAt: getBrazilTime().toISOString()
+          } 
+        }
+      );
+      
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'reopen_month',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { month, year }
+      });
+      
+      return NextResponse.json({ success: true });
     }
     
     // COMPARE MONTHS
@@ -383,6 +563,53 @@ export async function POST(request) {
         difference,
         percentChange,
         analysis: percentChange > 0 ? 'crescimento' : percentChange < 0 ? 'queda' : 'estável'
+      });
+    }
+    
+    // GET DASHBOARD DATA
+    if (path === 'dashboard/data') {
+      const user = verifyToken(request);
+      if (!user) {
+        return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+      }
+      
+      const { month, year } = await request.json();
+      
+      const entries = await db.collection('entries')
+        .find({ month: parseInt(month), year: parseInt(year) })
+        .toArray();
+      
+      // Group by day
+      const byDay = {};
+      const byTimeSlot = {};
+      
+      entries.forEach(entry => {
+        if (!byDay[entry.day]) byDay[entry.day] = 0;
+        byDay[entry.day] += entry.value || 0;
+        
+        if (!byTimeSlot[entry.timeSlot]) byTimeSlot[entry.timeSlot] = 0;
+        byTimeSlot[entry.timeSlot] += entry.value || 0;
+      });
+      
+      const dailyData = Object.keys(byDay).map(day => ({
+        day: parseInt(day),
+        total: byDay[day]
+      })).sort((a, b) => a.day - b.day);
+      
+      const timeSlotData = Object.keys(byTimeSlot).map(slot => ({
+        timeSlot: slot,
+        total: byTimeSlot[slot]
+      }));
+      
+      const total = entries.reduce((sum, e) => sum + (e.value || 0), 0);
+      const average = entries.length > 0 ? total / entries.length : 0;
+      
+      return NextResponse.json({
+        dailyData,
+        timeSlotData,
+        total,
+        average,
+        entryCount: entries.length
       });
     }
     
@@ -493,7 +720,7 @@ export async function POST(request) {
       return NextResponse.json({ logs });
     }
     
-    // GET ALL USERS (Master only)
+    // GET ALL USERS
     if (path === 'users/list') {
       const user = verifyToken(request);
       if (!user || user.role !== 'master') {
@@ -508,7 +735,7 @@ export async function POST(request) {
       return NextResponse.json({ users });
     }
     
-    // UPDATE USER PERMISSIONS (Master only)
+    // UPDATE USER PERMISSIONS
     if (path === 'users/permissions') {
       const user = verifyToken(request);
       if (!user || user.role !== 'master') {
@@ -552,10 +779,10 @@ export async function POST(request) {
         .sort({ day: 1, timeSlot: 1 })
         .toArray();
       
-      let csv = 'Dia,Horário,Valor,Observações,Data de Criação\n';
+      let csv = 'Dia,Horário,Valor,Igreja,Região,Estado,Observações,Data de Criação\n';
       
       for (const entry of entries) {
-        csv += `${entry.day},${entry.timeSlot},${entry.value},"${entry.notes || ''}",${entry.createdAt}\n`;
+        csv += `${entry.day},${entry.timeSlot},${entry.value},"${entry.church || ''}","${entry.region || ''}","${entry.state || ''}","${entry.notes || ''}",${entry.createdAt}\n`;
       }
       
       await db.collection('audit_logs').insertOne({
@@ -574,7 +801,7 @@ export async function POST(request) {
       });
     }
     
-    // GET STATISTICS (Master only)
+    // GET STATISTICS
     if (path === 'stats/overview') {
       const user = verifyToken(request);
       if (!user || user.role !== 'master') {
@@ -586,7 +813,6 @@ export async function POST(request) {
       const pendingRequests = await db.collection('unlock_requests').countDocuments({ status: 'pending' });
       const totalAuditLogs = await db.collection('audit_logs').countDocuments();
       
-      // Get current month total
       const now = getBrazilTime();
       const currentMonth = now.getMonth() + 1;
       const currentYear = now.getFullYear();
@@ -623,7 +849,6 @@ export async function GET(request) {
   try {
     const db = await connectDB();
     
-    // GET CURRENT TIME
     if (path === 'time/current') {
       const currentTime = getBrazilTime();
       return NextResponse.json({ 
@@ -632,7 +857,6 @@ export async function GET(request) {
       });
     }
     
-    // DOWNLOAD RECEIPT
     if (path.startsWith('download/receipt/')) {
       const filename = path.replace('download/receipt/', '');
       const filepath = `/app/uploads/receipts/${filename}`;
