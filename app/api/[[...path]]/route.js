@@ -7,6 +7,7 @@ import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 import { writeFile, mkdir, readFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 
 // FIXAR TIMEZONE DO SERVIDOR PARA AMERICA/SAO_PAULO
 process.env.TZ = 'America/Sao_Paulo';
