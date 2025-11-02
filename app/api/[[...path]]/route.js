@@ -664,12 +664,12 @@ export async function POST(request) {
       const monthObservation = await db.collection('month_observations')
         .findOne({ month: parseInt(month), year: parseInt(year) });
       
-      const currentTime = getBrazilTime();
-      const currentHour = currentTime.getHours();
-      const currentMinute = currentTime.getMinutes();
-      const currentDay = currentTime.getDate();
-      const currentMonth = currentTime.getMonth() + 1;
-      const currentYear = currentTime.getFullYear();
+      const currentTime = getBrazilTime(); // dayjs object
+      const currentHour = currentTime.hour();
+      const currentMinute = currentTime.minute();
+      const currentDay = currentTime.date();
+      const currentMonth = currentTime.month() + 1;
+      const currentYear = currentTime.year();
       
       for (const entry of entries) {
         if (!entry.timeWindowLocked && !entry.masterUnlocked && !monthStatus?.closed) {
