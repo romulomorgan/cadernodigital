@@ -857,6 +857,20 @@ export async function GET(request) {
       });
     }
     
+    if (path === 'unlock/requests') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const requests = await db.collection('unlock_requests')
+        .find({ status: 'pending' })
+        .sort({ createdAt: -1 })
+        .toArray();
+      
+      return NextResponse.json({ requests });
+    }
+    
     if (path.startsWith('download/receipt/')) {
       const filename = path.replace('download/receipt/', '');
       const filepath = `/app/uploads/receipts/${filename}`;
