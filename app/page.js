@@ -1145,12 +1145,11 @@ export default function App() {
                       {availableStates.length > 0 && (
                         <div>
                           <Label className="text-xs text-gray-600 mb-1 block">Estado</Label>
-                          <Select value={filterState} onValueChange={setFilterState}>
+                          <Select value={filterState || undefined} onValueChange={(value) => setFilterState(value || '')}>
                             <SelectTrigger className="h-9">
                               <SelectValue placeholder="Todos os Estados" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="">Todos</SelectItem>
                               {availableStates.map(state => (
                                 <SelectItem key={state} value={state}>{state}</SelectItem>
                               ))}
@@ -1161,12 +1160,11 @@ export default function App() {
                       {availableRegions.length > 0 && (
                         <div>
                           <Label className="text-xs text-gray-600 mb-1 block">Região</Label>
-                          <Select value={filterRegion} onValueChange={setFilterRegion}>
+                          <Select value={filterRegion || undefined} onValueChange={(value) => setFilterRegion(value || '')}>
                             <SelectTrigger className="h-9">
                               <SelectValue placeholder="Todas as Regiões" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="">Todas</SelectItem>
                               {availableRegions.map(region => (
                                 <SelectItem key={region} value={region}>{region}</SelectItem>
                               ))}
@@ -1177,7 +1175,7 @@ export default function App() {
                       {availableChurches.length > 0 && (
                         <div>
                           <Label className="text-xs text-gray-600 mb-1 block">Igreja</Label>
-                          <Select value={filterChurch} onValueChange={setFilterChurch}>
+                          <Select value={filterChurch || undefined} onValueChange={(value) => setFilterChurch(value || '')}>
                             <SelectTrigger className="h-9">
                               <SelectValue placeholder="Todas as Igrejas" />
                             </SelectTrigger>
