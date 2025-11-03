@@ -764,7 +764,10 @@ export async function POST(request) {
         entries, 
         monthClosed: monthStatus?.closed || false,
         dayObservations,
-        monthObservation: monthObservation?.observation || ''
+        monthObservation: monthObservation ? {
+          observation: monthObservation.observation || '',
+          active: monthObservation.active || false
+        } : { observation: '', active: false }
       });
     }
     
