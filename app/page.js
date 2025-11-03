@@ -223,14 +223,17 @@ export default function App() {
         const localBackup = localStorage.getItem(backupKey);
         
         if (data.monthObservation) {
-          setMonthObservation(data.monthObservation);
+          setMonthObservation(data.monthObservation.observation || data.monthObservation);
+          setMonthObservationActive(data.monthObservation.active || false);
         } else if (localBackup) {
           setMonthObservation(localBackup);
+          setMonthObservationActive(false);
           toast.info('📝 Rascunho local restaurado', {
             description: 'Clique em Salvar para sincronizar'
           });
         } else {
           setMonthObservation('');
+          setMonthObservationActive(false);
         }
       }
     } catch (error) {
