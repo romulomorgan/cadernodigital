@@ -1235,6 +1235,40 @@ export async function GET(request) {
       return NextResponse.json({ requests });
     }
     
+    // VIEW RECEIPT (serve arquivo para visualização)
+    if (endpoint.startsWith('view/receipt/')) {
+      const filename = endpoint.replace('view/receipt/', '');
+      const filepath = path.join(UPLOAD_DIR, filename);
+      
+      console.log('[VIEW RECEIPT] Tentando servir:', filepath);
+      
+      if (!existsSync(filepath)) {
+        console.log('[VIEW RECEIPT] Arquivo não encontrado:', filepath);
+        return NextResponse.json({ error: 'Arquivo não encontrado' }, { status: 404 });
+      }
+      
+      const fileBuffer = await readFile(filepath);
+      
+      // Detectar tipo de arquivo pela extensão
+      const ext = filename.split('.').pop().toLowerCase();
+      const contentTypes = {
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'png': 'image/png',
+        'webp': 'image/webp',
+        'pdf': 'application/pdf'
+      };
+      
+      const contentType = contentTypes[ext] || 'application/octet-stream';
+      
+      return new NextResponse(fileBuffer, {
+        headers: {
+          'Content-Type': contentType,
+          'Cache-Control': 'public, max-age=31536000'
+        }
+      });
+    }
+    
     if (endpoint.startsWith('download/receipt/')) {
       const filename = endpoint.replace('download/receipt/', '');
       const filepath = `/app/uploads/receipts/${filename}`;
