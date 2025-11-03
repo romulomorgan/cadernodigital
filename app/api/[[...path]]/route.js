@@ -653,7 +653,7 @@ export async function POST(request) {
           } 
         },
         { upsert: true }
-      });
+      );
       
       await db.collection('audit_logs').insertOne({
         logId: crypto.randomUUID(),
