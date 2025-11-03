@@ -1148,7 +1148,7 @@ export default function App() {
                   <Clock className="w-4 h-4 text-yellow-400" />
                   {liveClockTime && !clockSyncError ? (
                     <span className="text-lg font-mono font-bold text-yellow-300">
-                      {dayjs(liveClockTime).tz('America/Sao_Paulo').format('DD/MM/YYYY — HH:mm:ss')}
+                      {dayjs(liveClockTime).format('DD/MM/YYYY — HH:mm:ss')}
                     </span>
                   ) : clockSyncError ? (
                     <span className="text-sm text-orange-300 animate-pulse">
