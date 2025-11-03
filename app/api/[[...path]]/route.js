@@ -665,16 +665,25 @@ export async function POST(request) {
         year: parseInt(year) 
       };
       
-      if (userData.role !== 'master' && userData.scope !== 'global') {
-        if (userData.scope === 'state') {
-          filter.state = userData.state;
-        } else if (userData.scope === 'region') {
-          filter.region = userData.region;
-          filter.state = userData.state;
-        } else if (userData.scope === 'church') {
-          filter.church = userData.church;
-        }
+      // MASTER vê tudo
+      if (userData.role === 'master' || userData.scope === 'global') {
+        // Sem filtros adicionais - vê tudo
+      } 
+      // LEADER vê por hierarquia (state/region/church)
+      else if (userData.scope === 'state') {
+        filter.state = userData.state;
+      } else if (userData.scope === 'region') {
+        filter.region = userData.region;
+        filter.state = userData.state;
+      } else if (userData.scope === 'church') {
+        filter.church = userData.church;
       }
+      // USUÁRIO COMUM vê apenas seus próprios lançamentos
+      else {
+        filter.userId = userData.userId;
+      }
+      
+      console.log('[ENTRIES/MONTH] User:', userData.userId, 'Role:', userData.role, 'Filter:', JSON.stringify(filter));
       
       const entries = await db.collection('entries').find(filter).toArray();
       
