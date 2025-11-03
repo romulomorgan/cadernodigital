@@ -1357,33 +1357,83 @@ export default function App() {
                   
                   {/* Month Observation */}
                   <div className="border-t pt-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <Label htmlFor="month-obs" className="text-base font-semibold">
+                    <div className="flex items-center justify-between mb-3">
+                      <Label htmlFor="month-obs" className="text-base font-semibold flex items-center gap-2">
                         📝 Observação do Mês
+                        {monthObservationActive && (
+                          <Badge className="bg-green-500">ATIVA</Badge>
+                        )}
                       </Label>
-                      <span className="text-xs text-gray-500">
-                        {monthObservation.length} / {MAX_OBSERVATION_LENGTH} caracteres
-                      </span>
+                      
+                      {/* TOGGLE - APENAS MASTER */}
+                      {user?.role === 'master' && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600">
+                            {monthObservationActive ? 'Visível para todos' : 'Oculta'}
+                          </span>
+                          <Switch
+                            checked={monthObservationActive}
+                            onCheckedChange={setMonthObservationActive}
+                            className="data-[state=checked]:bg-green-500"
+                          />
+                        </div>
+                      )}
                     </div>
-                    <div className="flex gap-2">
-                      <Textarea
-                        id="month-obs"
-                        value={monthObservation}
-                        onChange={(e) => setMonthObservation(e.target.value)}
-                        placeholder="Adicione observações gerais sobre este mês..."
-                        rows={3}
-                        className="flex-1"
-                        maxLength={MAX_OBSERVATION_LENGTH}
-                      />
-                      <Button 
-                        onClick={handleSaveMonthObservation} 
-                        className="bg-blue-600 hover:bg-blue-700"
-                        disabled={uploadingReceipt}
-                      >
-                        <Save className="w-4 h-4 mr-2" />
-                        {uploadingReceipt ? 'Salvando...' : 'Salvar'}
-                      </Button>
-                    </div>
+                    
+                    {/* MASTER: Pode editar */}
+                    {user?.role === 'master' ? (
+                      <>
+                        <div className="flex gap-2 mb-2">
+                          <Textarea
+                            id="month-obs"
+                            value={monthObservation}
+                            onChange={(e) => setMonthObservation(e.target.value)}
+                            placeholder="Digite a mensagem que aparecerá como letreiro digital para todos os usuários..."
+                            rows={3}
+                            className="flex-1"
+                            maxLength={MAX_OBSERVATION_LENGTH}
+                          />
+                          <div className="flex flex-col gap-2">
+                            <Button 
+                              onClick={handleSaveMonthObservation} 
+                              className="bg-blue-600 hover:bg-blue-700"
+                              disabled={uploadingReceipt}
+                            >
+                              <Save className="w-4 h-4 mr-2" />
+                              Salvar
+                            </Button>
+                            <Button 
+                              onClick={() => {
+                                setMonthObservation('');
+                                setMonthObservationActive(false);
+                              }}
+                              variant="outline"
+                              size="sm"
+                            >
+                              Limpar
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-500 text-right">
+                          {monthObservation.length} / {MAX_OBSERVATION_LENGTH} caracteres
+                        </div>
+                      </>
+                    ) : (
+                      /* OUTROS USUÁRIOS: Apenas visualização com letreiro animado */
+                      <div className="relative overflow-hidden bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg p-4 min-h-[60px] flex items-center">
+                        {monthObservationActive && monthObservation ? (
+                          <div className="marquee-container w-full">
+                            <div className="marquee-content text-white font-semibold text-lg">
+                              {monthObservation}
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-white/70 text-center w-full italic">
+                            Sem mensagens no momento...
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>
