@@ -468,17 +468,15 @@ export default function App() {
   
   const handleSaveMonthObservation = async () => {
     if (monthObservation.length > MAX_OBSERVATION_LENGTH) {
-      toast.error(`❌ Texto muito longo (máx ${MAX_OBSERVATION_LENGTH} caracteres)`);
+      toast.error(`❌ Texto muito longo (${monthObservation.length}/${MAX_OBSERVATION_LENGTH})`);
       return;
     }
     
-    setUploadingReceipt(true); // Reutilizando estado de loading
+    // Salvar em localStorage como backup
+    const backupKey = `obs_${currentDate.getFullYear()}_${currentDate.getMonth() + 1}`;
+    localStorage.setItem(backupKey, monthObservation);
     
     try {
-      // Backup local antes de enviar
-      const backupKey = `obs_${currentDate.getFullYear()}_${currentDate.getMonth() + 1}`;
-      localStorage.setItem(backupKey, monthObservation);
-      
       const res = await fetch('/api/observations/month', {
         method: 'POST',
         headers: {
@@ -488,29 +486,21 @@ export default function App() {
         body: JSON.stringify({
           month: currentDate.getMonth() + 1,
           year: currentDate.getFullYear(),
-          observation: monthObservation
+          observation: monthObservation,
+          active: monthObservationActive
         })
       });
       
-      const data = await res.json();
-      
       if (res.ok) {
-        toast.success('💾 Observação salva!', {
-          description: `${data.chars || monthObservation.length} caracteres salvos`
-        });
-        // Limpar backup após sucesso
+        const data = await res.json();
+        toast.success(data.message || '✅ Observação salva');
         localStorage.removeItem(backupKey);
       } else {
-        toast.error('❌ Erro ao salvar', {
-          description: data.error
-        });
+        const error = await res.json();
+        toast.error(`❌ ${error.error || 'Erro ao salvar'}`);
       }
     } catch (error) {
-      toast.error('❌ Erro de conexão', {
-        description: 'Texto salvo localmente'
-      });
-    } finally {
-      setUploadingReceipt(false);
+      toast.error('❌ Erro ao conectar');
     }
   };
   
