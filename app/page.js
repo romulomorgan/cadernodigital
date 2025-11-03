@@ -2,6 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+// Configurar dayjs com timezone para SEMPRE usar America/Sao_Paulo
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault('America/Sao_Paulo');
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
