@@ -1176,24 +1176,13 @@ export async function GET(request) {
     const db = await connectDB();
     
     if (endpoint === 'time/current') {
-      // Pega horário UTC
-      const now = new Date();
-      
-      // Ajusta para Brasília (UTC-3)
-      const brasiliaMs = now.getTime() - (3 * 60 * 60 * 1000);
-      const brasiliaDate = new Date(brasiliaMs);
-      
-      // Extrai componentes do UTC (que agora representa Brasília)
-      const day = String(brasiliaDate.getUTCDate()).padStart(2, '0');
-      const month = String(brasiliaDate.getUTCMonth() + 1).padStart(2, '0');
-      const year = brasiliaDate.getUTCFullYear();
-      const hours = String(brasiliaDate.getUTCHours()).padStart(2, '0');
-      const minutes = String(brasiliaDate.getUTCMinutes()).padStart(2, '0');
-      const seconds = String(brasiliaDate.getUTCSeconds()).padStart(2, '0');
+      // Usa dayjs para garantir America/Sao_Paulo sempre
+      const now = getBrazilTime(); // já retorna dayjs com timezone
       
       return NextResponse.json({ 
-        time: brasiliaDate.toISOString(),
-        formatted: `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`
+        time: now.toISOString(),
+        formatted: now.format('DD/MM/YYYY HH:mm:ss'),
+        timezone: 'America/Sao_Paulo'
       });
     }
     
