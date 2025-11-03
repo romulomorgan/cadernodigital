@@ -642,11 +642,18 @@ export default function App() {
   };
   
   const handleUploadReceipt = async (entryId, file) => {
+    if (!file) {
+      toast.error('❌ Nenhum arquivo selecionado');
+      return;
+    }
+    
     setUploadingReceipt(true);
     try {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('entryId', entryId);
+      
+      console.log('[FRONTEND] Enviando comprovante para entryId:', entryId);
       
       const res = await fetch('/api/upload/receipt', {
         method: 'POST',
@@ -656,13 +663,18 @@ export default function App() {
         body: formData
       });
       
+      const data = await res.json();
+      
       if (res.ok) {
         toast.success('📎 Comprovante enviado com sucesso!');
-        fetchEntries();
+        fetchEntries(); // Recarrega para mostrar o comprovante
       } else {
-        toast.error('❌ Erro ao enviar comprovante');
+        toast.error(`❌ ${data.error || 'Erro ao enviar comprovante'}`, {
+          description: data.details || ''
+        });
       }
     } catch (error) {
+      console.error('[FRONTEND] Erro no upload:', error);
       toast.error('❌ Erro ao conectar com o servidor');
     } finally {
       setUploadingReceipt(false);
