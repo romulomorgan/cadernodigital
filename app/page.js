@@ -48,6 +48,7 @@ export default function App() {
   const [entries, setEntries] = useState([]);
   const [monthClosed, setMonthClosed] = useState(false);
   const [monthObservation, setMonthObservation] = useState('');
+  const [monthObservationActive, setMonthObservationActive] = useState(false);
   const [dayObservations, setDayObservations] = useState([]);
   const [editingEntry, setEditingEntry] = useState(null);
   const [entryValue, setEntryValue] = useState('');
