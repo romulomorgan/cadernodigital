@@ -2531,7 +2531,7 @@ export default function App() {
                   </div>
                 ) : (
                   <img
-                    src={`/uploads/receipts/${viewingReceipts.receipts[viewingReceipts.currentIndex]?.filepath}`}
+                    src={`/api/view/receipt/${viewingReceipts.receipts[viewingReceipts.currentIndex]?.filepath}`}
                     alt="Comprovante"
                     className="max-w-full max-h-[600px] object-contain"
                     onError={(e) => {
