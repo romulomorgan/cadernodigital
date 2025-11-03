@@ -2521,7 +2521,7 @@ export default function App() {
                     <Button
                       onClick={() => {
                         const receipt = viewingReceipts.receipts[viewingReceipts.currentIndex];
-                        window.open(`/uploads/receipts/${receipt.filepath}`, '_blank');
+                        window.open(`/api/view/receipt/${receipt.filepath}`, '_blank');
                       }}
                       className="bg-red-600 hover:bg-red-700"
                     >
