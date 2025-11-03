@@ -619,16 +619,25 @@ export async function POST(request) {
       return NextResponse.json({ success: true });
     }
     
-    // SAVE MONTH OBSERVATION
+    // SAVE MONTH OBSERVATION (APENAS MASTER)
     if (endpoint === 'observations/month') {
       const user = verifyToken(request);
       if (!user) {
         return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
       }
       
-      const { month, year, observation } = await request.json();
+      // APENAS MASTER PODE CRIAR/EDITAR
+      if (user.role !== 'master') {
+        return NextResponse.json({ 
+          error: 'Apenas o Líder Máximo pode criar/editar observações do mês' 
+        }, { status: 403 });
+      }
+      
+      const { month, year, observation, active } = await request.json();
       
       const obsId = `${year}-${String(month).padStart(2, '0')}`;
+      
+      console.log('[OBSERVATION] Salvando:', { obsId, active, length: observation?.length });
       
       await db.collection('month_observations').updateOne(
         { obsId },
@@ -637,15 +646,27 @@ export async function POST(request) {
             obsId,
             month,
             year,
-            observation,
+            observation: observation || '',
+            active: active === true, // Force boolean
             updatedBy: user.userId,
             updatedAt: getBrazilTime().toISOString()
           } 
         },
         { upsert: true }
-      );
+      });
       
-      return NextResponse.json({ success: true });
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'update_month_observation',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { obsId, active, textLength: observation?.length || 0 }
+      });
+      
+      return NextResponse.json({ 
+        success: true,
+        message: active ? 'Mensagem salva e ativada' : 'Mensagem salva (inativa)'
+      });
     }
     
     // GET MONTH DATA (with observations)
