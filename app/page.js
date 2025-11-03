@@ -141,9 +141,8 @@ export default function App() {
         const res = await fetch('/api/time/current');
         const data = await res.json();
         if (data.time) {
-          // Usar dayjs para garantir timezone America/Sao_Paulo
-          const brasiliaTime = dayjs(data.time).tz('America/Sao_Paulo');
-          setLiveClockTime(brasiliaTime.toDate());
+          // Backend JÁ retorna em America/Sao_Paulo, não converter novamente
+          setLiveClockTime(new Date(data.time));
           setClockSyncError(false);
         }
       } catch (error) {
