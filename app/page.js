@@ -132,7 +132,7 @@ export default function App() {
     }
   }, [isAuthenticated, currentDate, filterState, filterRegion, filterChurch]);
   
-  // Relógio Digital - atualiza a cada segundo
+  // Relógio Digital - atualiza a cada segundo com America/Sao_Paulo
   useEffect(() => {
     if (!isAuthenticated) return;
     
@@ -141,7 +141,9 @@ export default function App() {
         const res = await fetch('/api/time/current');
         const data = await res.json();
         if (data.time) {
-          setLiveClockTime(new Date(data.time));
+          // Usar dayjs para garantir timezone America/Sao_Paulo
+          const brasiliaTime = dayjs(data.time).tz('America/Sao_Paulo');
+          setLiveClockTime(brasiliaTime.toDate());
           setClockSyncError(false);
         }
       } catch (error) {
@@ -152,10 +154,11 @@ export default function App() {
     // Atualização inicial
     updateClock();
     
-    // Atualizar a cada segundo (local) e sincronizar com servidor a cada 30s
+    // Atualizar a cada segundo usando dayjs
     const tickInterval = setInterval(() => {
       if (liveClockTime) {
-        setLiveClockTime(new Date(liveClockTime.getTime() + 1000));
+        const nextSecond = dayjs(liveClockTime).add(1, 'second');
+        setLiveClockTime(nextSecond.toDate());
       }
     }, 1000);
     
