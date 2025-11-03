@@ -418,9 +418,27 @@ export async function POST(request) {
       const file = formData.get('file');
       const entryId = formData.get('entryId');
       
+      console.log('[UPLOAD] EntryID recebido:', entryId);
+      
       if (!file) {
         return NextResponse.json({ error: 'Arquivo não enviado' }, { status: 400 });
       }
+      
+      if (!entryId) {
+        return NextResponse.json({ error: 'EntryID não fornecido' }, { status: 400 });
+      }
+      
+      // Verificar se entry existe
+      const existingEntry = await db.collection('entries').findOne({ entryId });
+      if (!existingEntry) {
+        console.log('[UPLOAD] Entry não encontrado:', entryId);
+        return NextResponse.json({ 
+          error: '❌ Lançamento não encontrado',
+          details: `EntryID: ${entryId}`
+        }, { status: 404 });
+      }
+      
+      console.log('[UPLOAD] Entry encontrado:', existingEntry.entryId);
       
       // PATCH 3: Validar tipo e tamanho
       const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
@@ -452,6 +470,7 @@ export async function POST(request) {
       const filepath = path.join(UPLOAD_DIR, filename);
       
       await writeFile(filepath, buffer);
+      console.log('[UPLOAD] Arquivo salvo:', filepath);
       
       const receipt = {
         receiptId: fileId,
@@ -463,20 +482,27 @@ export async function POST(request) {
         uploadedAt: getBrazilTime().toISOString()
       };
       
-      await db.collection('entries').updateOne(
+      // Atualizar entry com receipt
+      const updateResult = await db.collection('entries').updateOne(
         { entryId },
         { $push: { receipts: receipt } }
       );
+      
+      console.log('[UPLOAD] Update result:', updateResult.modifiedCount, 'docs modificados');
       
       await db.collection('audit_logs').insertOne({
         logId: crypto.randomUUID(),
         action: 'upload_receipt',
         userId: user.userId,
         timestamp: getBrazilTime().toISOString(),
-        details: { entryId, filename: file.name }
+        details: { entryId, filename: file.name, receiptId: fileId }
       });
       
-      return NextResponse.json({ success: true, receipt });
+      return NextResponse.json({ 
+        success: true, 
+        receipt,
+        message: 'Comprovante enviado e salvo com sucesso'
+      });
     }
     
     // SAVE ENTRY
