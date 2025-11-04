@@ -124,10 +124,15 @@ export default function App() {
   
   // States para formulário de igreja
   const [newChurchName, setNewChurchName] = useState('');
+  const [newChurchCEP, setNewChurchCEP] = useState('');
   const [newChurchAddress, setNewChurchAddress] = useState('');
+  const [newChurchNumber, setNewChurchNumber] = useState('');
+  const [newChurchComplement, setNewChurchComplement] = useState('');
+  const [newChurchNeighborhood, setNewChurchNeighborhood] = useState('');
   const [newChurchCity, setNewChurchCity] = useState('');
   const [newChurchState, setNewChurchState] = useState('');
   const [newChurchRegion, setNewChurchRegion] = useState('');
+  const [loadingCEP, setLoadingCEP] = useState(false);
   
   const timeSlots = ['08:00', '10:00', '12:00', '15:00', '19:30'];
   const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
