@@ -608,6 +608,18 @@ export default function App() {
     );
   };
   
+  const hasPendingRequest = (day, timeSlot) => {
+    return myPendingRequests.some(req => 
+      req.day === day && req.timeSlot === timeSlot
+    );
+  };
+  
+  const hasActiveOverride = (day, timeSlot) => {
+    return myActiveOverrides.some(override => 
+      override.day === day && override.timeSlot === timeSlot
+    );
+  };
+  
   const isEntryLocked = (entry, currentTime, day, timeSlot) => {
     if (!currentTime) return { locked: false, reason: null, timeLeft: null };
     
