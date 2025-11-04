@@ -95,6 +95,16 @@ export default function App() {
   const timeSlots = ['08:00', '10:00', '12:00', '15:00', '19:30'];
   const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
   
+  const roleNames = {
+    'master': 'Líder Máximo',
+    'leader': 'Líder',
+    'pastor': 'Pastor',
+    'treasurer': 'Tesoureiro',
+    'secretary': 'Secretário',
+    'member': 'Membro',
+    'Usuário': 'Usuário'
+  };
+  
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
