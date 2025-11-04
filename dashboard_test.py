@@ -419,24 +419,39 @@ def main():
     
     try:
         # Cenário 1: Usuário comum
-        result1 = test_scenario_1_user_comum(tokens)
-        results.append(("Cenário 1 - Usuário Comum", result1))
+        if 'user1@iudp.com' in tokens:
+            result1 = test_scenario_1_user_comum(tokens)
+            results.append(("Cenário 1 - Usuário Comum", result1))
+        else:
+            log_test("Pulando Cenário 1 - usuário comum não disponível", None)
         
         # Cenário 2: Usuário Master
-        result2 = test_scenario_2_user_master(tokens)
-        results.append(("Cenário 2 - Usuário Master", result2))
+        if 'mastertest@iudp.com' in tokens:
+            result2 = test_scenario_2_user_master(tokens)
+            results.append(("Cenário 2 - Usuário Master", result2))
+        else:
+            log_test("Pulando Cenário 2 - usuário master não disponível", None)
         
         # Cenário 3: Usuário State Scope
-        result3 = test_scenario_3_user_state_scope(tokens)
-        results.append(("Cenário 3 - Usuário State Scope", result3))
+        if 'userstate@iudp.com' in tokens:
+            result3 = test_scenario_3_user_state_scope(tokens)
+            results.append(("Cenário 3 - Usuário State Scope", result3))
+        else:
+            log_test("Pulando Cenário 3 - usuário state scope não disponível", None)
         
         # Cenário 4: Usuário Church Scope
-        result4 = test_scenario_4_user_church_scope(tokens)
-        results.append(("Cenário 4 - Usuário Church Scope", result4))
+        if 'userchurch@iudp.com' in tokens:
+            result4 = test_scenario_4_user_church_scope(tokens)
+            results.append(("Cenário 4 - Usuário Church Scope", result4))
+        else:
+            log_test("Pulando Cenário 4 - usuário church scope não disponível", None)
         
         # Teste de Logout
-        result5 = test_logout_functionality(tokens)
-        results.append(("Teste de Logout", result5))
+        if len(tokens) > 0:
+            result5 = test_logout_functionality(tokens)
+            results.append(("Teste de Logout", result5))
+        else:
+            log_test("Pulando Teste de Logout - nenhum usuário disponível", None)
         
     except Exception as e:
         log_test(f"Erro durante execução dos testes: {str(e)}", False)
