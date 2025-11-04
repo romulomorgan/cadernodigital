@@ -1033,6 +1033,57 @@ export default function App() {
     }
   };
   
+  const handleCreateChurchForm = async () => {
+    if (!newChurchName.trim()) {
+      toast.error('❌ Nome da igreja é obrigatório');
+      return;
+    }
+    
+    const churchData = {
+      name: newChurchName,
+      address: newChurchAddress,
+      city: newChurchCity,
+      state: newChurchState,
+      region: newChurchRegion
+    };
+    
+    try {
+      const res = await fetch('/api/churches/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(churchData)
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        
+        // Upload de foto se houver
+        if (churchPhotoFile) {
+          await handleUploadChurchPhoto(data.church.churchId);
+        }
+        
+        // Limpar formulário
+        setNewChurchName('');
+        setNewChurchAddress('');
+        setNewChurchCity('');
+        setNewChurchState('');
+        setNewChurchRegion('');
+        setChurchPhotoFile(null);
+        setChurchPhotoPreview(null);
+        
+        fetchAllChurches();
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao criar igreja');
+    }
+  };
+  
   const handleChurchPhotoSelect = (e) => {
     const file = e.target.files[0];
     if (!file) return;
