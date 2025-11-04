@@ -1388,6 +1388,250 @@ export async function POST(request) {
         message: 'Foto enviada com sucesso!' 
       });
     }
+    
+    // ========== IGREJAS (CHURCHES) CRUD ==========
+    
+    // GET ALL CHURCHES
+    if (endpoint === 'churches/list') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const churches = await db.collection('churches')
+        .find({})
+        .sort({ createdAt: -1 })
+        .toArray();
+      
+      // Para cada igreja, buscar dados do pastor
+      for (let church of churches) {
+        if (church.pastorId) {
+          const pastor = await db.collection('users').findOne(
+            { userId: church.pastorId },
+            { projection: { password: 0 } }
+          );
+          church.pastor = pastor;
+        }
+      }
+      
+      return NextResponse.json({ churches });
+    }
+    
+    // CREATE CHURCH
+    if (endpoint === 'churches/create') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const churchData = await request.json();
+      
+      const newChurch = {
+        churchId: crypto.randomUUID(),
+        ...churchData,
+        createdAt: getBrazilTime().toISOString(),
+        updatedAt: getBrazilTime().toISOString()
+      };
+      
+      await db.collection('churches').insertOne(newChurch);
+      
+      // Se tem pastor, atualizar user
+      if (churchData.pastorId) {
+        await db.collection('users').updateOne(
+          { userId: churchData.pastorId },
+          { $set: { church: churchData.name, churchId: newChurch.churchId } }
+        );
+      }
+      
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'create_church',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { churchId: newChurch.churchId, churchName: churchData.name }
+      });
+      
+      return NextResponse.json({ success: true, church: newChurch, message: 'Igreja cadastrada com sucesso!' });
+    }
+    
+    // UPDATE CHURCH
+    if (endpoint === 'churches/update') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const { churchId, churchData } = await request.json();
+      
+      await db.collection('churches').updateOne(
+        { churchId },
+        { $set: { ...churchData, updatedAt: getBrazilTime().toISOString() } }
+      );
+      
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'update_church',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { churchId, updates: Object.keys(churchData) }
+      });
+      
+      return NextResponse.json({ success: true, message: 'Igreja atualizada com sucesso!' });
+    }
+    
+    // DELETE CHURCH
+    if (endpoint === 'churches/delete') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const { churchId } = await request.json();
+      
+      const church = await db.collection('churches').findOne({ churchId });
+      
+      // Remover associação de usuários com esta igreja
+      await db.collection('users').updateMany(
+        { churchId },
+        { $unset: { church: '', churchId: '' } }
+      );
+      
+      await db.collection('churches').deleteOne({ churchId });
+      
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'delete_church',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { deletedChurchId: churchId, deletedChurchName: church?.name }
+      });
+      
+      return NextResponse.json({ success: true, message: 'Igreja excluída com sucesso!' });
+    }
+    
+    // UPLOAD CHURCH PHOTO
+    if (endpoint === 'churches/upload-photo') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const formData = await request.formData();
+      const file = formData.get('photo');
+      const churchId = formData.get('churchId');
+      
+      if (!file) {
+        return NextResponse.json({ error: 'Nenhum arquivo enviado' }, { status: 400 });
+      }
+      
+      // Validar tipo de arquivo
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        return NextResponse.json({ error: 'Tipo de arquivo não permitido. Use JPG, PNG ou WebP.' }, { status: 400 });
+      }
+      
+      // Validar tamanho (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        return NextResponse.json({ error: 'Arquivo muito grande. Tamanho máximo: 2MB' }, { status: 400 });
+      }
+      
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      
+      const photoId = crypto.randomUUID();
+      const ext = file.name.split('.').pop();
+      const filename = `church_${churchId}_${photoId}.${ext}`;
+      const uploadDir = path.join(process.cwd(), 'uploads', 'churches');
+      
+      // Criar diretório se não existir
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+      
+      const filepath = path.join(uploadDir, filename);
+      fs.writeFileSync(filepath, buffer);
+      
+      // Atualizar igreja com URL da foto
+      await db.collection('churches').updateOne(
+        { churchId },
+        { $set: { photoUrl: `/uploads/churches/${filename}`, updatedAt: getBrazilTime().toISOString() } }
+      );
+      
+      return NextResponse.json({ 
+        success: true, 
+        photoUrl: `/uploads/churches/${filename}`,
+        message: 'Foto da igreja enviada com sucesso!' 
+      });
+    }
+    
+    // GET AVAILABLE PASTORS (pastores disponíveis para trocar)
+    if (endpoint === 'churches/available-pastors') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      // Buscar todos os usuários com role pastor/leader
+      const pastors = await db.collection('users')
+        .find(
+          { role: { $in: ['pastor', 'leader'] } },
+          { projection: { password: 0 } }
+        )
+        .toArray();
+      
+      // Marcar quais têm igreja e quais estão livres
+      for (let pastor of pastors) {
+        pastor.hasChurch = !!pastor.churchId;
+        pastor.available = !pastor.churchId;
+      }
+      
+      return NextResponse.json({ pastors });
+    }
+    
+    // CHANGE PASTOR (trocar pastor de uma igreja)
+    if (endpoint === 'churches/change-pastor') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const { churchId, newPastorId } = await request.json();
+      
+      const church = await db.collection('churches').findOne({ churchId });
+      const oldPastorId = church?.pastorId;
+      
+      // Remover associação do pastor antigo
+      if (oldPastorId) {
+        await db.collection('users').updateOne(
+          { userId: oldPastorId },
+          { $unset: { church: '', churchId: '' } }
+        );
+      }
+      
+      // Atualizar igreja com novo pastor
+      await db.collection('churches').updateOne(
+        { churchId },
+        { $set: { pastorId: newPastorId, updatedAt: getBrazilTime().toISOString() } }
+      );
+      
+      // Atualizar novo pastor com igreja
+      if (newPastorId) {
+        await db.collection('users').updateOne(
+          { userId: newPastorId },
+          { $set: { church: church.name, churchId } }
+        );
+      }
+      
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'change_pastor',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { churchId, oldPastorId, newPastorId }
+      });
+      
+      return NextResponse.json({ success: true, message: 'Pastor alterado com sucesso!' });
+    }
 
     
     // EXPORT CSV
