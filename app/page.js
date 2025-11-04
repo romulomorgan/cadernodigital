@@ -2647,8 +2647,9 @@ export default function App() {
                     onClick={() => {
                       const receipt = viewingReceipts.receipts[viewingReceipts.currentIndex];
                       const link = document.createElement('a');
-                      link.href = `/uploads/receipts/${receipt.filepath}`;
+                      link.href = `/api/download/receipt/${receipt.filepath}`;
                       link.download = receipt.filename;
+                      link.target = '_blank';
                       document.body.appendChild(link);
                       link.click();
                       document.body.removeChild(link);
