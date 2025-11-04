@@ -293,6 +293,13 @@ export default function App() {
     }
   };
   
+  // Auto-carregar stats quando entrar na aba Dashboard
+  useEffect(() => {
+    if (isAuthenticated && activeTab === 'dashboard' && !stats) {
+      fetchStats();
+    }
+  }, [isAuthenticated, activeTab, stats]);
+  
   const fetchStats = async () => {
     try {
       const res = await fetch('/api/stats/overview', {
