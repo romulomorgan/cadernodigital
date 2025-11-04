@@ -3090,11 +3090,15 @@ export default function App() {
                                       <img 
                                         src={church.photoUrl} 
                                         alt={church.name}
-                                        className="w-24 h-24 rounded-lg object-cover"
+                                        className="w-32 h-32 rounded-lg object-cover border-2 border-gray-300"
+                                        onError={(e) => {
+                                          e.target.onerror = null;
+                                          e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2UwZTBlMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjQwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+8J+Pm++4jzwvdGV4dD48L3N2Zz4=';
+                                        }}
                                       />
                                     ) : (
-                                      <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
-                                        <span className="text-4xl">🏛️</span>
+                                      <div className="w-32 h-32 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center border-2 border-blue-300">
+                                        <span className="text-6xl">🏛️</span>
                                       </div>
                                     )}
                                     <div className="flex-1">
