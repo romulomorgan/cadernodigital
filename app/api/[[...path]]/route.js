@@ -1552,14 +1552,15 @@ export async function POST(request) {
       writeFileSync(filepath, buffer);
       
       // Atualizar igreja com URL da foto
+      const photoUrl = `/api/uploads/churches/${filename}`;
       await db.collection('churches').updateOne(
         { churchId },
-        { $set: { photoUrl: `/uploads/churches/${filename}`, updatedAt: getBrazilTime().toISOString() } }
+        { $set: { photoUrl, updatedAt: getBrazilTime().toISOString() } }
       );
       
       return NextResponse.json({ 
         success: true, 
-        photoUrl: `/uploads/churches/${filename}`,
+        photoUrl,
         message: 'Foto da igreja enviada com sucesso!' 
       });
     }
