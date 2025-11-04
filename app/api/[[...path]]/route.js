@@ -1030,7 +1030,7 @@ export async function POST(request) {
       return NextResponse.json({ success: true, message: 'Solicitação enviada ao Líder Máximo' });
     }
     
-    // GET UNLOCK REQUESTS
+    // GET UNLOCK REQUESTS (Master vê todas pendentes)
     if (endpoint === 'unlock/requests') {
       const user = verifyToken(request);
       if (!user || user.role !== 'master') {
@@ -1043,6 +1043,42 @@ export async function POST(request) {
         .toArray();
       
       return NextResponse.json({ requests });
+    }
+    
+    // GET MY UNLOCK STATUS (usuário vê suas próprias solicitações e overrides ativos)
+    if (endpoint === 'unlock/my-status') {
+      const user = verifyToken(request);
+      if (!user) {
+        return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+      }
+      
+      const { month, year } = await request.json();
+      
+      // Buscar solicitações pendentes do usuário
+      const pendingRequests = await db.collection('unlock_requests')
+        .find({ 
+          requesterId: user.userId,
+          month: parseInt(month),
+          year: parseInt(year),
+          status: 'pending'
+        })
+        .toArray();
+      
+      // Buscar time_overrides ativos do usuário
+      const now = getBrazilTime().toISOString();
+      const activeOverrides = await db.collection('time_overrides')
+        .find({ 
+          userId: user.userId,
+          month: parseInt(month),
+          year: parseInt(year),
+          expiresAt: { $gt: now }
+        })
+        .toArray();
+      
+      return NextResponse.json({ 
+        pendingRequests,
+        activeOverrides
+      });
     }
     
     // APPROVE UNLOCK
