@@ -3308,6 +3308,96 @@ export default function App() {
           </div>
         </DialogContent>
       </Dialog>
+      
+      {/* Dialog de Confirmação - Excluir Usuário */}
+      <Dialog open={showUserDeleteConfirm} onOpenChange={setShowUserDeleteConfirm}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertCircle className="w-5 h-5" />
+              Confirmar Exclusão
+            </DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir este usuário?
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {selectedUser && (
+              <div className="bg-gray-50 p-3 rounded">
+                <p className="font-semibold">{selectedUser.name}</p>
+                <p className="text-sm text-gray-600">{selectedUser.email}</p>
+              </div>
+            )}
+            
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <p className="text-sm text-red-800 font-medium">
+                ⚠️ Esta ação não pode ser desfeita!
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex gap-3 justify-end">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowUserDeleteConfirm(false)}
+            >
+              Cancelar
+            </Button>
+            <Button 
+              onClick={() => handleDeleteUser(selectedUser?.userId)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Sim, Excluir
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Dialog de Confirmação - Excluir Igreja */}
+      <Dialog open={showChurchDeleteConfirm} onOpenChange={setShowChurchDeleteConfirm}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertCircle className="w-5 h-5" />
+              Confirmar Exclusão da Igreja
+            </DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir esta igreja?
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {selectedChurch && (
+              <div className="bg-gray-50 p-3 rounded">
+                <p className="font-semibold">{selectedChurch.name}</p>
+                <p className="text-sm text-gray-600">{selectedChurch.city} - {selectedChurch.state}</p>
+              </div>
+            )}
+            
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <p className="text-sm text-red-800 font-medium">
+                ⚠️ Esta ação não pode ser desfeita! Todos os usuários associados perderão a referência a esta igreja.
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex gap-3 justify-end">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowChurchDeleteConfirm(false)}
+            >
+              Cancelar
+            </Button>
+            <Button 
+              onClick={() => handleDeleteChurch(selectedChurch?.churchId)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Sim, Excluir Igreja
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
