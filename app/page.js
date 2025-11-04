@@ -1777,6 +1777,8 @@ export default function App() {
                         {timeSlots.map(timeSlot => {
                           const entry = getEntry(day, timeSlot);
                           const lockStatus = isEntryLocked(entry, currentBrazilTime, day, timeSlot);
+                          const isPending = hasPendingRequest(day, timeSlot);
+                          const isApproved = hasActiveOverride(day, timeSlot);
                           
                           return (
                             <div key={timeSlot} className="border-2 border-gray-200 rounded-lg p-3 hover:border-blue-300 transition-colors">
