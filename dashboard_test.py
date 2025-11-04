@@ -248,7 +248,7 @@ def test_scenario_2_user_master(tokens):
     """
     log_test("=== CENÁRIO 2: USUÁRIO MASTER ===")
     
-    master_headers = {"Authorization": f"Bearer {tokens['mastertest@iudp.com']}"}
+    master_headers = {"Authorization": f"Bearer {tokens['joao.silva@iudp.org.br']}"}
     
     # Fazer requisição ao dashboard
     dashboard_data = {"month": 9, "year": 2024}
