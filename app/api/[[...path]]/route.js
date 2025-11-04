@@ -1055,23 +1055,47 @@ export async function POST(request) {
       
       const { requestId, entryId, durationMinutes } = await request.json();
       
-      // Buscar entry para verificar se mês está fechado (apenas para info no audit)
-      const entry = await db.collection('entries').findOne({ entryId });
+      // Buscar a solicitação para obter informações
+      const unlockRequest = await db.collection('unlock_requests').findOne({ requestId });
+      if (!unlockRequest) {
+        return NextResponse.json({ error: 'Solicitação não encontrada' }, { status: 404 });
+      }
+      
+      // Verificar se mês está fechado
       const monthStatus = await db.collection('month_status').findOne({ 
-        month: entry?.month, 
-        year: entry?.year 
+        month: unlockRequest.month, 
+        year: unlockRequest.year 
       });
       
-      await db.collection('entries').updateOne(
-        { entryId },
-        { 
-          $set: { 
-            masterUnlocked: true,
-            unlockedUntil: addHours(getBrazilTime(), Math.ceil(durationMinutes / 60)).toISOString()
-          } 
-        }
-      );
+      // Se tem entryId, atualizar o entry existente
+      if (entryId && entryId !== 'null') {
+        await db.collection('entries').updateOne(
+          { entryId },
+          { 
+            $set: { 
+              masterUnlocked: true,
+              unlockedUntil: addHours(getBrazilTime(), Math.ceil(durationMinutes / 60)).toISOString()
+            } 
+          }
+        );
+      } else {
+        // Se não tem entryId, criar um time override para permitir lançamento no slot vazio
+        const unlockExpiry = addHours(getBrazilTime(), Math.ceil(durationMinutes / 60)).toISOString();
+        
+        await db.collection('time_overrides').insertOne({
+          overrideId: crypto.randomUUID(),
+          day: unlockRequest.day,
+          month: unlockRequest.month,
+          year: unlockRequest.year,
+          timeSlot: unlockRequest.timeSlot,
+          userId: unlockRequest.requesterId,
+          approvedBy: user.userId,
+          expiresAt: unlockExpiry,
+          createdAt: getBrazilTime().toISOString()
+        });
+      }
       
+      // Atualizar a solicitação como aprovada
       await db.collection('unlock_requests').updateOne(
         { requestId },
         { 
@@ -1083,6 +1107,7 @@ export async function POST(request) {
         }
       );
       
+      // Registrar no audit log
       await db.collection('audit_logs').insertOne({
         logId: crypto.randomUUID(),
         action: 'approve_unlock',
@@ -1090,7 +1115,12 @@ export async function POST(request) {
         timestamp: getBrazilTime().toISOString(),
         details: { 
           requestId, 
-          entryId, 
+          entryId: entryId || 'empty_slot',
+          day: unlockRequest.day,
+          month: unlockRequest.month,
+          year: unlockRequest.year,
+          timeSlot: unlockRequest.timeSlot,
+          requesterId: unlockRequest.requesterId,
           durationMinutes,
           monthClosed: monthStatus?.closed || false
         }
@@ -1098,6 +1128,7 @@ export async function POST(request) {
       
       return NextResponse.json({ 
         success: true,
+        message: entryId ? 'Liberação concedida para edição' : 'Liberação concedida para novo lançamento',
         warning: monthStatus?.closed ? 'Atenção: Mês está fechado. Liberação concedida pelo Master.' : null
       });
     }
