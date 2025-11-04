@@ -17,36 +17,71 @@ from datetime import datetime
 # Configuração da API
 BASE_URL = "https://financial-iudp.preview.emergentagent.com/api"
 
-def log_test(message, success=None):
-    """Log de teste com formatação"""
-    timestamp = datetime.now().strftime("%H:%M:%S")
-    if success is True:
-        print(f"[{timestamp}] ✅ {message}")
-    elif success is False:
-        print(f"[{timestamp}] ❌ {message}")
-    else:
-        print(f"[{timestamp}] ℹ️  {message}")
-
-def make_request(method, endpoint, data=None, headers=None):
-    """Fazer requisição HTTP com tratamento de erro"""
-    url = f"{BASE_URL}/{endpoint}"
-    try:
-        if method == "POST":
-            response = requests.post(url, json=data, headers=headers, timeout=10)
-        elif method == "GET":
-            response = requests.get(url, headers=headers, timeout=10)
+class IUDPTester:
+    def __init__(self):
+        self.master_token = None
+        self.test_user_id = None
+        self.test_church_id = None
+        self.test_pastor_id = None
         
-        return {
-            'status_code': response.status_code,
-            'data': response.json() if response.headers.get('content-type', '').startswith('application/json') else response.text,
-            'success': response.status_code < 400
+    def log(self, message):
+        print(f"[TEST] {message}")
+        
+    def log_success(self, message):
+        print(f"✅ {message}")
+        
+    def log_error(self, message):
+        print(f"❌ {message}")
+        
+    def log_info(self, message):
+        print(f"ℹ️  {message}")
+
+    def authenticate_master(self):
+        """Autentica como usuário Master"""
+        self.log("🔐 Autenticando como Master...")
+        
+        # Credenciais Master conforme especificado
+        login_data = {
+            "email": "joao.silva@iudp.org.br",
+            "password": "master123"
         }
-    except Exception as e:
+        
+        try:
+            response = requests.post(f"{BASE_URL}/auth/login", json=login_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.master_token = data.get('token')
+                user_info = data.get('user', {})
+                
+                if user_info.get('role') == 'master':
+                    self.log_success(f"Master autenticado: {user_info.get('name')} ({user_info.get('email')})")
+                    return True
+                else:
+                    self.log_error(f"Usuário não é Master. Role: {user_info.get('role')}")
+                    return False
+            else:
+                self.log_error(f"Falha na autenticação Master: {response.status_code} - {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_error(f"Erro na autenticação Master: {str(e)}")
+            return False
+
+    def get_headers(self):
+        """Retorna headers com token de autenticação"""
         return {
-            'status_code': 0,
-            'data': {'error': str(e)},
-            'success': False
+            "Authorization": f"Bearer {self.master_token}",
+            "Content-Type": "application/json"
         }
+
+    def create_test_image(self, format='JPEG'):
+        """Cria uma imagem de teste pequena"""
+        img = Image.new('RGB', (100, 100), color='red')
+        img_bytes = io.BytesIO()
+        img.save(img_bytes, format=format)
+        img_bytes.seek(0)
+        return img_bytes
 def create_test_users():
     """Criar usuários de teste: Master e usuário comum"""
     log_test("=== CRIANDO USUÁRIOS DE TESTE ===")
