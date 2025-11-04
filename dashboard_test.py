@@ -422,13 +422,10 @@ def main():
     
     log_test(f"Continuando com {len(tokens)} usuários disponíveis", None)
     
-    # Criar time overrides se temos Master
-    master_token = tokens.get('joao.silva@iudp.org.br')
-    if master_token:
-        create_time_overrides_for_testing(master_token)
-    
-    # Criar entries de teste
-    create_test_entries(tokens)
+    # Encontrar mês com entries existentes ou criar entries de teste
+    test_month = create_test_entries_with_master(tokens)
+    if not test_month:
+        test_month = {"month": 11, "year": 2025}  # Usar mês padrão se não encontrar entries
     
     # Executar cenários de teste
     results = []
