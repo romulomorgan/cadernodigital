@@ -15,7 +15,7 @@ API_URL = f"{BASE_URL}/api"
 
 # Test credentials
 MASTER_EMAIL = "joao.silva@iudp.org.br"
-MASTER_PASSWORD = "senha123"
+MASTER_PASSWORD = "LiderMaximo2025!"
 
 def login_master():
     """Login as master user and return token"""
