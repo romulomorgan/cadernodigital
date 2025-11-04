@@ -2961,7 +2961,7 @@ export default function App() {
                       </CardHeader>
                       <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="col-span-2">
+                          <div>
                             <Label>Nome da Igreja *</Label>
                             <Input 
                               value={newChurchName}
@@ -2970,13 +2970,50 @@ export default function App() {
                               className="mt-1" 
                             />
                           </div>
+                          <div>
+                            <Label>CEP *</Label>
+                            <Input 
+                              value={newChurchCEP}
+                              onChange={(e) => handleCEPChange(e.target.value)}
+                              placeholder="00000-000" 
+                              maxLength={9}
+                              className="mt-1" 
+                            />
+                            {loadingCEP && <p className="text-xs text-blue-600 mt-1">🔍 Buscando endereço...</p>}
+                          </div>
                           <div className="col-span-2">
-                            <Label>Endereço Completo</Label>
-                            <Textarea 
+                            <Label>Endereço (Rua/Avenida)</Label>
+                            <Input 
                               value={newChurchAddress}
                               onChange={(e) => setNewChurchAddress(e.target.value)}
-                              placeholder="Rua, número, bairro" 
-                              rows={2} 
+                              placeholder="Rua/Avenida" 
+                              className="mt-1" 
+                            />
+                          </div>
+                          <div>
+                            <Label>Número</Label>
+                            <Input 
+                              value={newChurchNumber}
+                              onChange={(e) => setNewChurchNumber(e.target.value)}
+                              placeholder="123" 
+                              className="mt-1" 
+                            />
+                          </div>
+                          <div>
+                            <Label>Complemento</Label>
+                            <Input 
+                              value={newChurchComplement}
+                              onChange={(e) => setNewChurchComplement(e.target.value)}
+                              placeholder="Sala 10, Bloco A..." 
+                              className="mt-1" 
+                            />
+                          </div>
+                          <div>
+                            <Label>Bairro</Label>
+                            <Input 
+                              value={newChurchNeighborhood}
+                              onChange={(e) => setNewChurchNeighborhood(e.target.value)}
+                              placeholder="Centro" 
                               className="mt-1" 
                             />
                           </div>
@@ -2985,16 +3022,17 @@ export default function App() {
                             <Input 
                               value={newChurchCity}
                               onChange={(e) => setNewChurchCity(e.target.value)}
-                              placeholder="Ex: São Paulo" 
+                              placeholder="São Paulo" 
                               className="mt-1" 
                             />
                           </div>
                           <div>
-                            <Label>Estado</Label>
+                            <Label>Estado (UF)</Label>
                             <Input 
                               value={newChurchState}
                               onChange={(e) => setNewChurchState(e.target.value)}
-                              placeholder="Ex: SP" 
+                              placeholder="SP" 
+                              maxLength={2}
                               className="mt-1" 
                             />
                           </div>
@@ -3003,7 +3041,7 @@ export default function App() {
                             <Input 
                               value={newChurchRegion}
                               onChange={(e) => setNewChurchRegion(e.target.value)}
-                              placeholder="Ex: Zona Sul" 
+                              placeholder="Zona Sul" 
                               className="mt-1" 
                             />
                           </div>
