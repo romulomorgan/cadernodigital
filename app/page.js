@@ -92,6 +92,24 @@ export default function App() {
   const [availableRegions, setAvailableRegions] = useState([]);
   const [availableChurches, setAvailableChurches] = useState([]);
   
+  // CRUD states - Usuários e Igrejas
+  const [userPhotoFile, setUserPhotoFile] = useState(null);
+  const [userPhotoPreview, setUserPhotoPreview] = useState(null);
+  const [churchPhotoFile, setChurchPhotoFile] = useState(null);
+  const [churchPhotoPreview, setChurchPhotoPreview] = useState(null);
+  const [showUserViewModal, setShowUserViewModal] = useState(false);
+  const [showUserEditModal, setShowUserEditModal] = useState(false);
+  const [showUserDeleteConfirm, setShowUserDeleteConfirm] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [allChurches, setAllChurches] = useState([]);
+  const [showChurchViewModal, setShowChurchViewModal] = useState(false);
+  const [showChurchEditModal, setShowChurchEditModal] = useState(false);
+  const [showChurchDeleteConfirm, setShowChurchDeleteConfirm] = useState(false);
+  const [showChangePastorModal, setShowChangePastorModal] = useState(false);
+  const [selectedChurch, setSelectedChurch] = useState(null);
+  const [availablePastors, setAvailablePastors] = useState([]);
+  const [pastorSearchQuery, setPastorSearchQuery] = useState('');
+  
   const timeSlots = ['08:00', '10:00', '12:00', '15:00', '19:30'];
   const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
   
