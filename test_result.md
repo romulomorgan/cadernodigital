@@ -325,20 +325,27 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
-      Implementados endpoints de fechar/reabrir mês. Endpoints estão duplicados no código
-      (aparecem 2 vezes), mas isso será corrigido após confirmar que funcionam.
+      ✅ CORREÇÕES CRÍTICAS IMPLEMENTADAS - NOV 4, 2025 13:42
       
-      Para testar, o agente precisará:
-      1. Criar um usuário master ou usar credenciais existentes
-      2. Fazer login e obter token JWT
-      3. Testar POST /api/month/close com { month: X, year: 2025 }
-      4. Verificar que mês foi marcado como fechado no DB (collection month_status)
-      5. Testar POST /api/month/reopen com mesmos parâmetros
-      6. Verificar que mês foi marcado como reaberto no DB
-      7. Verificar logs de auditoria (collection audit_logs)
-      8. Testar negação de acesso com usuário não-master
+      1. DASHBOARD AUTO-LOAD E FILTROS:
+         - ✅ Backend: Adicionados filtros de permissão no endpoint /api/dashboard/data (linha 891-935)
+         - ✅ Frontend: Adicionado useEffect para auto-carregar dashboard quando entrar na aba (linha 303-307)
+         - ✅ Frontend: Removido botão "Carregar Dashboard" - agora carrega automaticamente com loading skeleton
+         - ✅ Filtros implementados: Master vê tudo, outros usuários veem apenas seus dados (state/region/church/userId)
       
-      Aguardando teste do backend antes de implementar UI e lógica de bloqueio de edições.
+      2. CONFIRMAÇÃO DE LOGOUT MELHORADA:
+         - ✅ Substituído confirm() nativo por Dialog do shadcn (linha 70 e 2762-2791)
+         - ✅ Dialog com mensagem clara e botões de ação (Cancelar / Sim, Sair)
+         - ✅ Toast de sucesso ao confirmar logout
+      
+      3. CONFIRMAÇÕES EXISTENTES:
+         - ✅ Fechar mês: confirmação simples já implementada (linha 395)
+         - ✅ Reabrir mês: dupla confirmação já implementada (linha 430-432)
+      
+      PENDENTE:
+      - Testar dashboard com diferentes tipos de usuários
+      - Verificar se comprovantes estão sendo baixados corretamente
+      - Adicionar endpoints de exclusão com confirmações (quando necessário)
   - agent: "testing"
     message: |
       ✅ TESTES DE BACKEND CONCLUÍDOS COM SUCESSO - FASE 2 GOVERNANÇA FUNCIONANDO
