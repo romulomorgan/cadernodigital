@@ -246,11 +246,11 @@ def test_scenario_1_user_comum(tokens, test_month):
     
     return True
 
-def test_scenario_2_user_master(tokens):
+def test_scenario_2_user_master(tokens, test_month):
     """
     Cenário 2: Usuário Master
     - Login com usuário master (role === 'master')
-    - POST /api/dashboard/data com { month: 11, year: 2025 }
+    - POST /api/dashboard/data com test_month
     - Validar: Retorna TODOS os entries do mês (sem filtros)
     - Validar: Total inclui dados de todos os usuários
     """
@@ -259,7 +259,7 @@ def test_scenario_2_user_master(tokens):
     master_headers = {"Authorization": f"Bearer {tokens['joao.silva@iudp.org.br']}"}
     
     # Fazer requisição ao dashboard
-    dashboard_data = {"month": 9, "year": 2024}
+    dashboard_data = test_month
     response = make_request("POST", "dashboard/data", dashboard_data, master_headers)
     
     if not response['success']:
