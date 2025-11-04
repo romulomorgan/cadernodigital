@@ -1276,6 +1276,118 @@ export async function POST(request) {
         message: active ? 'Usuário desbloqueado!' : 'Usuário bloqueado!' 
       });
     }
+    
+    // UPDATE USER DATA (editar usuário completo)
+    if (endpoint === 'users/update') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const { userId, userData } = await request.json();
+      
+      // Remover campos que não devem ser atualizados diretamente
+      delete userData.password;
+      delete userData.userId;
+      
+      await db.collection('users').updateOne(
+        { userId },
+        { $set: { ...userData, updatedAt: getBrazilTime().toISOString() } }
+      );
+      
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'update_user',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { targetUserId: userId, updates: Object.keys(userData) }
+      });
+      
+      return NextResponse.json({ success: true, message: 'Usuário atualizado com sucesso!' });
+    }
+    
+    // DELETE USER
+    if (endpoint === 'users/delete') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const { userId } = await request.json();
+      
+      // Não permitir deletar a si mesmo
+      if (userId === user.userId) {
+        return NextResponse.json({ error: 'Você não pode excluir seu próprio usuário!' }, { status: 400 });
+      }
+      
+      const deletedUser = await db.collection('users').findOne({ userId });
+      await db.collection('users').deleteOne({ userId });
+      
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'delete_user',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { deletedUserId: userId, deletedUserEmail: deletedUser?.email }
+      });
+      
+      return NextResponse.json({ success: true, message: 'Usuário excluído com sucesso!' });
+    }
+    
+    // UPLOAD USER PHOTO
+    if (endpoint === 'users/upload-photo') {
+      const user = verifyToken(request);
+      if (!user) {
+        return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+      }
+      
+      const formData = await request.formData();
+      const file = formData.get('photo');
+      const targetUserId = formData.get('userId');
+      
+      if (!file) {
+        return NextResponse.json({ error: 'Nenhum arquivo enviado' }, { status: 400 });
+      }
+      
+      // Validar tipo de arquivo
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        return NextResponse.json({ error: 'Tipo de arquivo não permitido. Use JPG, PNG ou WebP.' }, { status: 400 });
+      }
+      
+      // Validar tamanho (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        return NextResponse.json({ error: 'Arquivo muito grande. Tamanho máximo: 2MB' }, { status: 400 });
+      }
+      
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      
+      const photoId = crypto.randomUUID();
+      const ext = file.name.split('.').pop();
+      const filename = `user_${targetUserId}_${photoId}.${ext}`;
+      const uploadDir = path.join(process.cwd(), 'uploads', 'users');
+      
+      // Criar diretório se não existir
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+      
+      const filepath = path.join(uploadDir, filename);
+      fs.writeFileSync(filepath, buffer);
+      
+      // Atualizar usuário com URL da foto
+      await db.collection('users').updateOne(
+        { userId: targetUserId },
+        { $set: { photoUrl: `/uploads/users/${filename}`, updatedAt: getBrazilTime().toISOString() } }
+      );
+      
+      return NextResponse.json({ 
+        success: true, 
+        photoUrl: `/uploads/users/${filename}`,
+        message: 'Foto enviada com sucesso!' 
+      });
+    }
 
     
     // EXPORT CSV
