@@ -24,7 +24,7 @@ API_BASE = f"{BASE_URL}/api"
 
 # Credenciais do teste
 LOGIN_EMAIL = "joao.silva@iudp.org.br"
-LOGIN_PASSWORD = "senha123"
+LOGIN_PASSWORD = "LiderMaximo2025!"
 
 class TestRunner:
     def __init__(self):
