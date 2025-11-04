@@ -887,6 +887,28 @@ agent_communication:
       PRÓXIMA AÇÃO RECOMENDADA: Main agent pode finalizar e fazer summary da correção.
   - agent: "testing"
     message: |
+      ✅ TESTE RÁPIDO ESPECÍFICO CONCLUÍDO COM SUCESSO - NOV 4, 2025 18:45
+      
+      🎯 TESTE SOLICITADO: Validar que /api/churches/available-pastors retorna pastores, bispos E masters
+      
+      ✅ RESULTADO DO TESTE:
+      - ✅ Endpoint funcionando perfeitamente (Status 200)
+      - ✅ Retorna array de 7 usuários ordenados alfabeticamente
+      - ✅ Inclui usuários com role 'pastor' (4 usuários encontrados)
+      - ✅ Inclui usuários com role 'master' (3 usuários encontrados)
+      - ✅ Filtro configurado para incluir 'bispo' e 'leader' (0 usuários no DB atualmente)
+      - ✅ Cada usuário tem hasChurch (boolean) e available (boolean) funcionando corretamente
+      
+      🔍 IMPLEMENTAÇÃO CONFIRMADA:
+      - Código usa filtro: { role: { $in: ['pastor', 'leader', 'bispo', 'master'] } }
+      - Todos os roles solicitados estão incluídos no filtro
+      - Lógica de disponibilidade (hasChurch/available) funcionando
+      
+      📊 STATUS: TESTE RÁPIDO COMPLETADO - ENDPOINT 100% FUNCIONAL
+      
+      PRÓXIMA AÇÃO: Main agent pode prosseguir com outras tarefas ou finalizar.
+  - agent: "testing"
+    message: |
       🎉 TESTE COMPLETO DOS ENDPOINTS CRUD - USUÁRIOS E IGREJAS CONCLUÍDO COM SUCESSO TOTAL
       
       ✅ TODOS OS 14 TESTES PASSARAM - CRUD FUNCIONANDO PERFEITAMENTE
