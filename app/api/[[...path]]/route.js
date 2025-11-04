@@ -1377,14 +1377,15 @@ export async function POST(request) {
       writeFileSync(filepath, buffer);
       
       // Atualizar usuário com URL da foto
+      const photoUrl = `/api/uploads/users/${filename}`;
       await db.collection('users').updateOne(
         { userId: targetUserId },
-        { $set: { photoUrl: `/uploads/users/${filename}`, updatedAt: getBrazilTime().toISOString() } }
+        { $set: { photoUrl, updatedAt: getBrazilTime().toISOString() } }
       );
       
       return NextResponse.json({ 
         success: true, 
-        photoUrl: `/uploads/users/${filename}`,
+        photoUrl,
         message: 'Foto enviada com sucesso!' 
       });
     }
