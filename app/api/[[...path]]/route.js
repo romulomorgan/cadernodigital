@@ -1566,19 +1566,20 @@ export async function POST(request) {
       });
     }
     
-    // GET AVAILABLE PASTORS (pastores disponíveis para trocar)
+    // GET AVAILABLE PASTORS (pastores, bispos e masters disponíveis para trocar)
     if (endpoint === 'churches/available-pastors') {
       const user = verifyToken(request);
       if (!user || user.role !== 'master') {
         return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
       }
       
-      // Buscar todos os usuários com role pastor/leader
+      // Buscar todos os usuários com role pastor/leader/bispo/master
       const pastors = await db.collection('users')
         .find(
-          { role: { $in: ['pastor', 'leader'] } },
+          { role: { $in: ['pastor', 'leader', 'bispo', 'master'] } },
           { projection: { password: 0 } }
         )
+        .sort({ name: 1 })
         .toArray();
       
       // Marcar quais têm igreja e quais estão livres
