@@ -57,7 +57,7 @@ class TestRunner:
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get('success') and data.get('token'):
+                if data.get('token') and data.get('user'):
                     self.token = data['token']
                     user_info = data.get('user', {})
                     self.log_result(
