@@ -82,67 +82,160 @@ class IUDPTester:
         img.save(img_bytes, format=format)
         img_bytes.seek(0)
         return img_bytes
-def create_test_users():
-    """Criar usuários de teste: Master e usuário comum"""
-    log_test("=== CRIANDO USUÁRIOS DE TESTE ===")
-    
-    # Usuário Master
-    master_data = {
-        "name": "João Silva - Líder Máximo",
-        "email": "joao.silva@iudp.org.br",
-        "password": "LiderMaximo2025!",
-        "role": "master",
-        "church": "Igreja Central IUDP",
-        "region": "Região Sul",
-        "state": "São Paulo"
-    }
-    
-    master_response = make_request("POST", "auth/register", master_data)
-    if master_response['success']:
-        log_test("Usuário Master criado com sucesso", True)
-        master_token = master_response['data']['token']
-    else:
-        # Tentar login se já existe
-        login_response = make_request("POST", "auth/login", {
-            "email": master_data["email"],
-            "password": master_data["password"]
-        })
-        if login_response['success']:
-            log_test("Usuário Master já existe - fazendo login", True)
-            master_token = login_response['data']['token']
-        else:
-            log_test(f"Erro ao criar/logar Master: {master_response['data']}", False)
-            return None, None
-    
-    # Usuário comum
-    user_data = {
-        "name": "Maria Santos - Pastora",
-        "email": "maria.santos@iudp.org.br", 
-        "password": "Pastora2025!",
-        "role": "pastor",
-        "church": "Igreja Filial IUDP",
-        "region": "Região Norte",
-        "state": "São Paulo"
-    }
-    
-    user_response = make_request("POST", "auth/register", user_data)
-    if user_response['success']:
-        log_test("Usuário comum criado com sucesso", True)
-        user_token = user_response['data']['token']
-    else:
-        # Tentar login se já existe
-        login_response = make_request("POST", "auth/login", {
-            "email": user_data["email"],
-            "password": user_data["password"]
-        })
-        if login_response['success']:
-            log_test("Usuário comum já existe - fazendo login", True)
-            user_token = login_response['data']['token']
-        else:
-            log_test(f"Erro ao criar/logar usuário comum: {user_response['data']}", False)
-            return master_token, None
-    
-    return master_token, user_token
+    def test_users_list(self):
+        """Testa listagem de usuários"""
+        self.log("📋 Testando listagem de usuários...")
+        
+        try:
+            response = requests.post(f"{BASE_URL}/users/list", headers=self.get_headers())
+            
+            if response.status_code == 200:
+                data = response.json()
+                users = data.get('users', [])
+                self.log_success(f"Listagem de usuários funcionando. Total: {len(users)} usuários")
+                
+                # Encontrar um usuário para testes (que não seja Master)
+                for user in users:
+                    if user.get('role') != 'master':
+                        self.test_user_id = user.get('userId')
+                        self.log_info(f"Usuário de teste selecionado: {user.get('name')} ({user.get('email')})")
+                        break
+                        
+                return True
+            else:
+                self.log_error(f"Falha na listagem de usuários: {response.status_code} - {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_error(f"Erro na listagem de usuários: {str(e)}")
+            return False
+
+    def test_users_update(self):
+        """Testa atualização de usuário"""
+        if not self.test_user_id:
+            self.log_error("Nenhum usuário de teste disponível para atualização")
+            return False
+            
+        self.log("✏️ Testando atualização de usuário...")
+        
+        update_data = {
+            "userId": self.test_user_id,
+            "userData": {
+                "name": "Usuário Teste Atualizado",
+                "role": "pastor",
+                "church": "Igreja Teste",
+                "region": "Região Teste",
+                "state": "SP"
+            }
+        }
+        
+        try:
+            response = requests.post(f"{BASE_URL}/users/update", 
+                                   json=update_data, 
+                                   headers=self.get_headers())
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success'):
+                    self.log_success("Atualização de usuário funcionando")
+                    return True
+                else:
+                    self.log_error(f"Atualização falhou: {data}")
+                    return False
+            else:
+                self.log_error(f"Falha na atualização de usuário: {response.status_code} - {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_error(f"Erro na atualização de usuário: {str(e)}")
+            return False
+
+    def test_users_upload_photo(self):
+        """Testa upload de foto de usuário"""
+        if not self.test_user_id:
+            self.log_error("Nenhum usuário de teste disponível para upload de foto")
+            return False
+            
+        self.log("📸 Testando upload de foto de usuário...")
+        
+        try:
+            # Criar imagem de teste
+            img_data = self.create_test_image('JPEG')
+            
+            files = {
+                'photo': ('test_user.jpg', img_data, 'image/jpeg'),
+                'userId': (None, self.test_user_id)
+            }
+            
+            headers = {"Authorization": f"Bearer {self.master_token}"}
+            
+            response = requests.post(f"{BASE_URL}/users/upload-photo", 
+                                   files=files, 
+                                   headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success'):
+                    photo_url = data.get('photoUrl')
+                    self.log_success(f"Upload de foto de usuário funcionando. URL: {photo_url}")
+                    return True
+                else:
+                    self.log_error(f"Upload falhou: {data}")
+                    return False
+            else:
+                self.log_error(f"Falha no upload de foto: {response.status_code} - {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_error(f"Erro no upload de foto de usuário: {str(e)}")
+            return False
+
+    def test_users_upload_photo_validations(self):
+        """Testa validações do upload de foto de usuário"""
+        if not self.test_user_id:
+            return True  # Skip se não tem usuário de teste
+            
+        self.log("🔍 Testando validações de upload de foto...")
+        
+        # Teste 1: Arquivo muito grande (simular > 2MB)
+        try:
+            large_data = b'x' * (3 * 1024 * 1024)  # 3MB
+            files = {
+                'photo': ('large.jpg', io.BytesIO(large_data), 'image/jpeg'),
+                'userId': (None, self.test_user_id)
+            }
+            
+            headers = {"Authorization": f"Bearer {self.master_token}"}
+            response = requests.post(f"{BASE_URL}/users/upload-photo", files=files, headers=headers)
+            
+            if response.status_code == 400:
+                self.log_success("Validação de tamanho funcionando (rejeitou arquivo > 2MB)")
+            else:
+                self.log_error(f"Validação de tamanho falhou: {response.status_code}")
+                
+        except Exception as e:
+            self.log_info(f"Teste de arquivo grande: {str(e)}")
+        
+        # Teste 2: Tipo de arquivo inválido
+        try:
+            files = {
+                'photo': ('test.txt', io.BytesIO(b'texto'), 'text/plain'),
+                'userId': (None, self.test_user_id)
+            }
+            
+            headers = {"Authorization": f"Bearer {self.master_token}"}
+            response = requests.post(f"{BASE_URL}/users/upload-photo", files=files, headers=headers)
+            
+            if response.status_code == 400:
+                self.log_success("Validação de tipo de arquivo funcionando (rejeitou .txt)")
+                return True
+            else:
+                self.log_error(f"Validação de tipo falhou: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_error(f"Erro no teste de validações: {str(e)}")
+            return False
 def test_scenario_1_complete_flow(master_token, user_token):
     """
     Cenário 1: Fluxo Completo de Fechamento
