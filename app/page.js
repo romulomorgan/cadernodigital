@@ -2756,6 +2756,48 @@ export default function App() {
           </div>
         </DialogContent>
       </Dialog>
+      
+      {/* Dialog de Confirmação de Logout */}
+      <Dialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-orange-600">
+              <AlertCircle className="w-5 h-5" />
+              Confirmar Saída
+            </DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja sair do sistema?
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <p className="text-sm text-gray-600">
+              Ao sair, você precisará fazer login novamente para acessar o sistema.
+            </p>
+            
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+              <p className="text-xs text-gray-700">
+                💡 Seus dados estão salvos e seguros. Esta ação apenas encerrará sua sessão atual.
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex gap-3 justify-end">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowLogoutConfirm(false)}
+            >
+              Cancelar
+            </Button>
+            <Button 
+              onClick={confirmLogout}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Sim, Sair
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
