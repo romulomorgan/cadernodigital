@@ -457,6 +457,11 @@ export default function App() {
       return;
     }
     
+    console.log('[SAVE OBS] Salvando:', { 
+      length: monthObservation.length, 
+      active: monthObservationActive 
+    });
+    
     // Salvar em localStorage como backup
     const backupKey = `obs_${currentDate.getFullYear()}_${currentDate.getMonth() + 1}`;
     localStorage.setItem(backupKey, monthObservation);
@@ -478,14 +483,58 @@ export default function App() {
       
       if (res.ok) {
         const data = await res.json();
-        toast.success(data.message || '✅ Observação salva');
+        toast.success(data.message || '✅ Observação salva com sucesso!');
         localStorage.removeItem(backupKey);
+        // Recarregar entries para atualizar observação
+        fetchEntries();
       } else {
         const error = await res.json();
         toast.error(`❌ ${error.error || 'Erro ao salvar'}`);
       }
     } catch (error) {
-      toast.error('❌ Erro ao conectar');
+      console.error('[SAVE OBS] Erro:', error);
+      toast.error('❌ Erro ao conectar com servidor');
+    }
+  };
+  
+  const handleClearMonthObservation = async () => {
+    if (!confirm('⚠️ Tem certeza que deseja limpar a observação do mês?')) {
+      return;
+    }
+    
+    try {
+      // Limpar localmente
+      setMonthObservation('');
+      setMonthObservationActive(false);
+      
+      // Limpar no servidor
+      const res = await fetch('/api/observations/month', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          month: currentDate.getMonth() + 1,
+          year: currentDate.getFullYear(),
+          observation: '',
+          active: false
+        })
+      });
+      
+      if (res.ok) {
+        toast.success('✅ Observação limpa com sucesso!');
+        // Remover backup do localStorage
+        const backupKey = `obs_${currentDate.getFullYear()}_${currentDate.getMonth() + 1}`;
+        localStorage.removeItem(backupKey);
+        // Recarregar entries
+        fetchEntries();
+      } else {
+        toast.error('❌ Erro ao limpar observação');
+      }
+    } catch (error) {
+      console.error('[CLEAR OBS] Erro:', error);
+      toast.error('❌ Erro ao conectar com servidor');
     }
   };
   
