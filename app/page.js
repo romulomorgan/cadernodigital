@@ -3753,6 +3753,203 @@ export default function App() {
           </div>
         </DialogContent>
       </Dialog>
+      
+      {/* Dialog - Editar Usuário */}
+      <Dialog open={showUserEditModal} onOpenChange={setShowUserEditModal}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>✏️ Editar Usuário</DialogTitle>
+          </DialogHeader>
+          {selectedUser && (
+            <div className="space-y-4 py-4">
+              <div>
+                <Label>Nome Completo</Label>
+                <Input 
+                  value={editUserData.name || selectedUser.name}
+                  onChange={(e) => setEditUserData({...editUserData, name: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label>Email</Label>
+                <Input 
+                  value={editUserData.email || selectedUser.email}
+                  onChange={(e) => setEditUserData({...editUserData, email: e.target.value})}
+                />
+              </div>
+              <div className="flex gap-3 justify-end pt-4">
+                <Button variant="outline" onClick={() => setShowUserEditModal(false)}>
+                  Cancelar
+                </Button>
+                <Button onClick={() => handleEditUser(selectedUser.userId, editUserData)}>
+                  💾 Salvar Alterações
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Dialog - Visualizar Usuário */}
+      <Dialog open={showUserViewModal} onOpenChange={setShowUserViewModal}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>👁️ Visualizar Usuário</DialogTitle>
+          </DialogHeader>
+          {selectedUser && (
+            <div className="space-y-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-500 text-xs">Nome</Label>
+                  <p className="font-semibold">{selectedUser.name}</p>
+                </div>
+                <div>
+                  <Label className="text-gray-500 text-xs">Email</Label>
+                  <p className="font-semibold">{selectedUser.email}</p>
+                </div>
+                <div>
+                  <Label className="text-gray-500 text-xs">Função</Label>
+                  <Badge>{selectedUser.role}</Badge>
+                </div>
+                <div>
+                  <Label className="text-gray-500 text-xs">Escopo</Label>
+                  <Badge variant="outline">{selectedUser.scope}</Badge>
+                </div>
+                {selectedUser.church && (
+                  <div>
+                    <Label className="text-gray-500 text-xs">Igreja</Label>
+                    <p>{selectedUser.church}</p>
+                  </div>
+                )}
+              </div>
+              <Button variant="outline" onClick={() => setShowUserViewModal(false)} className="w-full mt-4">
+                Fechar
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Dialog - Visualizar Igreja */}
+      <Dialog open={showChurchViewModal} onOpenChange={setShowChurchViewModal}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>👁️ Visualizar Igreja</DialogTitle>
+          </DialogHeader>
+          {selectedChurch && (
+            <div className="space-y-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <Label className="text-gray-500 text-xs">Nome</Label>
+                  <p className="font-semibold text-lg">{selectedChurch.name}</p>
+                </div>
+                <div className="col-span-2">
+                  <Label className="text-gray-500 text-xs">Endereço</Label>
+                  <p>{selectedChurch.address}</p>
+                </div>
+                <div>
+                  <Label className="text-gray-500 text-xs">Cidade</Label>
+                  <p>{selectedChurch.city}</p>
+                </div>
+                <div>
+                  <Label className="text-gray-500 text-xs">Estado</Label>
+                  <p>{selectedChurch.state}</p>
+                </div>
+                <div>
+                  <Label className="text-gray-500 text-xs">Região</Label>
+                  <p>{selectedChurch.region}</p>
+                </div>
+              </div>
+              <Button variant="outline" onClick={() => setShowChurchViewModal(false)} className="w-full mt-4">
+                Fechar
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Dialog - Editar Igreja */}
+      <Dialog open={showChurchEditModal} onOpenChange={setShowChurchEditModal}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>✏️ Editar Igreja</DialogTitle>
+          </DialogHeader>
+          {selectedChurch && (
+            <div className="space-y-4 py-4">
+              <div>
+                <Label>Nome da Igreja</Label>
+                <Input 
+                  value={editChurchData.name || selectedChurch.name}
+                  onChange={(e) => setEditChurchData({...editChurchData, name: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label>Endereço</Label>
+                <Textarea 
+                  value={editChurchData.address || selectedChurch.address}
+                  onChange={(e) => setEditChurchData({...editChurchData, address: e.target.value})}
+                  rows={2}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Cidade</Label>
+                  <Input 
+                    value={editChurchData.city || selectedChurch.city}
+                    onChange={(e) => setEditChurchData({...editChurchData, city: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label>Estado</Label>
+                  <Input 
+                    value={editChurchData.state || selectedChurch.state}
+                    onChange={(e) => setEditChurchData({...editChurchData, state: e.target.value})}
+                  />
+                </div>
+              </div>
+              <div>
+                <Label>Região</Label>
+                <Input 
+                  value={editChurchData.region || selectedChurch.region}
+                  onChange={(e) => setEditChurchData({...editChurchData, region: e.target.value})}
+                />
+              </div>
+              <div className="flex gap-3 justify-end pt-4">
+                <Button variant="outline" onClick={() => setShowChurchEditModal(false)}>
+                  Cancelar
+                </Button>
+                <Button onClick={async () => {
+                  try {
+                    const res = await fetch('/api/churches/update', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                      },
+                      body: JSON.stringify({
+                        churchId: selectedChurch.churchId,
+                        churchData: editChurchData
+                      })
+                    });
+                    
+                    const data = await res.json();
+                    if (res.ok) {
+                      toast.success('✅ ' + data.message);
+                      setShowChurchEditModal(false);
+                      fetchAllChurches();
+                    } else {
+                      toast.error('❌ ' + data.error);
+                    }
+                  } catch (error) {
+                    toast.error('❌ Erro ao atualizar igreja');
+                  }
+                }}>
+                  💾 Salvar Alterações
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
