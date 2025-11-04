@@ -966,18 +966,25 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
       }
       
-      const { entryId, reason } = await request.json();
+      const userData = await db.collection('users').findOne({ userId: user.userId });
+      const { entryId, reason, day, month, year, timeSlot } = await request.json();
       
-      // Buscar entry para verificar o mês
-      const entry = await db.collection('entries').findOne({ entryId });
-      if (!entry) {
-        return NextResponse.json({ error: 'Lançamento não encontrado' }, { status: 404 });
+      // Pode ser solicitação para slot vazio OU para entry existente
+      let entryData = null;
+      if (entryId) {
+        entryData = await db.collection('entries').findOne({ entryId });
       }
       
-      // Verificar se mês está fechado (Master pode aprovar unlock mesmo em mês fechado)
+      // Se não tem entryId mas tem day/month/year/timeSlot, é solicitação para slot vazio
+      const requestMonth = entryData?.month || parseInt(month);
+      const requestYear = entryData?.year || parseInt(year);
+      const requestDay = entryData?.day || parseInt(day);
+      const requestTimeSlot = entryData?.timeSlot || timeSlot;
+      
+      // Verificar se mês está fechado
       const monthStatus = await db.collection('month_status').findOne({ 
-        month: entry.month, 
-        year: entry.year 
+        month: requestMonth, 
+        year: requestYear 
       });
       if (monthStatus?.closed) {
         return NextResponse.json({ 
@@ -988,10 +995,18 @@ export async function POST(request) {
       
       const request_record = {
         requestId: crypto.randomUUID(),
-        entryId,
+        entryId: entryId || null,
+        day: requestDay,
+        month: requestMonth,
+        year: requestYear,
+        timeSlot: requestTimeSlot,
         requesterId: user.userId,
-        requesterName: user.email,
-        reason: reason || '',
+        requesterName: user.name || user.email,
+        requesterEmail: user.email,
+        requesterChurch: userData.church || '',
+        requesterRegion: userData.region || '',
+        requesterState: userData.state || '',
+        reason: reason || 'Solicitação de liberação para lançamento',
         status: 'pending',
         createdAt: getBrazilTime().toISOString()
       };
@@ -1003,10 +1018,17 @@ export async function POST(request) {
         action: 'request_unlock',
         userId: user.userId,
         timestamp: getBrazilTime().toISOString(),
-        details: { entryId, reason }
+        details: { 
+          entryId: entryId || 'empty_slot', 
+          day: requestDay,
+          month: requestMonth,
+          year: requestYear,
+          timeSlot: requestTimeSlot,
+          reason 
+        }
       });
       
-      return NextResponse.json({ success: true });
+      return NextResponse.json({ success: true, message: 'Solicitação enviada ao Líder Máximo' });
     }
     
     // GET UNLOCK REQUESTS
