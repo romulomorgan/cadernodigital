@@ -43,7 +43,7 @@ class IUDPTester:
         # Credenciais Master conforme especificado
         login_data = {
             "email": "joao.silva@iudp.org.br",
-            "password": "master123"
+            "password": "LiderMaximo2025!"
         }
         
         try:
