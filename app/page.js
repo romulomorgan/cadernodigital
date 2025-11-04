@@ -1720,9 +1720,11 @@ export default function App() {
               <CardContent>
                 {!dashboardData ? (
                   <div className="text-center py-8">
-                    <Button onClick={() => { fetchDashboard(); fetchEntries(); }}>
-                      Carregar Dashboard
-                    </Button>
+                    <div className="animate-pulse">
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+                    </div>
+                    <p className="text-gray-500 mt-4">Carregando dados do dashboard...</p>
                   </div>
                 ) : (
                   <div className="space-y-6">
