@@ -3469,6 +3469,82 @@ export default function App() {
           </div>
         </DialogContent>
       </Dialog>
+      
+      {/* Dialog - Trocar Pastor */}
+      <Dialog open={showChangePastorModal} onOpenChange={setShowChangePastorModal}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              🔄 Trocar Pastor
+            </DialogTitle>
+            <DialogDescription>
+              Selecione um pastor para a igreja {selectedChurch?.name}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <Input 
+              placeholder="Buscar por nome ou email..."
+              value={pastorSearchQuery}
+              onChange={(e) => setPastorSearchQuery(e.target.value)}
+            />
+            
+            <div className="max-h-96 overflow-y-auto space-y-2">
+              {filteredPastors.map(pastor => (
+                <Card 
+                  key={pastor.userId} 
+                  className={`cursor-pointer hover:bg-gray-50 ${!pastor.available ? 'opacity-60' : ''}`}
+                  onClick={() => {
+                    if (window.confirm(`Confirma trocar o pastor para ${pastor.name}?`)) {
+                      handleChangePastor(selectedChurch.churchId, pastor.userId);
+                    }
+                  }}
+                >
+                  <CardContent className="p-3">
+                    <div className="flex items-center gap-3">
+                      {pastor.photoUrl ? (
+                        <img 
+                          src={pastor.photoUrl} 
+                          alt={pastor.name}
+                          className="w-12 h-12 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                          <span className="text-xl">👤</span>
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <p className="font-semibold">{pastor.name}</p>
+                        <p className="text-xs text-gray-600">{pastor.email}</p>
+                        {pastor.church && (
+                          <p className="text-xs text-gray-500 mt-1">🏛️ {pastor.church}</p>
+                        )}
+                      </div>
+                      {pastor.available ? (
+                        <Badge className="bg-green-500">✅ Disponível</Badge>
+                      ) : (
+                        <Badge className="bg-yellow-500">⚠️ Já tem igreja</Badge>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+          
+          <div className="flex gap-3 justify-end">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setShowChangePastorModal(false);
+                setPastorSearchQuery('');
+              }}
+            >
+              Cancelar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
