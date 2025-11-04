@@ -1882,7 +1882,38 @@ export default function App() {
                                 </div>
                               ) : (
                                 <div>
-                                  {!lockStatus.locked ? (
+                                  {/* Slot Vazio - Verificar status */}
+                                  {isApproved ? (
+                                    // APROVADO - Verde, pode lançar
+                                    <div className="space-y-1">
+                                      <div className="bg-green-100 border-2 border-green-500 rounded p-2 text-center">
+                                        <p className="text-xs font-semibold text-green-800">✅ Liberado pelo Master</p>
+                                      </div>
+                                      <Button
+                                        size="sm"
+                                        className="w-full bg-green-600 hover:bg-green-700"
+                                        onClick={() => {
+                                          setEditingEntry({ day, timeSlot });
+                                          setEntryValue('');
+                                          setEntryNotes('');
+                                        }}
+                                      >
+                                        + Lançar Agora
+                                      </Button>
+                                    </div>
+                                  ) : isPending ? (
+                                    // PENDENTE - Amarelo/Laranja
+                                    <div className="bg-yellow-100 border-2 border-yellow-500 rounded p-3 text-center space-y-2">
+                                      <div className="flex items-center justify-center gap-2">
+                                        <Clock className="w-4 h-4 text-yellow-700 animate-pulse" />
+                                        <p className="text-xs font-semibold text-yellow-800">⏳ Aguardando Aprovação</p>
+                                      </div>
+                                      <p className="text-xs text-yellow-700">
+                                        Solicitação enviada ao Líder Máximo
+                                      </p>
+                                    </div>
+                                  ) : !lockStatus.locked ? (
+                                    // NÃO BLOQUEADO - Pode lançar normalmente
                                     <Button
                                       size="sm"
                                       className="w-full bg-blue-600 hover:bg-blue-700"
@@ -1895,6 +1926,7 @@ export default function App() {
                                       + Lançar
                                     </Button>
                                   ) : (
+                                    // BLOQUEADO - Cinza, com botão solicitar
                                     <div className="space-y-2">
                                       <Button
                                         size="sm"
