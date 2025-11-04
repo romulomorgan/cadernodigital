@@ -287,11 +287,11 @@ def test_scenario_2_user_master(tokens, test_month):
     
     return True
 
-def test_scenario_3_user_state_scope(tokens):
+def test_scenario_3_user_state_scope(tokens, test_month):
     """
     Cenário 3: Usuário com Scope State
     - Login com usuário que tem scope: 'state' e state: 'SP'
-    - POST /api/dashboard/data com { month: 11, year: 2025 }
+    - POST /api/dashboard/data com test_month
     - Validar: Retorna apenas entries com state = 'SP'
     - Validar: Não retorna entries de outros estados
     """
@@ -300,7 +300,7 @@ def test_scenario_3_user_state_scope(tokens):
     userstate_headers = {"Authorization": f"Bearer {tokens['userstate@iudp.com']}"}
     
     # Fazer requisição ao dashboard
-    dashboard_data = {"month": 9, "year": 2024}
+    dashboard_data = test_month
     response = make_request("POST", "dashboard/data", dashboard_data, userstate_headers)
     
     if not response['success']:
