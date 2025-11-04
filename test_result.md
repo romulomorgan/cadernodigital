@@ -946,3 +946,38 @@ agent_communication:
           - ✅ Response: Retorna role completa e mensagem de sucesso
           
           📊 RESULTADO: CRIAÇÃO DE FUNÇÕES/ROLES FUNCIONANDO 100%
+
+  - task: "GET /api/uploads/churches/[filename] - Servir fotos das igrejas"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: |
+          ❌ PROBLEMA ENCONTRADO: Endpoint de servir fotos estava no POST handler em vez do GET handler
+          - URLs no banco estavam incorretas: /uploads/ em vez de /api/uploads/
+          - Fotos não eram acessíveis via GET requests
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ PROBLEMA CORRIGIDO E TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🔧 CORREÇÕES APLICADAS:
+          - Movido código de servir arquivos do POST handler para GET handler
+          - Adicionado import readFileSync do módulo fs
+          - Corrigidas todas as URLs no banco: /uploads/ → /api/uploads/
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Endpoint GET /api/uploads/churches/[filename] funcionando
+          - ✅ Content-Type correto: image/jpeg, image/png, image/webp
+          - ✅ Cache-Control configurado: public, max-age=31536000
+          - ✅ Status 404 para arquivos inexistentes
+          - ✅ Status 200 para arquivos existentes
+          - ✅ URLs no banco corrigidas para formato correto
+          - ✅ Fotos existentes agora acessíveis via browser
+          
+          📊 RESULTADO: SERVIR FOTOS DE IGREJAS FUNCIONANDO 100%
