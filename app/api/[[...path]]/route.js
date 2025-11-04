@@ -1730,40 +1730,6 @@ export async function POST(request) {
       return NextResponse.json({ success: true, message: 'Função excluída com sucesso!' });
     }
     
-    // SERVE UPLOADED FILES (churches, users)
-    if (endpoint.startsWith('uploads/')) {
-      const filepath = path.join(process.cwd(), endpoint);
-      
-      try {
-        if (existsSync(filepath)) {
-          const fileBuffer = readFileSync(filepath);
-          const ext = path.extname(filepath).toLowerCase();
-          
-          const contentTypes = {
-            '.jpg': 'image/jpeg',
-            '.jpeg': 'image/jpeg',
-            '.png': 'image/png',
-            '.webp': 'image/webp',
-            '.gif': 'image/gif'
-          };
-          
-          const contentType = contentTypes[ext] || 'application/octet-stream';
-          
-          return new NextResponse(fileBuffer, {
-            headers: {
-              'Content-Type': contentType,
-              'Cache-Control': 'public, max-age=31536000',
-            }
-          });
-        } else {
-          return NextResponse.json({ error: 'Arquivo não encontrado' }, { status: 404 });
-        }
-      } catch (error) {
-        console.error('Erro ao servir arquivo:', error);
-        return NextResponse.json({ error: 'Erro ao carregar arquivo' }, { status: 500 });
-      }
-    }
-
     
     // EXPORT CSV
     if (endpoint === 'export/csv') {
