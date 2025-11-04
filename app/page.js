@@ -358,6 +358,20 @@ export default function App() {
     }
   }, [isAuthenticated, activeTab, currentDate, token, user]);
   
+  // Carregar igrejas quando entrar na aba
+  useEffect(() => {
+    if (isAuthenticated && activeTab === 'churches' && token && user?.role === 'master') {
+      fetchAllChurches();
+    }
+  }, [isAuthenticated, activeTab, token, user]);
+  
+  // Carregar funções quando entrar na aba
+  useEffect(() => {
+    if (isAuthenticated && activeTab === 'funcoes' && token && user?.role === 'master') {
+      fetchAllRoles();
+    }
+  }, [isAuthenticated, activeTab, token, user]);
+  
   const fetchStats = async () => {
     try {
       const res = await fetch('/api/stats/overview', {
