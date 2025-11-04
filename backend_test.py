@@ -475,7 +475,7 @@ class IUDPTester:
         # Tentar deletar o próprio usuário Master (deve falhar)
         try:
             # Primeiro, fazer login para pegar o userId do Master
-            login_data = {"email": "joao.silva@iudp.org.br", "password": "master123"}
+            login_data = {"email": "joao.silva@iudp.org.br", "password": "LiderMaximo2025!"}
             response = requests.post(f"{BASE_URL}/auth/login", json=login_data)
             
             if response.status_code == 200:
