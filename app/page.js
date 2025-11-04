@@ -2790,14 +2790,25 @@ export default function App() {
                         <CardTitle className="text-lg">🏛️ Igrejas Cadastradas</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="space-y-4">
-                          {/* Exemplo de igreja */}
-                          <Card className="border-2 border-blue-200">
-                            <CardContent className="pt-4">
-                              <div className="flex gap-4">
-                                <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
-                                  <span className="text-4xl">🏛️</span>
-                                </div>
+                        {allChurches.length === 0 ? (
+                          <Button onClick={fetchAllChurches}>Carregar Igrejas</Button>
+                        ) : (
+                          <div className="space-y-4">
+                            {allChurches.map(church => (
+                              <Card key={church.churchId} className="border-2 border-blue-200">
+                                <CardContent className="pt-4">
+                                  <div className="flex gap-4">
+                                    {church.photoUrl ? (
+                                      <img 
+                                        src={church.photoUrl} 
+                                        alt={church.name}
+                                        className="w-24 h-24 rounded-lg object-cover"
+                                      />
+                                    ) : (
+                                      <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
+                                        <span className="text-4xl">🏛️</span>
+                                      </div>
+                                    )}
                                 <div className="flex-1">
                                   <h3 className="text-lg font-bold">Igreja Central</h3>
                                   <p className="text-sm text-gray-600">São Paulo - SP • Zona Centro</p>
