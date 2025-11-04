@@ -838,6 +838,35 @@ agent_communication:
       PRÓXIMA AÇÃO RECOMENDADA: Main agent pode finalizar e resumir as correções implementadas.
   - agent: "testing"
     message: |
+      🎉 CORREÇÃO DE URLs DE FOTOS DAS IGREJAS CONCLUÍDA COM SUCESSO TOTAL - NOV 4, 2025 18:16
+      
+      ✅ PROBLEMA IDENTIFICADO E CORRIGIDO:
+      
+      🔍 DIAGNÓSTICO:
+      - ❌ URLs no banco começavam com /uploads/ (INCORRETO)
+      - ❌ Endpoint de servir fotos estava no POST handler (INCORRETO)
+      - ❌ Faltava import readFileSync do módulo fs
+      - ❌ Fotos não eram acessíveis via GET requests
+      
+      🔧 CORREÇÕES APLICADAS:
+      - ✅ Movido código de servir arquivos do POST para GET handler
+      - ✅ Adicionado import readFileSync do módulo fs
+      - ✅ Corrigidas URLs no banco: /uploads/ → /api/uploads/
+      - ✅ Igreja IUDP - Sede: URL corrigida com sucesso
+      
+      🎯 TESTES REALIZADOS:
+      - ✅ GET /api/uploads/churches/[filename]: Status 200, Content-Type correto
+      - ✅ Fotos existentes agora acessíveis via browser
+      - ✅ Cache-Control configurado: public, max-age=31536000
+      - ✅ Status 404 para arquivos inexistentes (comportamento correto)
+      - ✅ Novos uploads geram URLs no formato correto (/api/uploads/churches/)
+      
+      📊 RESULTADO FINAL: URLS DE FOTOS DAS IGREJAS FUNCIONANDO 100%
+      🎯 STATUS: PROBLEMA COMPLETAMENTE RESOLVIDO
+      
+      PRÓXIMA AÇÃO RECOMENDADA: Main agent pode finalizar e fazer summary da correção.
+  - agent: "testing"
+    message: |
       🎉 TESTE COMPLETO DOS ENDPOINTS CRUD - USUÁRIOS E IGREJAS CONCLUÍDO COM SUCESSO TOTAL
       
       ✅ TODOS OS 14 TESTES PASSARAM - CRUD FUNCIONANDO PERFEITAMENTE
