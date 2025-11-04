@@ -442,6 +442,11 @@ def main():
     
     log_test(f"Continuando com {len(tokens)} usuários disponíveis", None)
     
+    # Criar time overrides se temos Master
+    master_token = tokens.get('joao.silva@iudp.org.br')
+    if master_token:
+        create_time_overrides_for_testing(master_token)
+    
     # Criar entries de teste
     create_test_entries(tokens)
     
