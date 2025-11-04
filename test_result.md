@@ -234,7 +234,64 @@ backend:
           - ✅ Mensagens de erro apropriadas (403 com texto explicativo)
           - ✅ Collections do DB atualizadas corretamente (month_status, audit_logs, entries)
 
+  - task: "Dashboard auto-load e filtros de permissão"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js e /app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          ✅ IMPLEMENTADO - 04 NOV 2025
+          
+          Backend (/app/app/api/[[...path]]/route.js linha 891-935):
+          - Adicionados filtros de permissão no endpoint /api/dashboard/data
+          - Master/global vê tudo
+          - state scope vê apenas seu estado
+          - region scope vê apenas sua região
+          - church scope vê apenas sua igreja
+          - usuário comum vê apenas seus próprios dados
+          
+          Frontend (/app/app/page.js):
+          - Adicionado useEffect (linha 303-307) para auto-carregar dashboard
+          - Removido botão "Carregar Dashboard"
+          - Adicionado loading skeleton enquanto carrega
+          - Dashboard recarrega automaticamente ao trocar de mês
+          
+          PRECISA TESTAR:
+          - Login com usuário comum e verificar se vê apenas seus dados
+          - Login com Master e verificar se vê todos os dados
+          - Trocar de mês e verificar se dashboard atualiza automaticamente
+
 frontend:
+  - task: "Confirmação de Logout melhorada"
+    implemented: true
+    working: "NA"
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          ✅ IMPLEMENTADO - 04 NOV 2025
+          
+          - Estado showLogoutConfirm adicionado (linha 70)
+          - handleLogout alterado para abrir dialog (linha 356-358)
+          - confirmLogout criado para executar logout (linha 360-367)
+          - Dialog de confirmação adicionado no JSX (linha 2762-2791)
+          - Dialog com mensagem clara, ícone de alerta e botões de ação
+          - Toast de sucesso ao confirmar logout
+          
+          PRECISA TESTAR:
+          - Clicar em logout e verificar se dialog aparece
+          - Clicar em "Cancelar" e verificar se permanece logado
+          - Clicar em "Sim, Sair" e verificar se desloga corretamente
+  
   - task: "UI para Fechar/Reabrir mês no painel Master"
     implemented: true
     working: true
