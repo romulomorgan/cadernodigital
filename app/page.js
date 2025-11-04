@@ -802,12 +802,44 @@ export default function App() {
         toast.success('📨 Solicitação enviada ao Líder Máximo!', {
           description: 'Aguarde a aprovação para realizar o lançamento.'
         });
+        // Atualizar status de solicitações
+        fetchMyUnlockStatus();
       } else {
         toast.error(`❌ ${data.error || 'Erro ao enviar solicitação'}`);
       }
     } catch (error) {
       console.error('Erro ao solicitar liberação:', error);
       toast.error('❌ Erro ao enviar solicitação');
+    }
+  };
+  
+  const fetchMyUnlockStatus = async () => {
+    if (!token || user?.role === 'master') return;
+    
+    try {
+      const res = await fetch('/api/unlock/my-status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          month: currentDate.getMonth() + 1,
+          year: currentDate.getFullYear()
+        })
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setMyPendingRequests(data.pendingRequests || []);
+        setMyActiveOverrides(data.activeOverrides || []);
+        console.log('[UNLOCK STATUS]', {
+          pending: data.pendingRequests?.length,
+          active: data.activeOverrides?.length
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao buscar status de unlock:', error);
     }
   };
   
