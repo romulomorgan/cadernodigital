@@ -4017,28 +4017,61 @@ export default function App() {
       
       {/* Dialog - Editar Igreja */}
       <Dialog open={showChurchEditModal} onOpenChange={setShowChurchEditModal}>
-        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>✏️ Editar Igreja</DialogTitle>
           </DialogHeader>
           {selectedChurch && (
             <div className="space-y-4 py-4">
-              <div>
-                <Label>Nome da Igreja</Label>
-                <Input 
-                  value={editChurchData.name || selectedChurch.name}
-                  onChange={(e) => setEditChurchData({...editChurchData, name: e.target.value})}
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Nome da Igreja</Label>
+                  <Input 
+                    value={editChurchData.name || selectedChurch.name}
+                    onChange={(e) => setEditChurchData({...editChurchData, name: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label>CEP</Label>
+                  <Input 
+                    value={editChurchData.cep || selectedChurch.cep}
+                    onChange={(e) => setEditChurchData({...editChurchData, cep: e.target.value})}
+                    maxLength={9}
+                    placeholder="00000-000"
+                  />
+                </div>
               </div>
               <div>
-                <Label>Endereço</Label>
-                <Textarea 
+                <Label>Endereço (Rua/Avenida)</Label>
+                <Input 
                   value={editChurchData.address || selectedChurch.address}
                   onChange={(e) => setEditChurchData({...editChurchData, address: e.target.value})}
-                  rows={2}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Número</Label>
+                  <Input 
+                    value={editChurchData.number || selectedChurch.number}
+                    onChange={(e) => setEditChurchData({...editChurchData, number: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label>Complemento</Label>
+                  <Input 
+                    value={editChurchData.complement || selectedChurch.complement}
+                    onChange={(e) => setEditChurchData({...editChurchData, complement: e.target.value})}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label>Bairro</Label>
+                  <Input 
+                    value={editChurchData.neighborhood || selectedChurch.neighborhood}
+                    onChange={(e) => setEditChurchData({...editChurchData, neighborhood: e.target.value})}
+                  />
+                </div>
                 <div>
                   <Label>Cidade</Label>
                   <Input 
@@ -4051,6 +4084,7 @@ export default function App() {
                   <Input 
                     value={editChurchData.state || selectedChurch.state}
                     onChange={(e) => setEditChurchData({...editChurchData, state: e.target.value})}
+                    maxLength={2}
                   />
                 </div>
               </div>
@@ -4061,12 +4095,33 @@ export default function App() {
                   onChange={(e) => setEditChurchData({...editChurchData, region: e.target.value})}
                 />
               </div>
+              <div>
+                <Label>Atualizar Foto da Igreja</Label>
+                <Input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={handleChurchPhotoSelect}
+                  className="mt-1" 
+                />
+                {(churchPhotoPreview || selectedChurch.photoUrl) && (
+                  <img 
+                    src={churchPhotoPreview || selectedChurch.photoUrl} 
+                    alt="Preview" 
+                    className="mt-2 w-32 h-32 rounded object-cover"
+                  />
+                )}
+              </div>
               <div className="flex gap-3 justify-end pt-4">
-                <Button variant="outline" onClick={() => setShowChurchEditModal(false)}>
+                <Button variant="outline" onClick={() => {
+                  setShowChurchEditModal(false);
+                  setChurchPhotoFile(null);
+                  setChurchPhotoPreview(null);
+                }}>
                   Cancelar
                 </Button>
                 <Button onClick={async () => {
                   try {
+                    // Atualizar dados da igreja
                     const res = await fetch('/api/churches/update', {
                       method: 'POST',
                       headers: {
@@ -4081,8 +4136,15 @@ export default function App() {
                     
                     const data = await res.json();
                     if (res.ok) {
-                      toast.success('✅ ' + data.message);
+                      // Upload de foto se houver
+                      if (churchPhotoFile) {
+                        await handleUploadChurchPhoto(selectedChurch.churchId);
+                      }
+                      
+                      toast.success('✅ Igreja atualizada com sucesso!');
                       setShowChurchEditModal(false);
+                      setChurchPhotoFile(null);
+                      setChurchPhotoPreview(null);
                       fetchAllChurches();
                     } else {
                       toast.error('❌ ' + data.error);
