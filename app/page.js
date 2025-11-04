@@ -348,11 +348,15 @@ export default function App() {
   };
   
   const handleLogout = () => {
+    if (!confirm('⚠️ Tem certeza que deseja sair do sistema?')) {
+      return;
+    }
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setToken(null);
     setUser(null);
     setIsAuthenticated(false);
+    toast.success('👋 Até logo!');
   };
   
   const fetchDashboard = async () => {
