@@ -2632,9 +2632,41 @@ export default function App() {
                                       </div>
                                       
                                       <div className="border-t pt-2 mt-2 space-y-2">
-                                        <Button size="sm" variant="outline" className="w-full text-xs">
-                                          🔑 Resetar Senha
-                                        </Button>
+                                        <div className="grid grid-cols-3 gap-1">
+                                          <Button 
+                                            size="sm" 
+                                            variant="outline" 
+                                            className="text-xs"
+                                            onClick={() => {
+                                              setSelectedUser(u);
+                                              setShowUserViewModal(true);
+                                            }}
+                                          >
+                                            <Eye className="w-3 h-3" />
+                                          </Button>
+                                          <Button 
+                                            size="sm" 
+                                            variant="outline" 
+                                            className="text-xs"
+                                            onClick={() => {
+                                              setSelectedUser(u);
+                                              setShowUserEditModal(true);
+                                            }}
+                                          >
+                                            <Edit className="w-3 h-3" />
+                                          </Button>
+                                          <Button 
+                                            size="sm" 
+                                            variant="destructive" 
+                                            className="text-xs"
+                                            onClick={() => {
+                                              setSelectedUser(u);
+                                              setShowUserDeleteConfirm(true);
+                                            }}
+                                          >
+                                            <Trash2 className="w-3 h-3" />
+                                          </Button>
+                                        </div>
                                         <Button 
                                           size="sm" 
                                           variant={u.active ? "destructive" : "default"}
