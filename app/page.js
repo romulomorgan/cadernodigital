@@ -67,6 +67,9 @@ export default function App() {
   // Timezone notification - Aviso Institucional
   const [showTimezoneNotice, setShowTimezoneNotice] = useState(false);
   
+  // Confirmation dialogs
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  
   // Dashboard states
   const [dashboardData, setDashboardData] = useState(null);
   
