@@ -54,6 +54,8 @@ export default function App() {
   const [entryValue, setEntryValue] = useState('');
   const [entryNotes, setEntryNotes] = useState('');
   const [unlockRequests, setUnlockRequests] = useState([]);
+  const [myPendingRequests, setMyPendingRequests] = useState([]);
+  const [myActiveOverrides, setMyActiveOverrides] = useState([]);
   const [currentBrazilTime, setCurrentBrazilTime] = useState(null);
   const [liveClockTime, setLiveClockTime] = useState(null); // Relógio digital tempo real
   const [clockSyncError, setClockSyncError] = useState(false);
