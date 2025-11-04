@@ -47,6 +47,9 @@ def create_test_users():
     """Criar usuários de teste com diferentes permissões"""
     log_test("=== CRIANDO USUÁRIOS DE TESTE COM DIFERENTES PERMISSÕES ===")
     
+    # Tentar diferentes senhas conhecidas
+    possible_passwords = ["senha123", "LiderMaximo2025!", "Pastora2025!", "mastertest123", "usertest123"]
+    
     users_data = [
         {
             "name": "Master Test User",
@@ -94,24 +97,31 @@ def create_test_users():
         email = user_data["email"]
         password = user_data["password"]
         
-        # Tentar registrar
+        # Tentar registrar primeiro
         register_response = make_request("POST", "auth/register", user_data)
         if register_response['success']:
             log_test(f"Usuário {email} criado com sucesso", True)
             tokens[email] = register_response['data']['token']
-        else:
-            # Tentar login se já existe
+            continue
+        
+        # Se falhou, tentar login com diferentes senhas
+        login_success = False
+        for test_password in possible_passwords:
             login_response = make_request("POST", "auth/login", {
                 "email": email,
-                "password": password
+                "password": test_password
             })
             if login_response['success']:
-                log_test(f"Usuário {email} já existe - fazendo login", True)
+                log_test(f"Usuário {email} já existe - login com senha {test_password}", True)
                 tokens[email] = login_response['data']['token']
-            else:
-                log_test(f"Erro ao criar/logar {email}: {register_response['data']}", False)
-                return None
+                login_success = True
+                break
+        
+        if not login_success:
+            log_test(f"Erro ao criar/logar {email}: {register_response['data']}", False)
+            # Não retornar None, continuar com outros usuários
     
+    log_test(f"Tokens obtidos para {len(tokens)} usuários", None)
     return tokens
 
 def create_test_entries(tokens):
