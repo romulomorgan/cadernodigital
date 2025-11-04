@@ -1735,8 +1735,8 @@ export async function POST(request) {
       const filepath = path.join(process.cwd(), endpoint);
       
       try {
-        if (fs.existsSync(filepath)) {
-          const fileBuffer = fs.readFileSync(filepath);
+        if (existsSync(filepath)) {
+          const fileBuffer = readFileSync(filepath);
           const ext = path.extname(filepath).toLowerCase();
           
           const contentTypes = {
