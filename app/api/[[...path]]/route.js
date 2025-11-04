@@ -1002,6 +1002,7 @@ export async function POST(request) {
         requesterId: user.userId,
         requesterName: user.name || user.email,
         requesterEmail: user.email,
+        requesterRole: userData.role || 'Usuário',
         requesterChurch: userData.church || '',
         requesterRegion: userData.region || '',
         requesterState: userData.state || '',
