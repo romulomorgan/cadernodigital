@@ -596,26 +596,67 @@ export default function App() {
     );
   };
   
-  const isEntryLocked = (entry, currentTime) => {
-    if (!entry || !currentTime) return { locked: false, reason: null, timeLeft: null };
+  const isEntryLocked = (entry, currentTime, day, timeSlot) => {
+    if (!currentTime) return { locked: false, reason: null, timeLeft: null };
     
-    if (entry.timeWindowLocked && !entry.masterUnlocked) {
-      return { locked: true, reason: 'time_window', timeLeft: null };
-    }
-    
-    if (entry.value !== null && entry.value !== undefined && entry.value !== '' && entry.createdAt) {
-      const createdTime = new Date(entry.createdAt);
-      const oneHourLater = new Date(createdTime.getTime() + 60 * 60 * 1000);
-      const now = currentTime;
-      
-      if (now > oneHourLater && !entry.masterUnlocked) {
-        return { locked: true, reason: 'one_hour', timeLeft: null };
+    // Se há entry, verificar bloqueios normais
+    if (entry) {
+      if (entry.timeWindowLocked && !entry.masterUnlocked) {
+        return { locked: true, reason: 'time_window', timeLeft: null };
       }
       
-      const timeLeftMs = oneHourLater - now;
-      if (timeLeftMs > 0) {
-        const minutes = Math.floor(timeLeftMs / 60000);
-        return { locked: false, reason: null, timeLeft: `${minutes}min` };
+      if (entry.value !== null && entry.value !== undefined && entry.value !== '' && entry.createdAt) {
+        const createdTime = new Date(entry.createdAt);
+        const oneHourLater = new Date(createdTime.getTime() + 60 * 60 * 1000);
+        const now = currentTime;
+        
+        if (now > oneHourLater && !entry.masterUnlocked) {
+          return { locked: true, reason: 'one_hour', timeLeft: null };
+        }
+        
+        const timeLeftMs = oneHourLater - now;
+        if (timeLeftMs > 0) {
+          const minutes = Math.floor(timeLeftMs / 60000);
+          return { locked: false, reason: null, timeLeft: `${minutes}min` };
+        }
+      }
+    }
+    
+    // Se não há entry, verificar se o dia/horário já passou
+    if (day && timeSlot) {
+      const now = new Date(currentTime);
+      const currentYear = currentDate.getFullYear();
+      const currentMonth = currentDate.getMonth();
+      
+      // Criar data do slot
+      const slotDate = new Date(currentYear, currentMonth, day);
+      const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      
+      // Se é dia anterior, está bloqueado
+      if (slotDate < todayDate) {
+        return { locked: true, reason: 'past_day', timeLeft: null };
+      }
+      
+      // Se é hoje, verificar se o horário já passou
+      if (slotDate.getTime() === todayDate.getTime()) {
+        const [slotHour, slotMinute] = timeSlot.split(':').map(Number);
+        const slotDateTime = new Date(currentYear, currentMonth, day, slotHour, slotMinute);
+        
+        // Adicionar tempo de janela (cada slot tem ~2h de janela)
+        const timeSlotWindows = {
+          '08:00': 120, // 2h
+          '10:00': 120,
+          '12:00': 180, // 3h
+          '15:00': 270, // 4.5h
+          '19:30': 150  // 2.5h
+        };
+        
+        const windowMinutes = timeSlotWindows[timeSlot] || 120;
+        const slotEndTime = new Date(slotDateTime.getTime() + windowMinutes * 60 * 1000);
+        
+        if (now > slotEndTime) {
+          return { locked: true, reason: 'past_time', timeLeft: null };
+        }
       }
     }
     
