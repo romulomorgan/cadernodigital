@@ -52,13 +52,13 @@ def create_test_users():
     
     users_data = [
         {
-            "name": "Master Test User",
-            "email": "mastertest@iudp.com",
-            "password": "senha123",
+            "name": "João Silva - Líder Máximo",
+            "email": "joao.silva@iudp.org.br",
+            "password": "LiderMaximo2025!",
             "role": "master",
-            "church": "Igreja Central",
+            "church": "Igreja Central IUDP",
             "region": "Região Sul",
-            "state": "SP"
+            "state": "São Paulo"
         },
         {
             "name": "User Common Test",
