@@ -893,6 +893,249 @@ export default function App() {
     }
   };
   
+  // ========== FUNÇÕES CRUD - USUÁRIOS ==========
+  
+  const handleUserPhotoSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('❌ Arquivo muito grande. Máximo 2MB');
+      return;
+    }
+    
+    if (!['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(file.type)) {
+      toast.error('❌ Tipo não permitido. Use JPG, PNG ou WebP');
+      return;
+    }
+    
+    setUserPhotoFile(file);
+    const reader = new FileReader();
+    reader.onload = (e) => setUserPhotoPreview(e.target.result);
+    reader.readAsDataURL(file);
+  };
+  
+  const handleUploadUserPhoto = async (userId) => {
+    if (!userPhotoFile) return null;
+    
+    const formData = new FormData();
+    formData.append('photo', userPhotoFile);
+    formData.append('userId', userId);
+    
+    try {
+      const res = await fetch('/api/users/upload-photo', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ Foto enviada!');
+        return data.photoUrl;
+      } else {
+        toast.error('❌ ' + data.error);
+        return null;
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao enviar foto');
+      return null;
+    }
+  };
+  
+  const handleDeleteUser = async (userId) => {
+    try {
+      const res = await fetch('/api/users/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ userId })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        fetchAllUsers();
+        setShowUserDeleteConfirm(false);
+        setSelectedUser(null);
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao excluir usuário');
+    }
+  };
+  
+  const handleEditUser = async (userId, userData) => {
+    try {
+      const res = await fetch('/api/users/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ userId, userData })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        fetchAllUsers();
+        setShowUserEditModal(false);
+        setSelectedUser(null);
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao atualizar usuário');
+    }
+  };
+  
+  // ========== FUNÇÕES CRUD - IGREJAS ==========
+  
+  const fetchAllChurches = async () => {
+    try {
+      const res = await fetch('/api/churches/list', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setAllChurches(data.churches || []);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar igrejas:', error);
+    }
+  };
+  
+  const handleChurchPhotoSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('❌ Arquivo muito grande. Máximo 2MB');
+      return;
+    }
+    
+    if (!['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(file.type)) {
+      toast.error('❌ Tipo não permitido. Use JPG, PNG ou WebP');
+      return;
+    }
+    
+    setChurchPhotoFile(file);
+    const reader = new FileReader();
+    reader.onload = (e) => setChurchPhotoPreview(e.target.result);
+    reader.readAsDataURL(file);
+  };
+  
+  const handleUploadChurchPhoto = async (churchId) => {
+    if (!churchPhotoFile) return null;
+    
+    const formData = new FormData();
+    formData.append('photo', churchPhotoFile);
+    formData.append('churchId', churchId);
+    
+    try {
+      const res = await fetch('/api/churches/upload-photo', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ Foto da igreja enviada!');
+        return data.photoUrl;
+      } else {
+        toast.error('❌ ' + data.error);
+        return null;
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao enviar foto');
+      return null;
+    }
+  };
+  
+  const handleDeleteChurch = async (churchId) => {
+    try {
+      const res = await fetch('/api/churches/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ churchId })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        fetchAllChurches();
+        setShowChurchDeleteConfirm(false);
+        setSelectedChurch(null);
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao excluir igreja');
+    }
+  };
+  
+  const fetchAvailablePastors = async () => {
+    try {
+      const res = await fetch('/api/churches/available-pastors', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setAvailablePastors(data.pastors || []);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar pastores:', error);
+    }
+  };
+  
+  const handleChangePastor = async (churchId, newPastorId) => {
+    try {
+      const res = await fetch('/api/churches/change-pastor', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ churchId, newPastorId })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        fetchAllChurches();
+        setShowChangePastorModal(false);
+        setPastorSearchQuery('');
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao trocar pastor');
+    }
+  };
+  
+  const filteredPastors = availablePastors.filter(p => 
+    p.name?.toLowerCase().includes(pastorSearchQuery.toLowerCase()) ||
+    p.email?.toLowerCase().includes(pastorSearchQuery.toLowerCase())
+  );
+  
   const handleApproveUnlock = async (requestId, entryId) => {
     try {
       const res = await fetch('/api/unlock/approve', {
