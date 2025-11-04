@@ -2906,54 +2906,73 @@ export default function App() {
                       <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="col-span-2">
-                            <Label>Nome da Igreja</Label>
-                            <Input placeholder="Ex: Igreja Central - IUDP" className="mt-1" />
+                            <Label>Nome da Igreja *</Label>
+                            <Input 
+                              value={newChurchName}
+                              onChange={(e) => setNewChurchName(e.target.value)}
+                              placeholder="Ex: Igreja Central - IUDP" 
+                              className="mt-1" 
+                            />
                           </div>
                           <div className="col-span-2">
                             <Label>Endereço Completo</Label>
-                            <Textarea placeholder="Rua, número, bairro, cidade" rows={2} className="mt-1" />
+                            <Textarea 
+                              value={newChurchAddress}
+                              onChange={(e) => setNewChurchAddress(e.target.value)}
+                              placeholder="Rua, número, bairro" 
+                              rows={2} 
+                              className="mt-1" 
+                            />
+                          </div>
+                          <div>
+                            <Label>Cidade</Label>
+                            <Input 
+                              value={newChurchCity}
+                              onChange={(e) => setNewChurchCity(e.target.value)}
+                              placeholder="Ex: São Paulo" 
+                              className="mt-1" 
+                            />
                           </div>
                           <div>
                             <Label>Estado</Label>
-                            <Input placeholder="Ex: SP" className="mt-1" />
+                            <Input 
+                              value={newChurchState}
+                              onChange={(e) => setNewChurchState(e.target.value)}
+                              placeholder="Ex: SP" 
+                              className="mt-1" 
+                            />
                           </div>
                           <div>
                             <Label>Região</Label>
-                            <Input placeholder="Ex: Zona Sul" className="mt-1" />
+                            <Input 
+                              value={newChurchRegion}
+                              onChange={(e) => setNewChurchRegion(e.target.value)}
+                              placeholder="Ex: Zona Sul" 
+                              className="mt-1" 
+                            />
                           </div>
                           <div>
-                            <Label>WhatsApp</Label>
-                            <Input placeholder="(11) 99999-9999" className="mt-1" />
-                          </div>
-                          <div>
-                            <Label>Foto da Igreja</Label>
-                            <Input type="file" accept="image/*" className="mt-1" />
+                            <Label>Foto da Igreja (opcional)</Label>
+                            <Input 
+                              type="file" 
+                              accept="image/*" 
+                              onChange={handleChurchPhotoSelect}
+                              className="mt-1" 
+                            />
+                            {churchPhotoPreview && (
+                              <img 
+                                src={churchPhotoPreview} 
+                                alt="Preview" 
+                                className="mt-2 w-24 h-24 rounded object-cover"
+                              />
+                            )}
                           </div>
                         </div>
                         
-                        <div className="border-t mt-4 pt-4">
-                          <h3 className="font-semibold mb-3">Pastor Responsável</h3>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <Label>Nome do Pastor</Label>
-                              <Input placeholder="Nome completo" className="mt-1" />
-                            </div>
-                            <div>
-                              <Label>Foto do Pastor</Label>
-                              <Input type="file" accept="image/*" className="mt-1" />
-                            </div>
-                            <div>
-                              <Label>Email</Label>
-                              <Input type="email" placeholder="pastor@igreja.com" className="mt-1" />
-                            </div>
-                            <div>
-                              <Label>WhatsApp</Label>
-                              <Input placeholder="(11) 99999-9999" className="mt-1" />
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <Button className="mt-4 w-full bg-blue-600 hover:bg-blue-700">
+                        <Button 
+                          onClick={handleCreateChurchForm}
+                          className="mt-4 w-full bg-blue-600 hover:bg-blue-700"
+                        >
                           ✅ Cadastrar Igreja
                         </Button>
                       </CardContent>
