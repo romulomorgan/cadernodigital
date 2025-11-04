@@ -1052,6 +1052,35 @@ export default function App() {
     }
   };
   
+  const handleCEPChange = async (cep) => {
+    // Aplicar máscara
+    const maskedCEP = cep.replace(/\D/g, '').replace(/(\d{5})(\d)/, '$1-$2').slice(0, 9);
+    setNewChurchCEP(maskedCEP);
+    
+    // Buscar endereço quando CEP estiver completo
+    if (maskedCEP.replace(/\D/g, '').length === 8) {
+      setLoadingCEP(true);
+      try {
+        const response = await fetch(`https://viacep.com.br/ws/${maskedCEP.replace(/\D/g, '')}/json/`);
+        const data = await response.json();
+        
+        if (!data.erro) {
+          setNewChurchAddress(data.logradouro || '');
+          setNewChurchNeighborhood(data.bairro || '');
+          setNewChurchCity(data.localidade || '');
+          setNewChurchState(data.uf || '');
+          toast.success('✅ Endereço encontrado!');
+        } else {
+          toast.error('❌ CEP não encontrado');
+        }
+      } catch (error) {
+        toast.error('❌ Erro ao buscar CEP');
+      } finally {
+        setLoadingCEP(false);
+      }
+    }
+  };
+  
   const handleCreateChurchForm = async () => {
     if (!newChurchName.trim()) {
       toast.error('❌ Nome da igreja é obrigatório');
@@ -1060,7 +1089,11 @@ export default function App() {
     
     const churchData = {
       name: newChurchName,
+      cep: newChurchCEP,
       address: newChurchAddress,
+      number: newChurchNumber,
+      complement: newChurchComplement,
+      neighborhood: newChurchNeighborhood,
       city: newChurchCity,
       state: newChurchState,
       region: newChurchRegion
@@ -1087,7 +1120,11 @@ export default function App() {
         
         // Limpar formulário
         setNewChurchName('');
+        setNewChurchCEP('');
         setNewChurchAddress('');
+        setNewChurchNumber('');
+        setNewChurchComplement('');
+        setNewChurchNeighborhood('');
         setNewChurchCity('');
         setNewChurchState('');
         setNewChurchRegion('');
