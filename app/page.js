@@ -1732,18 +1732,40 @@ export default function App() {
                                   )}
                                 </div>
                               ) : (
-                                <Button
-                                  size="sm"
-                                  className="w-full bg-blue-600 hover:bg-blue-700"
-                                  onClick={() => {
-                                    setEditingEntry({ day, timeSlot });
-                                    setEntryValue('');
-                                    setEntryNotes('');
-                                  }}
-                                  disabled={lockStatus.locked}
-                                >
-                                  {lockStatus.locked ? 'Bloqueado' : '+ Lançar'}
-                                </Button>
+                                <div>
+                                  {!lockStatus.locked ? (
+                                    <Button
+                                      size="sm"
+                                      className="w-full bg-blue-600 hover:bg-blue-700"
+                                      onClick={() => {
+                                        setEditingEntry({ day, timeSlot });
+                                        setEntryValue('');
+                                        setEntryNotes('');
+                                      }}
+                                    >
+                                      + Lançar
+                                    </Button>
+                                  ) : (
+                                    <div className="space-y-2">
+                                      <Button
+                                        size="sm"
+                                        className="w-full bg-gray-400 cursor-not-allowed"
+                                        disabled
+                                      >
+                                        🔒 Bloqueado
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="w-full text-xs border-orange-300 hover:bg-orange-50"
+                                        onClick={() => handleRequestUnlockForEmptySlot(day, timeSlot)}
+                                      >
+                                        <Bell className="w-3 h-3 mr-1" />
+                                        Solicitar Liberação
+                                      </Button>
+                                    </div>
+                                  )}
+                                </div>
                               )}
                             </div>
                           );
