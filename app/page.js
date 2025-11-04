@@ -3793,45 +3793,73 @@ export default function App() {
             />
             
             <div className="max-h-96 overflow-y-auto space-y-2">
-              {filteredPastors.map(pastor => (
-                <Card 
-                  key={pastor.userId} 
-                  className={`cursor-pointer hover:bg-gray-50 ${!pastor.available ? 'opacity-60' : ''}`}
-                  onClick={() => {
-                    if (window.confirm(`Confirma trocar o pastor para ${pastor.name}?`)) {
-                      handleChangePastor(selectedChurch.churchId, pastor.userId);
-                    }
-                  }}
-                >
-                  <CardContent className="p-3">
-                    <div className="flex items-center gap-3">
-                      {pastor.photoUrl ? (
-                        <img 
-                          src={pastor.photoUrl} 
-                          alt={pastor.name}
-                          className="w-12 h-12 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                          <span className="text-xl">👤</span>
+              {filteredPastors.length === 0 ? (
+                <div className="text-center p-8 text-gray-500">
+                  <p>Nenhum pastor, bispo ou master encontrado.</p>
+                  <p className="text-sm mt-2">Tente ajustar sua busca.</p>
+                </div>
+              ) : (
+                filteredPastors.map(pastor => (
+                  <Card 
+                    key={pastor.userId} 
+                    className={`cursor-pointer hover:bg-gray-50 transition-all ${!pastor.available ? 'opacity-60' : ''}`}
+                    onClick={() => {
+                      const roleLabel = pastor.role === 'master' ? 'Master' : 
+                                       pastor.role === 'bispo' ? 'Bispo' : 
+                                       pastor.role === 'leader' ? 'Líder' : 'Pastor';
+                      if (window.confirm(`Confirma designar ${roleLabel} ${pastor.name} para esta igreja?`)) {
+                        handleChangePastor(selectedChurch.churchId, pastor.userId);
+                      }
+                    }}
+                  >
+                    <CardContent className="p-3">
+                      <div className="flex items-center gap-3">
+                        {pastor.photoUrl ? (
+                          <img 
+                            src={pastor.photoUrl} 
+                            alt={pastor.name}
+                            className="w-14 h-14 rounded-full object-cover border-2 border-purple-300"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2UwZTBlMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjQwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+8J+RpDwvdGV4dD48L3N2Zz4=';
+                            }}
+                          />
+                        ) : (
+                          <div className="w-14 h-14 bg-gradient-to-br from-purple-100 to-purple-200 rounded-full flex items-center justify-center border-2 border-purple-300">
+                            <span className="text-2xl">
+                              {pastor.role === 'master' ? '👑' : 
+                               pastor.role === 'bispo' ? '⛪' : '👤'}
+                            </span>
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <p className="font-semibold">{pastor.name}</p>
+                            <Badge variant={
+                              pastor.role === 'master' ? 'default' : 
+                              pastor.role === 'bispo' ? 'secondary' : 
+                              'outline'
+                            } className="text-xs">
+                              {pastor.role === 'master' ? '👑 Master' : 
+                               pastor.role === 'bispo' ? '⛪ Bispo' : 
+                               pastor.role === 'leader' ? '📌 Líder' : '👤 Pastor'}
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-gray-600">{pastor.email}</p>
+                          {pastor.church && (
+                            <p className="text-xs text-gray-500 mt-1">🏛️ {pastor.church}</p>
+                          )}
                         </div>
-                      )}
-                      <div className="flex-1">
-                        <p className="font-semibold">{pastor.name}</p>
-                        <p className="text-xs text-gray-600">{pastor.email}</p>
-                        {pastor.church && (
-                          <p className="text-xs text-gray-500 mt-1">🏛️ {pastor.church}</p>
+                        {pastor.available ? (
+                          <Badge className="bg-green-500 text-white">✅ Disponível</Badge>
+                        ) : (
+                          <Badge className="bg-yellow-500 text-white">⚠️ Já tem igreja</Badge>
                         )}
                       </div>
-                      {pastor.available ? (
-                        <Badge className="bg-green-500">✅ Disponível</Badge>
-                      ) : (
-                        <Badge className="bg-yellow-500">⚠️ Já tem igreja</Badge>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </div>
           </div>
           
