@@ -98,11 +98,10 @@ async function validateEntryTiming(db, {
   
   // 1. VERIFICAR OVERRIDE DE TEMPO (PRIORIDADE MÁXIMA)
   const override = await db.collection('time_overrides').findOne({
-    churchId,
-    month: parseInt(month),
-    year: parseInt(year),
-    day: parseInt(day),
-    timeSlot,
+    $or: [
+      { churchId, month: parseInt(month), year: parseInt(year), day: parseInt(day), timeSlot },
+      { userId, month: parseInt(month), year: parseInt(year), day: parseInt(day), timeSlot }
+    ],
     expiresAt: { $gt: now.toISOString() }
   });
   
