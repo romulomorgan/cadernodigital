@@ -328,11 +328,11 @@ def test_scenario_3_user_state_scope(tokens, test_month):
     
     return True
 
-def test_scenario_4_user_church_scope(tokens):
+def test_scenario_4_user_church_scope(tokens, test_month):
     """
     Cenário 4: Usuário com Scope Church
     - Login com usuário que tem scope: 'church' e church: 'Igreja Central'
-    - POST /api/dashboard/data com { month: 11, year: 2025 }
+    - POST /api/dashboard/data com test_month
     - Validar: Retorna apenas entries com church = 'Igreja Central'
     - Validar: Não retorna entries de outras igrejas
     """
@@ -341,7 +341,7 @@ def test_scenario_4_user_church_scope(tokens):
     userchurch_headers = {"Authorization": f"Bearer {tokens['userchurch@iudp.com']}"}
     
     # Fazer requisição ao dashboard
-    dashboard_data = {"month": 9, "year": 2024}
+    dashboard_data = test_month
     response = make_request("POST", "dashboard/data", dashboard_data, userchurch_headers)
     
     if not response['success']:
