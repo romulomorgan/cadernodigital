@@ -301,6 +301,16 @@ export default function App() {
     }
   }, [isAuthenticated, activeTab, currentDate, token]);
   
+  // Buscar status de unlock quando entrar no calendário ou trocar de mês
+  useEffect(() => {
+    if (isAuthenticated && activeTab === 'calendar' && token && user?.role !== 'master') {
+      fetchMyUnlockStatus();
+      // Atualizar a cada 10 segundos para detectar aprovações
+      const interval = setInterval(fetchMyUnlockStatus, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, activeTab, currentDate, token, user]);
+  
   const fetchStats = async () => {
     try {
       const res = await fetch('/api/stats/overview', {
