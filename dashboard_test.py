@@ -124,6 +124,34 @@ def create_test_users():
     log_test(f"Tokens obtidos para {len(tokens)} usuários", None)
     return tokens
 
+def create_time_overrides_for_testing(master_token):
+    """Criar time overrides para permitir criação de entries de teste"""
+    if not master_token:
+        return False
+        
+    log_test("=== CRIANDO TIME OVERRIDES PARA TESTE ===")
+    
+    master_headers = {"Authorization": f"Bearer {master_token}"}
+    
+    # Criar overrides para os timeslots que vamos usar
+    overrides = [
+        {"month": 9, "year": 2024, "day": 1, "timeSlot": "08:00", "durationMinutes": 60},
+        {"month": 9, "year": 2024, "day": 2, "timeSlot": "10:00", "durationMinutes": 60},
+        {"month": 9, "year": 2024, "day": 3, "timeSlot": "12:00", "durationMinutes": 60},
+        {"month": 9, "year": 2024, "day": 4, "timeSlot": "15:00", "durationMinutes": 60},
+        {"month": 9, "year": 2024, "day": 5, "timeSlot": "19:30", "durationMinutes": 60},
+        {"month": 9, "year": 2024, "day": 6, "timeSlot": "08:00", "durationMinutes": 60},
+    ]
+    
+    for override in overrides:
+        response = make_request("POST", "time/override", override, master_headers)
+        if response['success']:
+            log_test(f"Override criado para {override['day']}/{override['month']} {override['timeSlot']}", True)
+        else:
+            log_test(f"Erro ao criar override: {response['data']}", False)
+    
+    return True
+
 def create_test_entries(tokens):
     """Criar entries de teste para diferentes usuários e localizações"""
     log_test("=== CRIANDO ENTRIES DE TESTE ===")
