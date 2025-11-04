@@ -328,6 +328,26 @@ backend:
           - ✅ Response estruturada: { pastors: [...] }
           
           📊 RESULTADO: LISTAGEM DE PASTORES DISPONÍVEIS FUNCIONANDO 100%
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE RÁPIDO ESPECÍFICO REALIZADO - VALIDAÇÃO DE ROLES COMPLETA
+          
+          🎯 TESTE SOLICITADO - VALIDAR INCLUSÃO DE PASTORES/BISPOS/MASTERS:
+          - ✅ Retorna array de usuários (7 usuários encontrados)
+          - ✅ Inclui usuários com role: 'pastor' (4 usuários)
+          - ✅ Inclui usuários com role: 'bispo' (filtro configurado, 0 usuários no DB)
+          - ✅ Inclui usuários com role: 'master' (3 usuários)
+          - ✅ Inclui usuários com role: 'leader' (filtro configurado, 0 usuários no DB)
+          - ✅ Cada usuário tem: hasChurch (boolean) e available (boolean)
+          - ✅ Ordenado por nome (alfabético)
+          
+          🔍 IMPLEMENTAÇÃO VERIFICADA:
+          - Filtro no código: { role: { $in: ['pastor', 'leader', 'bispo', 'master'] } }
+          - Todos os roles solicitados estão incluídos no filtro
+          - Lógica hasChurch/available funcionando corretamente
+          
+          📊 RESULTADO: ENDPOINT INCLUI TODOS OS ROLES SOLICITADOS - 100% FUNCIONAL
 
   - task: "POST /churches/change-pastor - Trocar pastor de igreja"
     implemented: true
