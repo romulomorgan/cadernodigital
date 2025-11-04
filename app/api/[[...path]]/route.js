@@ -843,14 +843,33 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
       }
       
+      const userData = await db.collection('users').findOne({ userId: user.userId });
       const { month1, year1, month2, year2 } = await request.json();
       
+      // Build filter baseado nas permissões
+      let filter = {};
+      
+      if (userData.role === 'master' || userData.scope === 'global') {
+        // Master vê tudo
+      } else if (userData.scope === 'state') {
+        filter.state = userData.state;
+      } else if (userData.scope === 'region') {
+        filter.region = userData.region;
+        filter.state = userData.state;
+      } else if (userData.scope === 'church') {
+        filter.church = userData.church;
+      } else {
+        filter.userId = userData.userId;
+      }
+      
+      console.log('[COMPARE] User:', userData.userId, 'Filter:', JSON.stringify(filter));
+      
       const entries1 = await db.collection('entries')
-        .find({ month: parseInt(month1), year: parseInt(year1) })
+        .find({ ...filter, month: parseInt(month1), year: parseInt(year1) })
         .toArray();
       
       const entries2 = await db.collection('entries')
-        .find({ month: parseInt(month2), year: parseInt(year2) })
+        .find({ ...filter, month: parseInt(month2), year: parseInt(year2) })
         .toArray();
       
       const total1 = entries1.reduce((sum, e) => sum + (e.value || 0), 0);
