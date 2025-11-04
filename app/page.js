@@ -1434,13 +1434,11 @@ export default function App() {
                               Salvar
                             </Button>
                             <Button 
-                              onClick={() => {
-                                setMonthObservation('');
-                                setMonthObservationActive(false);
-                              }}
+                              onClick={handleClearMonthObservation}
                               variant="outline"
                               size="sm"
                             >
+                              <X className="w-4 h-4 mr-1" />
                               Limpar
                             </Button>
                           </div>
