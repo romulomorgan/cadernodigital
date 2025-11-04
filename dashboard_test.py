@@ -433,28 +433,28 @@ def main():
     try:
         # Cenário 1: Usuário comum
         if 'user1@iudp.com' in tokens:
-            result1 = test_scenario_1_user_comum(tokens)
+            result1 = test_scenario_1_user_comum(tokens, test_month)
             results.append(("Cenário 1 - Usuário Comum", result1))
         else:
             log_test("Pulando Cenário 1 - usuário comum não disponível", None)
         
         # Cenário 2: Usuário Master
         if 'joao.silva@iudp.org.br' in tokens:
-            result2 = test_scenario_2_user_master(tokens)
+            result2 = test_scenario_2_user_master(tokens, test_month)
             results.append(("Cenário 2 - Usuário Master", result2))
         else:
             log_test("Pulando Cenário 2 - usuário master não disponível", None)
         
         # Cenário 3: Usuário State Scope
         if 'userstate@iudp.com' in tokens:
-            result3 = test_scenario_3_user_state_scope(tokens)
+            result3 = test_scenario_3_user_state_scope(tokens, test_month)
             results.append(("Cenário 3 - Usuário State Scope", result3))
         else:
             log_test("Pulando Cenário 3 - usuário state scope não disponível", None)
         
         # Cenário 4: Usuário Church Scope
         if 'userchurch@iudp.com' in tokens:
-            result4 = test_scenario_4_user_church_scope(tokens)
+            result4 = test_scenario_4_user_church_scope(tokens, test_month)
             results.append(("Cenário 4 - Usuário Church Scope", result4))
         else:
             log_test("Pulando Cenário 4 - usuário church scope não disponível", None)
