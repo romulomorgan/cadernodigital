@@ -1718,7 +1718,7 @@ export default function App() {
                       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                         {timeSlots.map(timeSlot => {
                           const entry = getEntry(day, timeSlot);
-                          const lockStatus = isEntryLocked(entry, currentBrazilTime);
+                          const lockStatus = isEntryLocked(entry, currentBrazilTime, day, timeSlot);
                           
                           return (
                             <div key={timeSlot} className="border-2 border-gray-200 rounded-lg p-3 hover:border-blue-300 transition-colors">
