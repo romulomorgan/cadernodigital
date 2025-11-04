@@ -896,8 +896,33 @@ export async function POST(request) {
       
       const { month, year } = await request.json();
       
+      // Buscar dados do usuário para verificar permissões
+      const userData = await db.collection('users').findOne({ userId: user.userId });
+      
+      // Build filter baseado nas permissões (igual stats/overview)
+      let filter = {
+        month: parseInt(month), 
+        year: parseInt(year)
+      };
+      
+      if (userData.role === 'master' || userData.scope === 'global') {
+        // Master vê tudo - sem filtros adicionais
+      } else if (userData.scope === 'state') {
+        filter.state = userData.state;
+      } else if (userData.scope === 'region') {
+        filter.region = userData.region;
+        filter.state = userData.state;
+      } else if (userData.scope === 'church') {
+        filter.church = userData.church;
+      } else {
+        // Usuário comum - apenas seus dados
+        filter.userId = userData.userId;
+      }
+      
+      console.log('[DASHBOARD] User:', userData.userId, 'Role:', userData.role, 'Filter:', JSON.stringify(filter));
+      
       const entries = await db.collection('entries')
-        .find({ month: parseInt(month), year: parseInt(year) })
+        .find(filter)
         .toArray();
       
       // Group by day
