@@ -3107,6 +3107,7 @@ export default function App() {
                                       <p className="text-xs text-gray-500 mt-1">📍 {church.address}</p>
                                       
                                       <div className="mt-3 pt-3 border-t">
+                                        <p className="text-xs text-gray-500 font-medium mb-2">Pastor/Bispo Responsável:</p>
                                         <div className="flex items-center gap-3">
                                           {church.pastor ? (
                                             <>
@@ -3114,20 +3115,30 @@ export default function App() {
                                                 <img 
                                                   src={church.pastor.photoUrl} 
                                                   alt={church.pastor.name}
-                                                  className="w-12 h-12 rounded-full object-cover"
+                                                  className="w-14 h-14 rounded-full object-cover border-2 border-blue-300"
+                                                  onError={(e) => {
+                                                    e.target.onerror = null;
+                                                    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2UwZTBlMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjQwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+8J+RpDwvdGV4dD48L3N2Zz4=';
+                                                  }}
                                                 />
                                               ) : (
-                                                <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                                                  <span className="text-xl">👤</span>
+                                                <div className="w-14 h-14 bg-gradient-to-br from-purple-100 to-purple-200 rounded-full flex items-center justify-center border-2 border-purple-300">
+                                                  <span className="text-2xl">👤</span>
                                                 </div>
                                               )}
-                                              <div>
+                                              <div className="flex-1">
                                                 <p className="font-semibold text-sm">{church.pastor.name}</p>
                                                 <p className="text-xs text-gray-500">{church.pastor.email}</p>
+                                                <Badge variant="outline" className="text-xs mt-1">{church.pastor.role}</Badge>
                                               </div>
                                             </>
                                           ) : (
-                                            <p className="text-sm text-gray-500 italic">Sem pastor designado</p>
+                                            <div className="flex items-center gap-3 flex-1">
+                                              <div className="w-14 h-14 bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-300">
+                                                <span className="text-2xl">👤</span>
+                                              </div>
+                                              <p className="text-sm text-gray-500 italic">Sem pastor designado</p>
+                                            </div>
                                           )}
                                           <Button 
                                             size="sm" 
@@ -3139,7 +3150,7 @@ export default function App() {
                                               setShowChangePastorModal(true);
                                             }}
                                           >
-                                            🔄 Trocar Pastor
+                                            🔄 Trocar
                                           </Button>
                                         </div>
                                       </div>
