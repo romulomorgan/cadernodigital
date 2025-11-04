@@ -209,7 +209,7 @@ def test_scenario_1_user_comum(tokens):
     user_headers = {"Authorization": f"Bearer {tokens['user1@iudp.com']}"}
     
     # Fazer requisição ao dashboard
-    dashboard_data = {"month": 11, "year": 2025}
+    dashboard_data = {"month": 10, "year": 2025}
     response = make_request("POST", "dashboard/data", dashboard_data, user_headers)
     
     if not response['success']:
@@ -251,7 +251,7 @@ def test_scenario_2_user_master(tokens):
     master_headers = {"Authorization": f"Bearer {tokens['mastertest@iudp.com']}"}
     
     # Fazer requisição ao dashboard
-    dashboard_data = {"month": 11, "year": 2025}
+    dashboard_data = {"month": 10, "year": 2025}
     response = make_request("POST", "dashboard/data", dashboard_data, master_headers)
     
     if not response['success']:
@@ -292,7 +292,7 @@ def test_scenario_3_user_state_scope(tokens):
     userstate_headers = {"Authorization": f"Bearer {tokens['userstate@iudp.com']}"}
     
     # Fazer requisição ao dashboard
-    dashboard_data = {"month": 11, "year": 2025}
+    dashboard_data = {"month": 10, "year": 2025}
     response = make_request("POST", "dashboard/data", dashboard_data, userstate_headers)
     
     if not response['success']:
@@ -333,7 +333,7 @@ def test_scenario_4_user_church_scope(tokens):
     userchurch_headers = {"Authorization": f"Bearer {tokens['userchurch@iudp.com']}"}
     
     # Fazer requisição ao dashboard
-    dashboard_data = {"month": 11, "year": 2025}
+    dashboard_data = {"month": 10, "year": 2025}
     response = make_request("POST", "dashboard/data", dashboard_data, userchurch_headers)
     
     if not response['success']:
