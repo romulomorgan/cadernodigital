@@ -722,8 +722,46 @@ export default function App() {
       
       if (res.ok) {
         toast.success('📨 Solicitação enviada ao Líder Máximo!');
+      } else {
+        const error = await res.json();
+        toast.error(`❌ ${error.error || 'Erro ao enviar solicitação'}`);
       }
     } catch (error) {
+      toast.error('❌ Erro ao enviar solicitação');
+    }
+  };
+  
+  const handleRequestUnlockForEmptySlot = async (day, timeSlot) => {
+    const reason = prompt('Informe o motivo para lançar neste horário/dia anterior:');
+    if (!reason) return;
+    
+    try {
+      const res = await fetch('/api/unlock/request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          day, 
+          month: currentDate.getMonth() + 1,
+          year: currentDate.getFullYear(),
+          timeSlot, 
+          reason 
+        })
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        toast.success('📨 Solicitação enviada ao Líder Máximo!', {
+          description: 'Aguarde a aprovação para realizar o lançamento.'
+        });
+      } else {
+        toast.error(`❌ ${data.error || 'Erro ao enviar solicitação'}`);
+      }
+    } catch (error) {
+      console.error('Erro ao solicitar liberação:', error);
       toast.error('❌ Erro ao enviar solicitação');
     }
   };
