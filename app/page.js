@@ -101,14 +101,26 @@ export default function App() {
   const [showUserEditModal, setShowUserEditModal] = useState(false);
   const [showUserDeleteConfirm, setShowUserDeleteConfirm] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [editUserData, setEditUserData] = useState({});
   const [allChurches, setAllChurches] = useState([]);
   const [showChurchViewModal, setShowChurchViewModal] = useState(false);
   const [showChurchEditModal, setShowChurchEditModal] = useState(false);
   const [showChurchDeleteConfirm, setShowChurchDeleteConfirm] = useState(false);
   const [showChangePastorModal, setShowChangePastorModal] = useState(false);
   const [selectedChurch, setSelectedChurch] = useState(null);
+  const [editChurchData, setEditChurchData] = useState({});
   const [availablePastors, setAvailablePastors] = useState([]);
   const [pastorSearchQuery, setPastorSearchQuery] = useState('');
+  
+  // CRUD states - Funções (Roles)
+  const [allRoles, setAllRoles] = useState([]);
+  const [showRoleViewModal, setShowRoleViewModal] = useState(false);
+  const [showRoleEditModal, setShowRoleEditModal] = useState(false);
+  const [showRoleDeleteConfirm, setShowRoleDeleteConfirm] = useState(false);
+  const [selectedRole, setSelectedRole] = useState(null);
+  const [editRoleData, setEditRoleData] = useState({});
+  const [newRoleName, setNewRoleName] = useState('');
+  const [newRoleDescription, setNewRoleDescription] = useState('');
   
   const timeSlots = ['08:00', '10:00', '12:00', '15:00', '19:30'];
   const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
