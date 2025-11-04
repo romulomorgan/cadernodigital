@@ -300,6 +300,13 @@ export default function App() {
     }
   }, [isAuthenticated, activeTab, stats]);
   
+  // Auto-carregar dashboardData quando entrar na aba Dashboard ou trocar de mês
+  useEffect(() => {
+    if (isAuthenticated && activeTab === 'dashboard' && token) {
+      fetchDashboard();
+    }
+  }, [isAuthenticated, activeTab, currentDate, token]);
+  
   const fetchStats = async () => {
     try {
       const res = await fetch('/api/stats/overview', {
