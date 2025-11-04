@@ -1343,18 +1343,36 @@ export async function GET(request) {
     
     if (endpoint.startsWith('download/receipt/')) {
       const filename = endpoint.replace('download/receipt/', '');
-      const filepath = `/app/uploads/receipts/${filename}`;
+      const filepath = path.join(UPLOAD_DIR, filename);
+      
+      console.log('[DOWNLOAD] Tentando baixar:', filepath);
       
       if (!existsSync(filepath)) {
+        console.log('[DOWNLOAD] Arquivo não encontrado:', filepath);
         return NextResponse.json({ error: 'Arquivo não encontrado' }, { status: 404 });
       }
       
       const fileBuffer = await readFile(filepath);
       
+      // Detectar tipo correto baseado na extensão
+      const ext = filename.split('.').pop().toLowerCase();
+      const contentTypes = {
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'png': 'image/png',
+        'webp': 'image/webp',
+        'pdf': 'application/pdf'
+      };
+      
+      const contentType = contentTypes[ext] || 'application/octet-stream';
+      
+      console.log('[DOWNLOAD] Servindo arquivo:', filename, 'Type:', contentType, 'Size:', fileBuffer.length);
+      
       return new NextResponse(fileBuffer, {
         headers: {
-          'Content-Type': 'application/octet-stream',
-          'Content-Disposition': `attachment; filename="${filename}"`
+          'Content-Type': contentType,
+          'Content-Disposition': `attachment; filename="${filename}"`,
+          'Content-Length': fileBuffer.length.toString()
         }
       });
     }
