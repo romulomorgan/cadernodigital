@@ -2671,51 +2671,6 @@ export default function App() {
         </DialogContent>
       </Dialog>
       
-      {/* Aviso Institucional - Horário de Brasília */}
-      <Dialog open={showTimezoneNotice} onOpenChange={() => {}}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-blue-900">
-              <Clock className="w-6 h-6 text-yellow-600" />
-              Atualização Importante
-            </DialogTitle>
-          </DialogHeader>
-          
-          <div className="space-y-4 py-4">
-            <div className="bg-blue-50 border-l-4 border-blue-600 p-4 rounded">
-              <p className="text-gray-800 leading-relaxed">
-                A ferramenta da <strong>Igreja Unida Deus Proverá</strong> agora opera exclusivamente no{' '}
-                <strong className="text-blue-800">Horário Oficial de Brasília (UTC-3)</strong>.
-              </p>
-            </div>
-            
-            <p className="text-gray-700">
-              Esta atualização garante <strong>precisão, ordem e transparência</strong> em todos os registros 
-              de ofertas e dízimos, independentemente de onde você esteja localizado.
-            </p>
-            
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-              <p className="text-sm text-gray-700 flex items-start gap-2">
-                <Clock className="w-4 h-4 mt-0.5 text-yellow-600 flex-shrink-0" />
-                <span>
-                  Todos os horários exibidos e registros realizados seguirão sempre o fuso horário de Brasília.
-                </span>
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex justify-end">
-            <Button 
-              onClick={handleTimezoneNoticeConfirm}
-              className="bg-blue-600 hover:bg-blue-700 px-6"
-            >
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Entendido
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-      
       {/* Dialog de Confirmação de Logout */}
       <Dialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
         <DialogContent className="sm:max-w-md">
