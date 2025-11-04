@@ -632,6 +632,8 @@ export default function App() {
       const slotDate = new Date(currentYear, currentMonth, day);
       const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       
+      console.log(`[LOCK CHECK] Dia ${day}, Slot ${timeSlot}: slotDate=${slotDate.toISOString()}, today=${todayDate.toISOString()}, isPast=${slotDate < todayDate}`);
+      
       // Se é dia anterior, está bloqueado
       if (slotDate < todayDate) {
         return { locked: true, reason: 'past_day', timeLeft: null };
