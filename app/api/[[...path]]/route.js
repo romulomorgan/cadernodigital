@@ -1374,7 +1374,7 @@ export async function POST(request) {
       }
       
       const filepath = path.join(uploadDir, filename);
-      fs.writeFileSync(filepath, buffer);
+      writeFileSync(filepath, buffer);
       
       // Atualizar usuário com URL da foto
       await db.collection('users').updateOne(
@@ -1549,7 +1549,7 @@ export async function POST(request) {
       }
       
       const filepath = path.join(uploadDir, filename);
-      fs.writeFileSync(filepath, buffer);
+      writeFileSync(filepath, buffer);
       
       // Atualizar igreja com URL da foto
       await db.collection('churches').updateOne(
