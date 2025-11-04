@@ -1655,6 +1655,9 @@ export default function App() {
                               <div>
                                 <p className="text-gray-500 text-xs">Solicitante:</p>
                                 <p className="font-semibold text-gray-900">{req.requesterName}</p>
+                                <p className="text-xs bg-yellow-100 text-yellow-800 inline-block px-2 py-1 rounded mt-1">
+                                  {roleNames[req.requesterRole] || req.requesterRole || 'Usuário'}
+                                </p>
                               </div>
                               <div>
                                 <p className="text-gray-500 text-xs">Email:</p>
