@@ -128,17 +128,17 @@ def create_test_entries(tokens):
     """Criar entries de teste para diferentes usuários e localizações"""
     log_test("=== CRIANDO ENTRIES DE TESTE ===")
     
-    # Usar mês passado (outubro 2025) para evitar problemas de janela de tempo
+    # Usar mês bem no passado (setembro 2024) para evitar problemas de janela de tempo
     # Usar apenas timeslots válidos: '08:00', '10:00', '12:00', '15:00', '19:30'
     
     # Entries para usuário comum (RJ)
     user1_entries = [
         {
-            "month": 10, "year": 2025, "day": 1, "timeSlot": "08:00",
+            "month": 9, "year": 2024, "day": 1, "timeSlot": "08:00",
             "value": 100.0, "notes": "Entry User1 RJ"
         },
         {
-            "month": 10, "year": 2025, "day": 2, "timeSlot": "10:00", 
+            "month": 9, "year": 2024, "day": 2, "timeSlot": "10:00", 
             "value": 150.0, "notes": "Entry User1 RJ 2"
         }
     ]
@@ -146,11 +146,11 @@ def create_test_entries(tokens):
     # Entries para usuário state scope (SP)
     userstate_entries = [
         {
-            "month": 10, "year": 2025, "day": 3, "timeSlot": "12:00",
+            "month": 9, "year": 2024, "day": 3, "timeSlot": "12:00",
             "value": 200.0, "notes": "Entry UserState SP"
         },
         {
-            "month": 10, "year": 2025, "day": 4, "timeSlot": "15:00",
+            "month": 9, "year": 2024, "day": 4, "timeSlot": "15:00",
             "value": 250.0, "notes": "Entry UserState SP 2"
         }
     ]
@@ -158,11 +158,11 @@ def create_test_entries(tokens):
     # Entries para usuário church scope (Igreja Central)
     userchurch_entries = [
         {
-            "month": 10, "year": 2025, "day": 5, "timeSlot": "19:30",
+            "month": 9, "year": 2024, "day": 5, "timeSlot": "19:30",
             "value": 300.0, "notes": "Entry UserChurch Central"
         },
         {
-            "month": 10, "year": 2025, "day": 6, "timeSlot": "08:00",
+            "month": 9, "year": 2024, "day": 6, "timeSlot": "08:00",
             "value": 350.0, "notes": "Entry UserChurch Central 2"
         }
     ]
