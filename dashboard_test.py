@@ -429,7 +429,7 @@ def main():
             log_test("Pulando Cenário 1 - usuário comum não disponível", None)
         
         # Cenário 2: Usuário Master
-        if 'mastertest@iudp.com' in tokens:
+        if 'joao.silva@iudp.org.br' in tokens:
             result2 = test_scenario_2_user_master(tokens)
             results.append(("Cenário 2 - Usuário Master", result2))
         else:
