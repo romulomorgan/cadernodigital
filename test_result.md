@@ -667,8 +667,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Dashboard auto-load e filtros de permissão"
-    - "Confirmação de Logout melhorada"
+    - "Correção de URLs de fotos das igrejas"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
