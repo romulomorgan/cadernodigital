@@ -3926,34 +3926,87 @@ export default function App() {
       
       {/* Dialog - Visualizar Igreja */}
       <Dialog open={showChurchViewModal} onOpenChange={setShowChurchViewModal}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>👁️ Visualizar Igreja</DialogTitle>
           </DialogHeader>
           {selectedChurch && (
             <div className="space-y-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2">
-                  <Label className="text-gray-500 text-xs">Nome</Label>
-                  <p className="font-semibold text-lg">{selectedChurch.name}</p>
+              <div className="flex gap-4">
+                {selectedChurch.photoUrl ? (
+                  <img 
+                    src={selectedChurch.photoUrl} 
+                    alt={selectedChurch.name}
+                    className="w-32 h-32 rounded-lg object-cover border-2"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div className="w-32 h-32 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center border-2 border-blue-300" style={{display: selectedChurch.photoUrl ? 'none' : 'flex'}}>
+                  <span className="text-6xl">🏛️</span>
                 </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold">{selectedChurch.name}</h3>
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    <div>
+                      <Label className="text-gray-500 text-xs">CEP</Label>
+                      <p className="text-sm">{selectedChurch.cep || 'Não informado'}</p>
+                    </div>
+                    <div>
+                      <Label className="text-gray-500 text-xs">Estado</Label>
+                      <p className="text-sm">{selectedChurch.state}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 border-t pt-4">
                 <div className="col-span-2">
-                  <Label className="text-gray-500 text-xs">Endereço</Label>
-                  <p>{selectedChurch.address}</p>
+                  <Label className="text-gray-500 text-xs">Endereço Completo</Label>
+                  <p>{selectedChurch.address}, {selectedChurch.number || 'S/N'}</p>
+                  {selectedChurch.complement && <p className="text-sm text-gray-600">{selectedChurch.complement}</p>}
+                </div>
+                <div>
+                  <Label className="text-gray-500 text-xs">Bairro</Label>
+                  <p>{selectedChurch.neighborhood || 'Não informado'}</p>
                 </div>
                 <div>
                   <Label className="text-gray-500 text-xs">Cidade</Label>
                   <p>{selectedChurch.city}</p>
                 </div>
                 <div>
-                  <Label className="text-gray-500 text-xs">Estado</Label>
-                  <p>{selectedChurch.state}</p>
-                </div>
-                <div>
                   <Label className="text-gray-500 text-xs">Região</Label>
-                  <p>{selectedChurch.region}</p>
+                  <p>{selectedChurch.region || 'Não informada'}</p>
                 </div>
               </div>
+              
+              {selectedChurch.pastor && (
+                <div className="border-t pt-4">
+                  <Label className="text-gray-500 text-xs mb-2 block">Pastor/Bispo Responsável</Label>
+                  <div className="flex items-center gap-3 bg-gray-50 p-3 rounded">
+                    {selectedChurch.pastor.photoUrl ? (
+                      <img 
+                        src={selectedChurch.pastor.photoUrl} 
+                        alt={selectedChurch.pastor.name}
+                        className="w-16 h-16 rounded-full object-cover border-2"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-purple-200 rounded-full flex items-center justify-center border-2">
+                        <span className="text-3xl">👤</span>
+                      </div>
+                    )}
+                    <div>
+                      <p className="font-semibold">{selectedChurch.pastor.name}</p>
+                      <p className="text-sm text-gray-600">{selectedChurch.pastor.email}</p>
+                      <Badge variant="outline" className="mt-1">{selectedChurch.pastor.role}</Badge>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               <Button variant="outline" onClick={() => setShowChurchViewModal(false)} className="w-full mt-4">
                 Fechar
               </Button>
