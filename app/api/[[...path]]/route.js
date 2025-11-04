@@ -1632,6 +1632,101 @@ export async function POST(request) {
       
       return NextResponse.json({ success: true, message: 'Pastor alterado com sucesso!' });
     }
+    
+    // ========== FUNÇÕES (ROLES) CRUD ==========
+    
+    // GET ALL ROLES
+    if (endpoint === 'roles/list') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const roles = await db.collection('roles')
+        .find({})
+        .sort({ createdAt: -1 })
+        .toArray();
+      
+      return NextResponse.json({ roles });
+    }
+    
+    // CREATE ROLE
+    if (endpoint === 'roles/create') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const { name, description } = await request.json();
+      
+      const newRole = {
+        roleId: crypto.randomUUID(),
+        name,
+        description,
+        createdAt: getBrazilTime().toISOString(),
+        updatedAt: getBrazilTime().toISOString()
+      };
+      
+      await db.collection('roles').insertOne(newRole);
+      
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'create_role',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { roleId: newRole.roleId, roleName: name }
+      });
+      
+      return NextResponse.json({ success: true, role: newRole, message: 'Função criada com sucesso!' });
+    }
+    
+    // UPDATE ROLE
+    if (endpoint === 'roles/update') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const { roleId, roleData } = await request.json();
+      
+      await db.collection('roles').updateOne(
+        { roleId },
+        { $set: { ...roleData, updatedAt: getBrazilTime().toISOString() } }
+      );
+      
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'update_role',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { roleId, updates: Object.keys(roleData) }
+      });
+      
+      return NextResponse.json({ success: true, message: 'Função atualizada com sucesso!' });
+    }
+    
+    // DELETE ROLE
+    if (endpoint === 'roles/delete') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const { roleId } = await request.json();
+      
+      const role = await db.collection('roles').findOne({ roleId });
+      await db.collection('roles').deleteOne({ roleId });
+      
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'delete_role',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { deletedRoleId: roleId, deletedRoleName: role?.name }
+      });
+      
+      return NextResponse.json({ success: true, message: 'Função excluída com sucesso!' });
+    }
 
     
     // EXPORT CSV
