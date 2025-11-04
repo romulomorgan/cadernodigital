@@ -2809,31 +2809,91 @@ export default function App() {
                                         <span className="text-4xl">🏛️</span>
                                       </div>
                                     )}
-                                <div className="flex-1">
-                                  <h3 className="text-lg font-bold">Igreja Central</h3>
-                                  <p className="text-sm text-gray-600">São Paulo - SP • Zona Centro</p>
-                                  <p className="text-xs text-gray-500 mt-1">📍 Rua Exemplo, 123</p>
-                                  <p className="text-xs text-gray-500">📱 (11) 99999-9999</p>
-                                  
-                                  <div className="mt-3 pt-3 border-t">
-                                    <div className="flex items-center gap-3">
-                                      <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                                        <span className="text-xl">👤</span>
+                                    <div className="flex-1">
+                                      <h3 className="text-lg font-bold">{church.name}</h3>
+                                      <p className="text-sm text-gray-600">{church.city} - {church.state} • {church.region}</p>
+                                      <p className="text-xs text-gray-500 mt-1">📍 {church.address}</p>
+                                      
+                                      <div className="mt-3 pt-3 border-t">
+                                        <div className="flex items-center gap-3">
+                                          {church.pastor ? (
+                                            <>
+                                              {church.pastor.photoUrl ? (
+                                                <img 
+                                                  src={church.pastor.photoUrl} 
+                                                  alt={church.pastor.name}
+                                                  className="w-12 h-12 rounded-full object-cover"
+                                                />
+                                              ) : (
+                                                <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                                                  <span className="text-xl">👤</span>
+                                                </div>
+                                              )}
+                                              <div>
+                                                <p className="font-semibold text-sm">{church.pastor.name}</p>
+                                                <p className="text-xs text-gray-500">{church.pastor.email}</p>
+                                              </div>
+                                            </>
+                                          ) : (
+                                            <p className="text-sm text-gray-500 italic">Sem pastor designado</p>
+                                          )}
+                                          <Button 
+                                            size="sm" 
+                                            variant="outline" 
+                                            className="ml-auto"
+                                            onClick={() => {
+                                              setSelectedChurch(church);
+                                              fetchAvailablePastors();
+                                              setShowChangePastorModal(true);
+                                            }}
+                                          >
+                                            🔄 Trocar Pastor
+                                          </Button>
+                                        </div>
                                       </div>
-                                      <div>
-                                        <p className="font-semibold text-sm">Pastor João Silva</p>
-                                        <p className="text-xs text-gray-500">pastor@igreja.com</p>
+                                      
+                                      <div className="flex gap-2 mt-3">
+                                        <Button 
+                                          size="sm" 
+                                          variant="outline"
+                                          onClick={() => {
+                                            setSelectedChurch(church);
+                                            setShowChurchViewModal(true);
+                                          }}
+                                        >
+                                          <Eye className="w-4 h-4 mr-1" />
+                                          Visualizar
+                                        </Button>
+                                        <Button 
+                                          size="sm" 
+                                          variant="outline"
+                                          onClick={() => {
+                                            setSelectedChurch(church);
+                                            setShowChurchEditModal(true);
+                                          }}
+                                        >
+                                          <Edit className="w-4 h-4 mr-1" />
+                                          Editar
+                                        </Button>
+                                        <Button 
+                                          size="sm" 
+                                          variant="destructive"
+                                          onClick={() => {
+                                            setSelectedChurch(church);
+                                            setShowChurchDeleteConfirm(true);
+                                          }}
+                                        >
+                                          <Trash2 className="w-4 h-4 mr-1" />
+                                          Excluir
+                                        </Button>
                                       </div>
-                                      <Button size="sm" variant="outline" className="ml-auto">
-                                        🔄 Trocar Pastor
-                                      </Button>
                                     </div>
                                   </div>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   </div>
