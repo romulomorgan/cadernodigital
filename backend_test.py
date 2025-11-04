@@ -568,60 +568,72 @@ class IUDPTester:
         except Exception as e:
             self.log_error(f"Erro ao verificar audit logs: {str(e)}")
             return False
-def test_scenario_2_unlock_requests(master_token, user_token):
-    """
-    Cenário 2: Unlock Requests em Mês Fechado
-    1. Com Master: Fechar mês 6/2025
-    2. Com usuário comum: Tentar solicitar unlock (deve retornar 403)
-    3. Com Master: Reabrir mês
-    4. Com usuário comum: Solicitar unlock novamente (deve funcionar)
-    """
-    log_test("=== CENÁRIO 2: UNLOCK REQUESTS EM MÊS FECHADO ===")
-    
-    user_headers = {"Authorization": f"Bearer {user_token}"}
-    master_headers = {"Authorization": f"Bearer {master_token}"}
-    
-    # 1. Fechar mês com Master
-    log_test("1. Fechando mês 6/2025 com Master...")
-    close_response = make_request("POST", "month/close", {"month": 6, "year": 2025}, master_headers)
-    if close_response['success']:
-        log_test("Mês fechado com sucesso", True)
-    else:
-        log_test(f"Erro ao fechar mês: {close_response['data']}", False)
-        return False
-    
-    # 2. Tentar solicitar unlock com usuário comum (deve falhar)
-    log_test("2. Tentando solicitar unlock em mês fechado (deve ser bloqueado)...")
-    unlock_data = {
-        "entryId": "2025-06-15-10:00",
-        "reason": "Preciso corrigir valor da oferta"
-    }
-    
-    unlock_response = make_request("POST", "unlock/request", unlock_data, user_headers)
-    if unlock_response['status_code'] == 403 and 'fechado' in str(unlock_response['data']).lower():
-        log_test("✅ CORRETO: Unlock request bloqueado em mês fechado (403)", True)
-    else:
-        log_test(f"❌ ERRO: Unlock request deveria ser bloqueado. Response: {unlock_response}", False)
-        return False
-    
-    # 3. Reabrir mês com Master
-    log_test("3. Reabrindo mês 6/2025 com Master...")
-    reopen_response = make_request("POST", "month/reopen", {"month": 6, "year": 2025}, master_headers)
-    if reopen_response['success']:
-        log_test("Mês reaberto com sucesso", True)
-    else:
-        log_test(f"Erro ao reabrir mês: {reopen_response['data']}", False)
-        return False
-    
-    # 4. Solicitar unlock novamente (deve funcionar)
-    log_test("4. Tentando solicitar unlock após reabertura...")
-    unlock_response2 = make_request("POST", "unlock/request", unlock_data, user_headers)
-    if unlock_response2['success']:
-        log_test("✅ CORRETO: Unlock request aceito após reabertura", True)
-        return True
-    else:
-        log_test(f"❌ ERRO: Unlock request deveria funcionar após reabertura. Response: {unlock_response2}", False)
-        return False
+    def run_all_tests(self):
+        """Executa todos os testes na ordem correta"""
+        print("=" * 80)
+        print("🎯 TESTE COMPLETO DOS ENDPOINTS CRUD - USUÁRIOS E IGREJAS")
+        print("Sistema: Caderno de Controle Online — IUDP")
+        print("=" * 80)
+        
+        results = {}
+        
+        # 1. Autenticação
+        results['auth'] = self.authenticate_master()
+        if not results['auth']:
+            print("\n❌ FALHA CRÍTICA: Não foi possível autenticar como Master")
+            return results
+        
+        # 2. Testes de Usuários
+        print("\n" + "="*50)
+        print("👥 TESTES DE USUÁRIOS")
+        print("="*50)
+        
+        results['users_list'] = self.test_users_list()
+        results['users_update'] = self.test_users_update()
+        results['users_upload_photo'] = self.test_users_upload_photo()
+        results['users_upload_validations'] = self.test_users_upload_photo_validations()
+        results['users_delete_validation'] = self.test_users_delete_validation()
+        
+        # 3. Testes de Igrejas
+        print("\n" + "="*50)
+        print("🏛️ TESTES DE IGREJAS")
+        print("="*50)
+        
+        results['churches_list'] = self.test_churches_list()
+        results['churches_available_pastors'] = self.test_churches_available_pastors()
+        results['churches_create'] = self.test_churches_create()
+        results['churches_update'] = self.test_churches_update()
+        results['churches_upload_photo'] = self.test_churches_upload_photo()
+        results['churches_change_pastor'] = self.test_churches_change_pastor()
+        results['churches_delete'] = self.test_churches_delete()
+        
+        # 4. Verificações Finais
+        print("\n" + "="*50)
+        print("📋 VERIFICAÇÕES FINAIS")
+        print("="*50)
+        
+        results['audit_logs'] = self.test_audit_logs()
+        
+        # 5. Resumo Final
+        print("\n" + "="*80)
+        print("📊 RESUMO DOS TESTES")
+        print("="*80)
+        
+        passed = sum(1 for result in results.values() if result)
+        total = len(results)
+        
+        for test_name, result in results.items():
+            status = "✅ PASSOU" if result else "❌ FALHOU"
+            print(f"{test_name.replace('_', ' ').title()}: {status}")
+        
+        print(f"\n🎯 RESULTADO FINAL: {passed}/{total} testes passaram")
+        
+        if passed == total:
+            print("🎉 TODOS OS TESTES PASSARAM! CRUD FUNCIONANDO PERFEITAMENTE!")
+        else:
+            print(f"⚠️ {total - passed} teste(s) falharam. Verificar implementação.")
+        
+        return results
 def test_scenario_3_master_approve_unlock(master_token, user_token):
     """
     Cenário 3: Master Approve Unlock em Mês Fechado
