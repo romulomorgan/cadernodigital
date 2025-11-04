@@ -1148,6 +1148,111 @@ export default function App() {
     p.email?.toLowerCase().includes(pastorSearchQuery.toLowerCase())
   );
   
+  // ========== FUNÇÕES CRUD - ROLES ==========
+  
+  const fetchAllRoles = async () => {
+    try {
+      const res = await fetch('/api/roles/list', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setAllRoles(data.roles || []);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar funções:', error);
+    }
+  };
+  
+  const handleCreateRole = async () => {
+    if (!newRoleName.trim()) {
+      toast.error('❌ Nome da função é obrigatório');
+      return;
+    }
+    
+    try {
+      const res = await fetch('/api/roles/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: newRoleName,
+          description: newRoleDescription
+        })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        setNewRoleName('');
+        setNewRoleDescription('');
+        fetchAllRoles();
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao criar função');
+    }
+  };
+  
+  const handleUpdateRole = async () => {
+    try {
+      const res = await fetch('/api/roles/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          roleId: selectedRole.roleId,
+          roleData: editRoleData
+        })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        setShowRoleEditModal(false);
+        fetchAllRoles();
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao atualizar função');
+    }
+  };
+  
+  const handleDeleteRole = async (roleId) => {
+    try {
+      const res = await fetch('/api/roles/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ roleId })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        setShowRoleDeleteConfirm(false);
+        fetchAllRoles();
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao excluir função');
+    }
+  };
+  
   const handleApproveUnlock = async (requestId, entryId) => {
     try {
       const res = await fetch('/api/unlock/approve', {
