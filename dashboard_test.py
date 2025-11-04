@@ -204,11 +204,11 @@ def create_test_entries_with_master(tokens):
     # Por enquanto, vamos testar com entries existentes
     return test_dashboard_with_existing_entries(tokens)
 
-def test_scenario_1_user_comum(tokens):
+def test_scenario_1_user_comum(tokens, test_month):
     """
     Cenário 1: Usuário Comum (sem scope especial)
     - Login com usuário comum (role != master)
-    - POST /api/dashboard/data com { month: 11, year: 2025 }
+    - POST /api/dashboard/data com test_month
     - Validar: Retorna APENAS entries do próprio userId
     - Validar: Não retorna entries de outros usuários
     """
@@ -217,7 +217,7 @@ def test_scenario_1_user_comum(tokens):
     user_headers = {"Authorization": f"Bearer {tokens['user1@iudp.com']}"}
     
     # Fazer requisição ao dashboard
-    dashboard_data = {"month": 9, "year": 2024}
+    dashboard_data = test_month
     response = make_request("POST", "dashboard/data", dashboard_data, user_headers)
     
     if not response['success']:
