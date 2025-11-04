@@ -1189,21 +1189,51 @@ export async function POST(request) {
     // GET STATISTICS
     if (endpoint === 'stats/overview') {
       const user = verifyToken(request);
-      if (!user || user.role !== 'master') {
-        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!user) {
+        return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
       }
       
-      const totalUsers = await db.collection('users').countDocuments();
-      const totalEntries = await db.collection('entries').countDocuments();
-      const pendingRequests = await db.collection('unlock_requests').countDocuments({ status: 'pending' });
-      const totalAuditLogs = await db.collection('audit_logs').countDocuments();
+      const userData = await db.collection('users').findOne({ userId: user.userId });
+      
+      // Build filter baseado nas permissões
+      let filter = {};
+      
+      if (userData.role === 'master' || userData.scope === 'global') {
+        // Master vê tudo - sem filtros
+      } else if (userData.scope === 'state') {
+        filter.state = userData.state;
+      } else if (userData.scope === 'region') {
+        filter.region = userData.region;
+        filter.state = userData.state;
+      } else if (userData.scope === 'church') {
+        filter.church = userData.church;
+      } else {
+        // Usuário comum - apenas seus dados
+        filter.userId = userData.userId;
+      }
+      
+      console.log('[STATS] User:', userData.userId, 'Role:', userData.role, 'Filter:', JSON.stringify(filter));
+      
+      const totalUsers = userData.role === 'master' 
+        ? await db.collection('users').countDocuments()
+        : 1; // Usuário comum vê apenas ele mesmo
+        
+      const totalEntries = await db.collection('entries').countDocuments(filter);
+      const pendingRequests = await db.collection('unlock_requests').countDocuments({ 
+        ...filter,
+        status: 'pending' 
+      });
       
       const now = getBrazilTime();
-      const currentMonth = now.getMonth() + 1;
-      const currentYear = now.getFullYear();
+      const currentMonth = now.month() + 1;
+      const currentYear = now.year();
       
       const currentMonthEntries = await db.collection('entries')
-        .find({ month: currentMonth, year: currentYear })
+        .find({ 
+          ...filter,
+          month: currentMonth, 
+          year: currentYear 
+        })
         .toArray();
       
       const currentMonthTotal = currentMonthEntries.reduce((sum, e) => sum + (e.value || 0), 0);
@@ -1212,7 +1242,6 @@ export async function POST(request) {
         totalUsers,
         totalEntries,
         pendingRequests,
-        totalAuditLogs,
         currentMonthTotal,
         currentMonth,
         currentYear
