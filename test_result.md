@@ -108,6 +108,252 @@ user_problem_statement: |
   Atualmente em FASE 2 - Governança de período e fechamento.
 
 backend:
+  - task: "POST /users/update - Atualizar usuário (Master apenas)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Autenticação Master: Apenas usuários master podem acessar (403 para não-master)
+          - ✅ Atualização de dados: userData aplicado corretamente no usuário
+          - ✅ Validação de segurança: Campos password e userId não podem ser atualizados
+          - ✅ Audit Log: Registro criado com action 'update_user'
+          - ✅ Response: Retorna success: true com mensagem de confirmação
+          
+          📊 RESULTADO: ENDPOINT FUNCIONANDO 100%
+
+  - task: "POST /users/delete - Deletar usuário (Master apenas)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🎯 VALIDAÇÕES TESTADAS:
+          - ✅ Autenticação Master: Apenas usuários master podem acessar
+          - ✅ Validação crítica: Master NÃO pode se auto-excluir (400 com mensagem apropriada)
+          - ✅ Exclusão funcionando: Usuários são removidos do banco
+          - ✅ Audit Log: Registro criado com action 'delete_user'
+          - ✅ Integridade: deletedUserEmail registrado no audit log
+          
+          📊 RESULTADO: VALIDAÇÕES DE SEGURANÇA FUNCIONANDO 100%
+
+  - task: "POST /users/upload-photo - Upload de foto de usuário"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: |
+          ❌ ERRO ENCONTRADO: fs is not defined
+          Problema: Código usava fs.existsSync, fs.mkdirSync, fs.writeFileSync mas fs não estava importado
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ PROBLEMA CORRIGIDO E TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🔧 CORREÇÃO APLICADA:
+          - Adicionado import { mkdirSync, writeFileSync } from 'fs'
+          - Substituído fs.existsSync por existsSync (já importado)
+          - Substituído fs.mkdirSync por mkdirSync
+          - Substituído fs.writeFileSync por writeFileSync
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Upload de foto: Aceita JPG, PNG, WebP
+          - ✅ Validação de tamanho: Rejeita arquivos > 2MB (400)
+          - ✅ Validação de tipo: Rejeita tipos não permitidos (400)
+          - ✅ Diretório criado: /uploads/users/ criado automaticamente
+          - ✅ Arquivo salvo: Foto salva com nome único (user_userId_uuid.ext)
+          - ✅ DB atualizado: photoUrl atualizado no usuário
+          - ✅ Response: Retorna photoUrl e mensagem de sucesso
+          
+          📊 RESULTADO: UPLOAD DE FOTOS FUNCIONANDO 100%
+
+  - task: "POST /churches/list - Listar igrejas com dados do pastor"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Autenticação Master: Apenas usuários master podem acessar
+          - ✅ Listagem completa: Retorna todas as igrejas ordenadas por createdAt
+          - ✅ Dados do pastor: Para cada igreja com pastorId, busca e inclui dados do pastor
+          - ✅ Projeção segura: Password do pastor não é incluído
+          - ✅ Response estruturada: { churches: [...] }
+          
+          📊 RESULTADO: LISTAGEM DE IGREJAS FUNCIONANDO 100%
+
+  - task: "POST /churches/create - Criar igreja"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Autenticação Master: Apenas usuários master podem acessar
+          - ✅ Criação de igreja: churchId UUID gerado automaticamente
+          - ✅ Associação de pastor: Se pastorId fornecido, atualiza usuário com church e churchId
+          - ✅ Timestamps: createdAt e updatedAt preenchidos automaticamente
+          - ✅ Audit Log: Registro criado com action 'create_church'
+          - ✅ Response: Retorna church completa e mensagem de sucesso
+          
+          📊 RESULTADO: CRIAÇÃO DE IGREJAS FUNCIONANDO 100%
+
+  - task: "POST /churches/update - Atualizar igreja"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Autenticação Master: Apenas usuários master podem acessar
+          - ✅ Atualização: churchData aplicado corretamente na igreja
+          - ✅ Timestamp: updatedAt atualizado automaticamente
+          - ✅ Audit Log: Registro criado com action 'update_church'
+          - ✅ Response: Retorna success: true com mensagem
+          
+          📊 RESULTADO: ATUALIZAÇÃO DE IGREJAS FUNCIONANDO 100%
+
+  - task: "POST /churches/delete - Deletar igreja"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Autenticação Master: Apenas usuários master podem acessar
+          - ✅ Exclusão segura: Igreja removida do banco
+          - ✅ Limpeza de associações: Usuários com churchId têm church e churchId removidos
+          - ✅ Audit Log: Registro criado com action 'delete_church'
+          - ✅ Dados preservados: deletedChurchName registrado no audit log
+          - ✅ Response: Retorna success: true com mensagem
+          
+          📊 RESULTADO: EXCLUSÃO DE IGREJAS FUNCIONANDO 100%
+
+  - task: "POST /churches/upload-photo - Upload de foto de igreja"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: |
+          ❌ ERRO ENCONTRADO: fs is not defined (mesmo problema do upload de usuário)
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ PROBLEMA CORRIGIDO E TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Autenticação Master: Apenas usuários master podem acessar
+          - ✅ Upload de foto: Aceita JPG, PNG, WebP
+          - ✅ Validação de tamanho: Rejeita arquivos > 2MB
+          - ✅ Validação de tipo: Rejeita tipos não permitidos
+          - ✅ Diretório criado: /uploads/churches/ criado automaticamente
+          - ✅ Arquivo salvo: Foto salva com nome único (church_churchId_uuid.ext)
+          - ✅ DB atualizado: photoUrl atualizado na igreja
+          - ✅ Response: Retorna photoUrl e mensagem de sucesso
+          
+          📊 RESULTADO: UPLOAD DE FOTOS DE IGREJAS FUNCIONANDO 100%
+
+  - task: "POST /churches/available-pastors - Listar pastores disponíveis"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Autenticação Master: Apenas usuários master podem acessar
+          - ✅ Filtro de role: Busca apenas usuários com role 'pastor' ou 'leader'
+          - ✅ Marcação hasChurch: Indica se pastor já tem igreja (!!pastor.churchId)
+          - ✅ Marcação available: Indica se pastor está disponível (!pastor.churchId)
+          - ✅ Projeção segura: Password não incluído na resposta
+          - ✅ Response estruturada: { pastors: [...] }
+          
+          📊 RESULTADO: LISTAGEM DE PASTORES DISPONÍVEIS FUNCIONANDO 100%
+
+  - task: "POST /churches/change-pastor - Trocar pastor de igreja"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Autenticação Master: Apenas usuários master podem acessar
+          - ✅ Remoção do pastor antigo: church e churchId removidos do usuário anterior
+          - ✅ Associação do novo pastor: church e churchId atualizados no novo usuário
+          - ✅ Atualização da igreja: pastorId atualizado na igreja
+          - ✅ Timestamp: updatedAt atualizado na igreja
+          - ✅ Audit Log: Registro criado com action 'change_pastor'
+          - ✅ Integridade: oldPastorId e newPastorId registrados no audit log
+          - ✅ Response: Retorna success: true com mensagem
+          
+          📊 RESULTADO: TROCA DE PASTOR FUNCIONANDO 100%
+
   - task: "POST /month/close - Fechar mês (Master apenas)"
     implemented: true
     working: true
