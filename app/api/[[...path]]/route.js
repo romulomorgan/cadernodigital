@@ -1370,7 +1370,7 @@ export async function POST(request) {
       
       // Criar diretório se não existir
       if (!existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
+        mkdirSync(uploadDir, { recursive: true });
       }
       
       const filepath = path.join(uploadDir, filename);
@@ -1545,7 +1545,7 @@ export async function POST(request) {
       
       // Criar diretório se não existir
       if (!existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
+        mkdirSync(uploadDir, { recursive: true });
       }
       
       const filepath = path.join(uploadDir, filename);
