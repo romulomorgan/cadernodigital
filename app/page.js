@@ -122,6 +122,13 @@ export default function App() {
   const [newRoleName, setNewRoleName] = useState('');
   const [newRoleDescription, setNewRoleDescription] = useState('');
   
+  // States para formulário de igreja
+  const [newChurchName, setNewChurchName] = useState('');
+  const [newChurchAddress, setNewChurchAddress] = useState('');
+  const [newChurchCity, setNewChurchCity] = useState('');
+  const [newChurchState, setNewChurchState] = useState('');
+  const [newChurchRegion, setNewChurchRegion] = useState('');
+  
   const timeSlots = ['08:00', '10:00', '12:00', '15:00', '19:30'];
   const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
   
