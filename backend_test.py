@@ -1,30 +1,21 @@
 #!/usr/bin/env python3
 """
-TESTE FINAL COMPLETO - IGREJAS E FUNÇÕES
-Sistema "Caderno de Controle Online — IUDP"
-
-Testa os 5 endpoints prioritários conforme solicitado:
-1. POST /api/churches/create - Criar igreja
-2. POST /api/churches/list - Listar igrejas
-3. POST /api/churches/update - Atualizar igreja
-4. POST /api/roles/list - Listar funções/roles
-5. POST /api/roles/create - Criar funções/roles
-
-Credenciais: joao.silva@iudp.org.br / senha123
+Backend Test - Photo URLs for Churches and Users
+Testing and fixing photo URL issues where URLs should start with /api/uploads/ not /uploads/
 """
 
 import requests
 import json
-import sys
+import os
 from datetime import datetime
 
-# Configuração
+# Configuration
 BASE_URL = "https://financial-iudp.preview.emergentagent.com"
-API_BASE = f"{BASE_URL}/api"
+API_URL = f"{BASE_URL}/api"
 
-# Credenciais do teste
-LOGIN_EMAIL = "joao.silva@iudp.org.br"
-LOGIN_PASSWORD = "LiderMaximo2025!"
+# Test credentials
+MASTER_EMAIL = "joao.silva@iudp.org.br"
+MASTER_PASSWORD = "senha123"
 
 class TestRunner:
     def __init__(self):
