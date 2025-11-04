@@ -103,15 +103,7 @@ export default function App() {
     }
   }, []);
   
-  // Verificar se precisa mostrar aviso de timezone
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      const timezoneNoticeShown = localStorage.getItem(`timezone_notice_${user.userId}`);
-      if (!timezoneNoticeShown) {
-        setShowTimezoneNotice(true);
-      }
-    }
-  }, [isAuthenticated, user]);
+  // Timezone notice removido conforme solicitação do usuário
   
   useEffect(() => {
     if (isAuthenticated) {
