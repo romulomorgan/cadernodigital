@@ -1,49 +1,87 @@
 #!/usr/bin/env python3
 """
-Teste Completo dos Endpoints CRUD - Usuários e Igrejas
-Sistema: Caderno de Controle Online — IUDP
-Endpoints testados: Users CRUD + Churches CRUD + Upload de fotos
+TESTE FINAL COMPLETO - IGREJAS E FUNÇÕES
+Sistema "Caderno de Controle Online — IUDP"
+
+Testa os 5 endpoints prioritários conforme solicitado:
+1. POST /api/churches/create - Criar igreja
+2. POST /api/churches/list - Listar igrejas
+3. POST /api/churches/update - Atualizar igreja
+4. POST /api/roles/list - Listar funções/roles
+5. POST /api/roles/create - Criar funções/roles
+
+Credenciais: joao.silva@iudp.org.br / senha123
 """
 
 import requests
 import json
-import os
-import tempfile
-from PIL import Image
-import io
 import sys
 from datetime import datetime
 
-# Configuração da API
-BASE_URL = "https://financial-iudp.preview.emergentagent.com/api"
+# Configuração
+BASE_URL = "https://financial-iudp.preview.emergentagent.com"
+API_BASE = f"{BASE_URL}/api"
 
-class IUDPTester:
+# Credenciais do teste
+LOGIN_EMAIL = "joao.silva@iudp.org.br"
+LOGIN_PASSWORD = "senha123"
+
+class TestRunner:
     def __init__(self):
-        self.master_token = None
-        self.test_user_id = None
-        self.test_church_id = None
-        self.test_pastor_id = None
+        self.token = None
+        self.test_results = []
         
-    def log(self, message):
-        print(f"[TEST] {message}")
+    def log_result(self, test_name, success, details=""):
+        """Registra resultado do teste"""
+        status = "✅ PASSOU" if success else "❌ FALHOU"
+        self.test_results.append({
+            'test': test_name,
+            'success': success,
+            'details': details,
+            'status': status
+        })
+        print(f"{status} - {test_name}")
+        if details:
+            print(f"   Detalhes: {details}")
+        print()
+    
+    def authenticate(self):
+        """Autentica e obtém token"""
+        print("🔐 AUTENTICANDO USUÁRIO...")
         
-    def log_success(self, message):
-        print(f"✅ {message}")
-        
-    def log_error(self, message):
-        print(f"❌ {message}")
-        
-    def log_info(self, message):
-        print(f"ℹ️  {message}")
-
-    def authenticate_master(self):
-        """Autentica como usuário Master"""
-        self.log("🔐 Autenticando como Master...")
-        
-        # Credenciais Master conforme especificado
-        login_data = {
-            "email": "joao.silva@iudp.org.br",
-            "password": "LiderMaximo2025!"
+        try:
+            response = requests.post(f"{API_BASE}/auth/login", json={
+                "email": LOGIN_EMAIL,
+                "password": LOGIN_PASSWORD
+            })
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success') and data.get('token'):
+                    self.token = data['token']
+                    user_info = data.get('user', {})
+                    self.log_result(
+                        "Autenticação de usuário",
+                        True,
+                        f"Login realizado com sucesso. Role: {user_info.get('role', 'N/A')}"
+                    )
+                    return True
+                else:
+                    self.log_result("Autenticação de usuário", False, f"Resposta inválida: {data}")
+                    return False
+            else:
+                self.log_result("Autenticação de usuário", False, f"Status {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Autenticação de usuário", False, f"Erro de conexão: {str(e)}")
+            return False
+    
+    def get_headers(self):
+        """Retorna headers com token de autenticação"""
+        return {
+            'Authorization': f'Bearer {self.token}',
+            'Content-Type': 'application/json'
         }
         
         try:
