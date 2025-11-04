@@ -1845,15 +1845,17 @@ export default function App() {
                                       >
                                         🔒 Bloqueado
                                       </Button>
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        className="w-full text-xs border-orange-300 hover:bg-orange-50"
-                                        onClick={() => handleRequestUnlockForEmptySlot(day, timeSlot)}
-                                      >
-                                        <Bell className="w-3 h-3 mr-1" />
-                                        Solicitar Liberação
-                                      </Button>
+                                      {user?.role !== 'master' && (
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          className="w-full text-xs border-orange-300 hover:bg-orange-50 text-orange-700"
+                                          onClick={() => handleRequestUnlockForEmptySlot(day, timeSlot)}
+                                        >
+                                          <Bell className="w-3 h-3 mr-1" />
+                                          Solicitar Liberação
+                                        </Button>
+                                      )}
                                     </div>
                                   )}
                                 </div>
