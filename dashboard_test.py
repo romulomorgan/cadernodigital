@@ -128,39 +128,42 @@ def create_test_entries(tokens):
     """Criar entries de teste para diferentes usuários e localizações"""
     log_test("=== CRIANDO ENTRIES DE TESTE ===")
     
+    # Usar mês passado (outubro 2025) para evitar problemas de janela de tempo
+    # Usar apenas timeslots válidos: '08:00', '10:00', '12:00', '15:00', '19:30'
+    
     # Entries para usuário comum (RJ)
     user1_entries = [
         {
-            "month": 11, "year": 2025, "day": 1, "timeSlot": "09:00",
-            "value": 100.0, "notes": "Entry User1 RJ", "state": "RJ", "church": "Igreja Filial A"
+            "month": 10, "year": 2025, "day": 1, "timeSlot": "08:00",
+            "value": 100.0, "notes": "Entry User1 RJ"
         },
         {
-            "month": 11, "year": 2025, "day": 2, "timeSlot": "10:00", 
-            "value": 150.0, "notes": "Entry User1 RJ 2", "state": "RJ", "church": "Igreja Filial A"
+            "month": 10, "year": 2025, "day": 2, "timeSlot": "10:00", 
+            "value": 150.0, "notes": "Entry User1 RJ 2"
         }
     ]
     
     # Entries para usuário state scope (SP)
     userstate_entries = [
         {
-            "month": 11, "year": 2025, "day": 3, "timeSlot": "11:00",
-            "value": 200.0, "notes": "Entry UserState SP", "state": "SP", "church": "Igreja Estado SP"
+            "month": 10, "year": 2025, "day": 3, "timeSlot": "12:00",
+            "value": 200.0, "notes": "Entry UserState SP"
         },
         {
-            "month": 11, "year": 2025, "day": 4, "timeSlot": "12:00",
-            "value": 250.0, "notes": "Entry UserState SP 2", "state": "SP", "church": "Igreja Estado SP"
+            "month": 10, "year": 2025, "day": 4, "timeSlot": "15:00",
+            "value": 250.0, "notes": "Entry UserState SP 2"
         }
     ]
     
     # Entries para usuário church scope (Igreja Central)
     userchurch_entries = [
         {
-            "month": 11, "year": 2025, "day": 5, "timeSlot": "13:00",
-            "value": 300.0, "notes": "Entry UserChurch Central", "state": "MG", "church": "Igreja Central"
+            "month": 10, "year": 2025, "day": 5, "timeSlot": "19:30",
+            "value": 300.0, "notes": "Entry UserChurch Central"
         },
         {
-            "month": 11, "year": 2025, "day": 6, "timeSlot": "14:00",
-            "value": 350.0, "notes": "Entry UserChurch Central 2", "state": "MG", "church": "Igreja Central"
+            "month": 10, "year": 2025, "day": 6, "timeSlot": "08:00",
+            "value": 350.0, "notes": "Entry UserChurch Central 2"
         }
     ]
     
