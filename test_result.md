@@ -881,3 +881,46 @@ agent_communication:
       🎯 STATUS FINAL: TODOS OS ENDPOINTS CRUD FUNCIONANDO PERFEITAMENTE
       
       PRÓXIMA AÇÃO RECOMENDADA: Main agent pode finalizar e fazer summary do CRUD completo.
+
+  - task: "POST /roles/list - Listar funções/roles"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Autenticação Master: Apenas usuários master podem acessar
+          - ✅ Listagem completa: Retorna todas as funções/roles ordenadas por createdAt
+          - ✅ Response estruturada: { roles: [...] }
+          - ✅ Comportamento correto: Retorna array vazio quando não há roles cadastradas
+          
+          📊 RESULTADO: LISTAGEM DE FUNÇÕES/ROLES FUNCIONANDO 100%
+
+  - task: "POST /roles/create - Criar função/role"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Autenticação Master: Apenas usuários master podem acessar
+          - ✅ Criação de função: roleId UUID gerado automaticamente
+          - ✅ Timestamps: createdAt e updatedAt preenchidos automaticamente
+          - ✅ Audit Log: Registro criado com action 'create_role'
+          - ✅ Response: Retorna role completa e mensagem de sucesso
+          
+          📊 RESULTADO: CRIAÇÃO DE FUNÇÕES/ROLES FUNCIONANDO 100%
