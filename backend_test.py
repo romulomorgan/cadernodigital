@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 """
-IUDP Sistema - Teste de Verificação de Mês Fechado
-Testa se mês fechado bloqueia edições conforme especificado
+Teste Completo dos Endpoints CRUD - Usuários e Igrejas
+Sistema: Caderno de Controle Online — IUDP
+Endpoints testados: Users CRUD + Churches CRUD + Upload de fotos
 """
 
 import requests
 import json
+import os
+import tempfile
+from PIL import Image
+import io
 import sys
 from datetime import datetime
 
