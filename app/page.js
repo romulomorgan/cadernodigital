@@ -1512,26 +1512,74 @@ export default function App() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-red-700">
                     <Bell className="w-5 h-5" />
-                    Solicitações de Liberação Pendentes
+                    Solicitações de Liberação Pendentes ({unlockRequests.length})
                   </CardTitle>
+                  <CardDescription>
+                    Revise e aprove as solicitações de liberação para lançamentos em horários/dias anteriores
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {unlockRequests.map(req => (
-                      <div key={req.requestId} className="flex items-center justify-between bg-white p-3 rounded border border-red-200">
-                        <div>
-                          <p className="font-semibold">{req.entryId}</p>
-                          <p className="text-sm text-gray-600">Solicitante: {req.requesterName}</p>
-                          <p className="text-sm text-gray-600">Motivo: {req.reason}</p>
+                      <div key={req.requestId} className="bg-white p-4 rounded-lg border-2 border-orange-200 hover:border-orange-400 transition-colors">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Badge className="bg-blue-600 text-white">
+                                Dia {String(req.day).padStart(2, '0')}/{String(req.month).padStart(2, '0')}/{req.year}
+                              </Badge>
+                              <Badge variant="outline" className="text-blue-900">
+                                {req.timeSlot}
+                              </Badge>
+                              {req.entryId ? (
+                                <Badge variant="outline" className="text-xs text-gray-600">
+                                  Edição
+                                </Badge>
+                              ) : (
+                                <Badge variant="outline" className="text-xs text-green-700">
+                                  Novo Lançamento
+                                </Badge>
+                              )}
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-3 text-sm">
+                              <div>
+                                <p className="text-gray-500 text-xs">Solicitante:</p>
+                                <p className="font-semibold text-gray-900">{req.requesterName}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-500 text-xs">Email:</p>
+                                <p className="font-medium text-gray-700 text-xs">{req.requesterEmail}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-500 text-xs">Igreja:</p>
+                                <p className="font-medium text-gray-700">{req.requesterChurch || 'Não informada'}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-500 text-xs">Estado:</p>
+                                <p className="font-medium text-gray-700">{req.requesterState || 'Não informado'}</p>
+                              </div>
+                            </div>
+                            
+                            <div className="bg-yellow-50 border border-yellow-200 rounded p-2">
+                              <p className="text-xs text-gray-500">Motivo:</p>
+                              <p className="text-sm text-gray-800 font-medium">{req.reason}</p>
+                            </div>
+                            
+                            <p className="text-xs text-gray-500">
+                              Solicitado em: {new Date(req.createdAt).toLocaleString('pt-BR')}
+                            </p>
+                          </div>
+                          
+                          <Button 
+                            size="sm" 
+                            onClick={() => handleApproveUnlock(req.requestId, req.entryId)}
+                            className="bg-green-600 hover:bg-green-700 flex-shrink-0"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                            Aprovar
+                          </Button>
                         </div>
-                        <Button 
-                          size="sm" 
-                          onClick={() => handleApproveUnlock(req.requestId, req.entryId)}
-                          className="bg-green-600 hover:bg-green-700"
-                        >
-                          <CheckCircle className="w-4 h-4 mr-2" />
-                          Aprovar
-                        </Button>
                       </div>
                     ))}
                   </div>
