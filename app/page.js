@@ -1574,6 +1574,11 @@ export default function App() {
   };
   
   const handleUpdateRole = async () => {
+    if (!newRoleName || !newRoleName.trim()) {
+      toast.error('❌ Nome da função é obrigatório');
+      return;
+    }
+    
     try {
       const res = await fetch('/api/roles/update', {
         method: 'POST',
@@ -1583,7 +1588,7 @@ export default function App() {
         },
         body: JSON.stringify({
           roleId: selectedRole.roleId,
-          roleData: editRoleData
+          roleData: { name: newRoleName.trim() }
         })
       });
       
@@ -1591,7 +1596,10 @@ export default function App() {
       if (res.ok) {
         toast.success('✅ ' + data.message);
         setShowRoleEditModal(false);
-        fetchAllRoles();
+        setNewRoleName('');
+        setSelectedRole(null);
+        await fetchAllRoles();
+        await fetchAllRolesForDropdowns(); // Atualizar dropdowns também
       } else {
         toast.error('❌ ' + data.error);
       }
