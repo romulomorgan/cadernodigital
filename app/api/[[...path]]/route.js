@@ -344,13 +344,20 @@ export async function POST(request) {
       
       const hashedPassword = await bcrypt.hash(password, 10);
       
+      // Buscar nome da igreja se tiver churchId
+      let churchName = church || '';
+      if (churchId) {
+        const churchDoc = await db.collection('churches').findOne({ churchId });
+        churchName = churchDoc?.name || '';
+      }
+      
       const user = {
         userId: crypto.randomUUID(),
         name,
         email,
         password: hashedPassword,
         role: role || 'pastor',
-        church: church || '',
+        church: churchName,
         churchId: churchId || null,
         region: region || '',
         state: state || '',
