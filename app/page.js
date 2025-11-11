@@ -1160,6 +1160,7 @@ export default function App() {
       if (res.ok) {
         const data = await res.json();
         setAllChurches(data.churches || []);
+        setChurches(data.churches || []); // CORRIGIDO: Também popular o estado churches
       }
     } catch (error) {
       console.error('Erro ao buscar igrejas:', error);
