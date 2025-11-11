@@ -58,6 +58,7 @@ export default function App() {
   const [registerPhotoPreview, setRegisterPhotoPreview] = useState(null);
   const [publicChurches, setPublicChurches] = useState([]);
   const [publicRoles, setPublicRoles] = useState([]);
+  const [allRolesForDropdown, setAllRolesForDropdown] = useState([]); // Para usar nos dropdowns internos
   
   // Estados para recuperação de senha e visualização de senha
   const [showPassword, setShowPassword] = useState(false);
