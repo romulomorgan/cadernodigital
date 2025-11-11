@@ -614,6 +614,25 @@ export default function App() {
           }
         }
         
+        // RESETAR TODOS OS CAMPOS DO FORMULÁRIO DE CADASTRO
+        if (authMode === 'register') {
+          setName('');
+          setEmail('');
+          setPassword('');
+          setRegisterTelefone('');
+          setRegisterCEP('');
+          setRegisterEndereco('');
+          setRegisterNumero('');
+          setRegisterComplemento('');
+          setRegisterCidade('');
+          setRegisterEstado('');
+          setRegisterPais('Brasil');
+          setRegisterChurchId('');
+          setRegisterCargo('');
+          setRegisterPhotoFile(null);
+          setRegisterPhotoPreview(null);
+        }
+        
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         setToken(data.token);
