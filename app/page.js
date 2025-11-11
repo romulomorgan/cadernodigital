@@ -5214,6 +5214,24 @@ export default function App() {
                   onChange={(e) => setEditChurchData({...editChurchData, region: e.target.value})}
                 />
               </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Telefone (opcional)</Label>
+                  <Input 
+                    value={maskPhone(editChurchData.phone || selectedChurch.phone || '')}
+                    onChange={(e) => setEditChurchData({...editChurchData, phone: maskPhone(e.target.value)})}
+                    placeholder="(00) 00000-0000"
+                  />
+                </div>
+                <div>
+                  <Label>País</Label>
+                  <Input 
+                    value={editChurchData.country || selectedChurch.country || 'Brasil'}
+                    onChange={(e) => setEditChurchData({...editChurchData, country: e.target.value})}
+                    placeholder="Brasil"
+                  />
+                </div>
+              </div>
               <div>
                 <Label>Atualizar Foto da Igreja</Label>
                 <Input 
