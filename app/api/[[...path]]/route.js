@@ -1403,11 +1403,23 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
       }
       
-      const { userId, userData } = await request.json();
+      const { userId, userData, newPassword } = await request.json();
       
       // Remover campos que não devem ser atualizados diretamente
       delete userData.password;
       delete userData.userId;
+      
+      // Se tiver nova senha, fazer hash
+      if (newPassword && newPassword.trim()) {
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        userData.password = hashedPassword;
+      }
+      
+      // Se tiver churchId, buscar nome da igreja
+      if (userData.churchId) {
+        const church = await db.collection('churches').findOne({ churchId: userData.churchId });
+        userData.church = church?.name || 'Sem igreja';
+      }
       
       await db.collection('users').updateOne(
         { userId },
@@ -1419,7 +1431,7 @@ export async function POST(request) {
         action: 'update_user',
         userId: user.userId,
         timestamp: getBrazilTime().toISOString(),
-        details: { targetUserId: userId, updates: Object.keys(userData) }
+        details: { targetUserId: userId, updates: Object.keys(userData), passwordChanged: !!newPassword }
       });
       
       return NextResponse.json({ success: true, message: 'Usuário atualizado com sucesso!' });
