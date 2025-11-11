@@ -1407,6 +1407,7 @@ export async function POST(request) {
         cargo: cargo || '',
         role: 'pastor', // default
         photoUrl: null,
+        isActive: true, // NOVO: Usuário ativo por padrão
         isOnline: false,
         lastActivity: null,
         permissions: {
