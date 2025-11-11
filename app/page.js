@@ -407,6 +407,14 @@ export default function App() {
     }
   }, [isAuthenticated, activeTab, token, user]);
   
+  // Carregar usuários e igrejas quando entrar na aba usuarios
+  useEffect(() => {
+    if (isAuthenticated && activeTab === 'usuarios' && token && user?.role === 'master') {
+      fetchUsuarios();
+      fetchAllChurches();
+    }
+  }, [isAuthenticated, activeTab, token, user]);
+  
   const fetchStats = async () => {
     try {
       const res = await fetch('/api/stats/overview', {
