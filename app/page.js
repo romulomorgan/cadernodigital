@@ -2225,18 +2225,19 @@ export default function App() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
                     <div>
-                      <Label htmlFor="name">Nome Completo *</Label>
+                      <Label htmlFor="name" className="text-xs md:text-sm">Nome Completo *</Label>
                       <Input
                         id="name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         required
                         placeholder="Seu nome completo"
+                        className="text-sm h-9"
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="reg-email">Email *</Label>
+                      <Label htmlFor="reg-email" className="text-xs md:text-sm">Email *</Label>
                       <Input
                         id="reg-email"
                         type="email"
@@ -2244,11 +2245,12 @@ export default function App() {
                         onChange={(e) => setEmail(e.target.value)}
                         required
                         placeholder="seu@email.com"
+                        className="text-sm h-9"
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="reg-password">Senha *</Label>
+                      <Label htmlFor="reg-password" className="text-xs md:text-sm">Senha *</Label>
                       <Input
                         id="reg-password"
                         type="password"
@@ -2256,15 +2258,17 @@ export default function App() {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         placeholder="Senha segura"
+                        className="text-sm h-9"
                       />
                     </div>
                     
                     <div>
-                      <Label>Telefone (WhatsApp)</Label>
+                      <Label className="text-xs md:text-sm">Telefone (WhatsApp)</Label>
                       <Input
                         value={maskPhone(registerTelefone)}
                         onChange={(e) => setRegisterTelefone(maskPhone(e.target.value))}
                         placeholder="(00) 00000-0000"
+                        className="text-sm h-9"
                       />
                     </div>
                     
