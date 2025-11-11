@@ -1540,39 +1540,6 @@ export default function App() {
     }
   };
   
-  const handleCreateRole = async () => {
-    if (!newRoleName.trim()) {
-      toast.error('❌ Nome da função é obrigatório');
-      return;
-    }
-    
-    try {
-      const res = await fetch('/api/roles/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          name: newRoleName,
-          description: newRoleDescription
-        })
-      });
-      
-      const data = await res.json();
-      if (res.ok) {
-        toast.success('✅ ' + data.message);
-        setNewRoleName('');
-        setNewRoleDescription('');
-        fetchAllRoles();
-      } else {
-        toast.error('❌ ' + data.error);
-      }
-    } catch (error) {
-      toast.error('❌ Erro ao criar função');
-    }
-  };
-  
   const handleUpdateRole = async () => {
     if (!newRoleName || !newRoleName.trim()) {
       toast.error('❌ Nome da função é obrigatório');
