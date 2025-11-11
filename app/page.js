@@ -2199,93 +2199,197 @@ export default function App() {
               </TabsContent>
               
               <TabsContent value="register">
-                <form onSubmit={handleAuth} className="space-y-4">
-                  <div>
-                    <Label htmlFor="name">Nome Completo</Label>
-                    <Input
-                      id="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                      className="mt-1"
-                    />
+                <form onSubmit={handleAuth} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+                  {/* Foto */}
+                  <div className="flex flex-col items-center gap-2">
+                    {registerPhotoPreview ? (
+                      <img src={registerPhotoPreview} alt="Preview" className="w-20 h-20 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center">
+                        <Users className="w-10 h-10 text-gray-400" />
+                      </div>
+                    )}
+                    <Label htmlFor="register-photo" className="cursor-pointer">
+                      <div className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                        {registerPhotoPreview ? 'Trocar Foto' : 'Adicionar Foto (Opcional)'}
+                      </div>
+                      <Input
+                        id="register-photo"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleRegisterPhotoChange}
+                      />
+                    </Label>
                   </div>
-                  <div>
-                    <Label htmlFor="reg-email">Email</Label>
-                    <Input
-                      id="reg-email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="mt-1"
-                    />
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor="name">Nome Completo *</Label>
+                      <Input
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                        placeholder="Seu nome completo"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="reg-email">Email *</Label>
+                      <Input
+                        id="reg-email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        placeholder="seu@email.com"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="reg-password">Senha *</Label>
+                      <Input
+                        id="reg-password"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        placeholder="Senha segura"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label>Telefone (WhatsApp)</Label>
+                      <Input
+                        value={maskPhone(registerTelefone)}
+                        onChange={(e) => setRegisterTelefone(maskPhone(e.target.value))}
+                        placeholder="(00) 00000-0000"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label>CEP</Label>
+                      <Input
+                        value={maskCEP(registerCEP)}
+                        onChange={(e) => {
+                          const masked = maskCEP(e.target.value);
+                          setRegisterCEP(masked);
+                          if (masked.replace(/\D/g, '').length === 8) {
+                            handleBuscarCEPRegistro(masked.replace(/\D/g, ''));
+                          }
+                        }}
+                        placeholder="00000-000"
+                      />
+                      {loadingCEP && <p className="text-xs text-blue-600 mt-1">🔍 Buscando...</p>}
+                    </div>
+                    
+                    <div>
+                      <Label>Endereço</Label>
+                      <Input
+                        value={registerEndereco}
+                        onChange={(e) => setRegisterEndereco(e.target.value)}
+                        placeholder="Rua, Avenida..."
+                        disabled={loadingCEP}
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label>Número</Label>
+                      <Input
+                        value={registerNumero}
+                        onChange={(e) => setRegisterNumero(e.target.value)}
+                        placeholder="Número"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label>Complemento</Label>
+                      <Input
+                        value={registerComplemento}
+                        onChange={(e) => setRegisterComplemento(e.target.value)}
+                        placeholder="Apto, Bloco..."
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label>Cidade</Label>
+                      <Input
+                        value={registerCidade}
+                        onChange={(e) => setRegisterCidade(e.target.value)}
+                        placeholder="Cidade"
+                        disabled={loadingCEP}
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label>Estado</Label>
+                      <Input
+                        value={registerEstado}
+                        onChange={(e) => setRegisterEstado(e.target.value)}
+                        placeholder="UF"
+                        disabled={loadingCEP}
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label>País</Label>
+                      <Input
+                        value={registerPais}
+                        onChange={(e) => setRegisterPais(e.target.value)}
+                        placeholder="Brasil"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label>Igreja *</Label>
+                      <Select value={registerChurchId} onValueChange={setRegisterChurchId} required>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione sua igreja" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {publicChurches.map(ch => (
+                            <SelectItem key={ch.churchId} value={ch.churchId}>
+                              {ch.name} - {ch.city}/{ch.state}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label>Cargo/Função</Label>
+                      <Select value={registerCargo} onValueChange={setRegisterCargo}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione sua função" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {publicRoles.length > 0 ? (
+                            publicRoles.map(r => (
+                              <SelectItem key={r.roleId} value={r.name}>
+                                {r.name}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <>
+                              <SelectItem value="Secretário(a)">Secretário(a)</SelectItem>
+                              <SelectItem value="Tesoureiro(a)">Tesoureiro(a)</SelectItem>
+                              <SelectItem value="Pastor(a)">Pastor(a)</SelectItem>
+                              <SelectItem value="Bispo(a)">Bispo(a)</SelectItem>
+                            </>
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  <div>
-                    <Label htmlFor="reg-password">Senha</Label>
-                    <Input
-                      id="reg-password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="role">Função</Label>
-                    <Select value={role} onValueChange={setRole}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="master">Líder Máximo</SelectItem>
-                        <SelectItem value="lider">Líder</SelectItem>
-                        <SelectItem value="lideranca">Liderança</SelectItem>
-                        <SelectItem value="secretaria">Secretária</SelectItem>
-                        <SelectItem value="tesoureira">Tesoureira</SelectItem>
-                        <SelectItem value="estadual">Estadual</SelectItem>
-                        <SelectItem value="regional">Regional</SelectItem>
-                        <SelectItem value="pastor">Pastor de Igreja</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="church">Igreja</Label>
-                    <Input
-                      id="church"
-                      value={church}
-                      onChange={(e) => setChurch(e.target.value)}
-                      placeholder="Nome da igreja"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="region">Região</Label>
-                    <Input
-                      id="region"
-                      value={region}
-                      onChange={(e) => setRegion(e.target.value)}
-                      placeholder="Região"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="state">Estado</Label>
-                    <Input
-                      id="state"
-                      value={state}
-                      onChange={(e) => setState(e.target.value)}
-                      placeholder="Estado"
-                      className="mt-1"
-                    />
-                  </div>
+                  
                   {authError && (
                     <div className="text-red-600 text-sm flex items-center gap-2">
                       <AlertCircle className="w-4 h-4" />
                       {authError}
                     </div>
                   )}
+                  
                   <Button type="submit" className="w-full bg-blue-900 hover:bg-blue-800">
                     Cadastrar
                   </Button>
