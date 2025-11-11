@@ -2400,13 +2400,12 @@ export default function App() {
                           <SelectValue placeholder="Selecione sua função" />
                         </SelectTrigger>
                         <SelectContent>
-                          {publicRoles.length > 0 ? (
-                            publicRoles.map(r => (
-                              <SelectItem key={r.roleId} value={r.name} className="text-sm">
-                                {r.name}
-                              </SelectItem>
-                            ))
-                          ) : (
+                          {publicRoles.map(r => (
+                            <SelectItem key={r.roleId} value={r.name} className="text-sm">
+                              {r.name}
+                            </SelectItem>
+                          ))}
+                          {publicRoles.length === 0 && (
                             <>
                               <SelectItem value="Secretário(a)" className="text-sm">Secretário(a)</SelectItem>
                               <SelectItem value="Tesoureiro(a)" className="text-sm">Tesoureiro(a)</SelectItem>
