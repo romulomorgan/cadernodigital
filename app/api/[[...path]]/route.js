@@ -307,7 +307,7 @@ export async function POST(request) {
     
     // REGISTER
     if (endpoint === 'auth/register') {
-      const { name, email, password, role, church, region, state } = await request.json();
+      const { name, email, password, role, church, region, state, telefone, cep, endereco, numero, complemento, cidade, pais, cargo, churchId } = await request.json();
       
       const existing = await db.collection('users').findOne({ email });
       if (existing) {
@@ -323,8 +323,20 @@ export async function POST(request) {
         password: hashedPassword,
         role: role || 'pastor',
         church: church || '',
+        churchId: churchId || null,
         region: region || '',
         state: state || '',
+        telefone: telefone || '',
+        cep: cep || '',
+        endereco: endereco || '',
+        numero: numero || '',
+        complemento: complemento || '',
+        cidade: cidade || '',
+        pais: pais || 'Brasil',
+        cargo: cargo || '',
+        photoUrl: null,
+        isOnline: false,
+        lastActivity: null,
         permissions: {
           canView: true,
           canEdit: role === 'master',
