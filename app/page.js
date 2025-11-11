@@ -3649,6 +3649,16 @@ export default function App() {
                                         <Button
                                           size="sm"
                                           variant="ghost"
+                                          onClick={() => handleToggleUserActive(usuario)}
+                                          title={usuario.isActive === false ? 'Ativar Usuário' : 'Desativar Usuário'}
+                                          className={usuario.isActive === false ? 'text-green-600 hover:text-green-700' : 'text-orange-600 hover:text-orange-700'}
+                                        >
+                                          <Power className="w-4 h-4" />
+                                        </Button>
+                                        
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
                                           onClick={() => openDeleteUsuarioModal(usuario)}
                                           title="Excluir"
                                           className="text-red-600 hover:text-red-700"
