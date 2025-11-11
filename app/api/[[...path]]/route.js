@@ -305,6 +305,34 @@ export async function POST(request) {
   try {
     const db = await connectDB();
     
+    // PUBLIC: GET ALL CHURCHES (para cadastro público)
+    if (endpoint === 'public/churches') {
+      try {
+        const churches = await db.collection('churches')
+          .find({}, { projection: { name: 1, churchId: 1, city: 1, state: 1 } })
+          .sort({ name: 1 })
+          .toArray();
+        
+        return NextResponse.json({ churches });
+      } catch (error) {
+        return NextResponse.json({ error: 'Erro ao buscar igrejas' }, { status: 500 });
+      }
+    }
+    
+    // PUBLIC: GET ALL ROLES (para cadastro público)
+    if (endpoint === 'public/roles') {
+      try {
+        const roles = await db.collection('roles')
+          .find({})
+          .sort({ name: 1 })
+          .toArray();
+        
+        return NextResponse.json({ roles });
+      } catch (error) {
+        return NextResponse.json({ error: 'Erro ao buscar funções' }, { status: 500 });
+      }
+    }
+    
     // REGISTER
     if (endpoint === 'auth/register') {
       const { name, email, password, role, church, region, state, telefone, cep, endereco, numero, complemento, cidade, pais, cargo, churchId } = await request.json();
