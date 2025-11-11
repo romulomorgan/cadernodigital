@@ -3132,12 +3132,26 @@ export default function App() {
 
                   {/* Listagem de Usuários */}
                   <div className="border rounded-lg">
-                    <div className="bg-gray-50 p-4 border-b">
+                    <div className="bg-gray-50 p-4 border-b space-y-3">
                       <h3 className="font-semibold text-lg">Usuários Cadastrados ({usuarios.length})</h3>
+                      
+                      {/* Campo de busca */}
+                      <Input
+                        placeholder="🔍 Buscar por nome, igreja ou função..."
+                        value={usuariosSearchQuery}
+                        onChange={(e) => setUsuariosSearchQuery(e.target.value)}
+                        className="max-w-md"
+                      />
+                      
+                      {usuariosSearchQuery && (
+                        <p className="text-sm text-gray-600">
+                          Mostrando {usuariosFiltrados.length} de {usuarios.length} usuários
+                        </p>
+                      )}
                     </div>
                     
                     <div className="p-4 space-y-6">
-                      {Object.keys(usuariosGrouped).length === 0 ? (
+                      {Object.keys(usuariosGroupedFiltrado).length === 0 ? (
                         <div className="text-center py-8 text-gray-500">
                           <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
                           <p>Nenhum usuário cadastrado ainda</p>
