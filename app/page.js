@@ -165,6 +165,11 @@ export default function App() {
   const [newChurchPhone, setNewChurchPhone] = useState('');
   const [newChurchCountry, setNewChurchCountry] = useState('Brasil');
   
+  // Estados para nova estrutura de igrejas (modal)
+  const [showChurchCreateModal, setShowChurchCreateModal] = useState(false);
+  const [churchesSearchQuery, setChurchesSearchQuery] = useState('');
+  const [churchesPagination, setChurchesPagination] = useState({ page: 1, perPage: 5 });
+  
   const timeSlots = ['08:00', '10:00', '12:00', '15:00', '19:30'];
   const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
   
