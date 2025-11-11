@@ -509,6 +509,7 @@ export default function App() {
     if (isAuthenticated && activeTab === 'usuarios' && token && user?.role === 'master') {
       fetchUsuarios();
       fetchAllChurches();
+      fetchAllRoles(); // Buscar roles também
     }
   }, [isAuthenticated, activeTab, token, user]);
   
