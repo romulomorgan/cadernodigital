@@ -1600,6 +1600,37 @@ export default function App() {
     }
   };
   
+  const handleCreateRole = async () => {
+    if (!newRoleName || !newRoleName.trim()) {
+      toast.error('❌ Nome da função é obrigatório');
+      return;
+    }
+    
+    try {
+      const res = await fetch('/api/roles/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ name: newRoleName.trim() })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        setShowRoleCreateModal(false);
+        setNewRoleName('');
+        await fetchAllRoles();
+        await fetchAllRolesForDropdowns(); // Atualizar dropdowns também
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao criar função');
+    }
+  };
+  
   const handleDeleteRole = async (roleId) => {
     try {
       const res = await fetch('/api/roles/delete', {
@@ -1615,7 +1646,9 @@ export default function App() {
       if (res.ok) {
         toast.success('✅ ' + data.message);
         setShowRoleDeleteConfirm(false);
-        fetchAllRoles();
+        setSelectedRole(null);
+        await fetchAllRoles();
+        await fetchAllRolesForDropdowns(); // Atualizar dropdowns também
       } else {
         toast.error('❌ ' + data.error);
       }
