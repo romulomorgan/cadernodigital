@@ -1397,6 +1397,258 @@ export default function App() {
     }
   };
   
+  // ========== FUNÇÕES CRUD - USUÁRIOS ==========
+  
+  const fetchUsuarios = async () => {
+    try {
+      const res = await fetch('/api/users/list', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setUsuarios(data.users || []);
+        setUsuariosGrouped(data.grouped || {});
+      }
+    } catch (error) {
+      console.error('Erro ao buscar usuários:', error);
+    }
+  };
+  
+  const handleBuscarCEP = async (cep) => {
+    if (!cep || cep.length < 8) return;
+    
+    setLoadingCEP(true);
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await res.json();
+      
+      if (!data.erro) {
+        setUsuarioForm(prev => ({
+          ...prev,
+          endereco: data.logradouro || '',
+          cidade: data.localidade || '',
+          estado: data.uf || '',
+          pais: 'Brasil'
+        }));
+        toast.success('✅ Endereço preenchido automaticamente!');
+      } else {
+        toast.error('❌ CEP não encontrado');
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao buscar CEP');
+    } finally {
+      setLoadingCEP(false);
+    }
+  };
+  
+  const handleCreateUsuario = async () => {
+    if (!usuarioForm.name || !usuarioForm.email || !usuarioForm.password) {
+      toast.error('❌ Nome, e-mail e senha são obrigatórios');
+      return;
+    }
+    
+    if (!usuarioForm.churchId) {
+      toast.error('❌ Igreja é obrigatória');
+      return;
+    }
+    
+    try {
+      const res = await fetch('/api/users/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(usuarioForm)
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        
+        // Se tiver foto, fazer upload
+        if (usuarioPhotoFile && data.user?.userId) {
+          await handleUploadUsuarioPhoto(data.user.userId);
+        }
+        
+        setShowUsuarioCreateModal(false);
+        setUsuarioForm({
+          name: '',
+          email: '',
+          password: '',
+          telefone: '',
+          cep: '',
+          endereco: '',
+          numero: '',
+          complemento: '',
+          cidade: '',
+          estado: '',
+          pais: 'Brasil',
+          churchId: '',
+          cargo: ''
+        });
+        setUsuarioPhotoFile(null);
+        setUsuarioPhotoPreview(null);
+        fetchUsuarios();
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao criar usuário');
+    }
+  };
+  
+  const handleUploadUsuarioPhoto = async (userId) => {
+    if (!usuarioPhotoFile) return;
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', usuarioPhotoFile);
+      formData.append('userId', userId);
+      
+      const res = await fetch('/api/users/upload-photo', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+      
+      if (res.ok) {
+        toast.success('✅ Foto do usuário carregada!');
+      }
+    } catch (error) {
+      console.error('Erro ao fazer upload da foto:', error);
+    }
+  };
+  
+  const handleUpdateUsuario = async () => {
+    if (!selectedUsuario?.userId) return;
+    
+    try {
+      const res = await fetch('/api/users/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          userId: selectedUsuario.userId,
+          userData: usuarioForm,
+          newPassword: newPasswordUsuario
+        })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        // Se tiver foto nova, fazer upload
+        if (usuarioPhotoFile) {
+          await handleUploadUsuarioPhoto(selectedUsuario.userId);
+        }
+        
+        toast.success('✅ ' + data.message);
+        setShowUsuarioEditModal(false);
+        setNewPasswordUsuario('');
+        setUsuarioPhotoFile(null);
+        setUsuarioPhotoPreview(null);
+        fetchUsuarios();
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao atualizar usuário');
+    }
+  };
+  
+  const handleDeleteUsuario = async () => {
+    if (!selectedUsuario?.userId) return;
+    
+    try {
+      const res = await fetch('/api/users/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ userId: selectedUsuario.userId })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        setShowUsuarioDeleteModal(false);
+        setSelectedUsuario(null);
+        fetchUsuarios();
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao excluir usuário');
+    }
+  };
+  
+  const openEditUsuarioModal = (usuario) => {
+    setSelectedUsuario(usuario);
+    setUsuarioForm({
+      name: usuario.name || '',
+      email: usuario.email || '',
+      password: '', // Não mostrar senha
+      telefone: usuario.telefone || '',
+      cep: usuario.cep || '',
+      endereco: usuario.endereco || '',
+      numero: usuario.numero || '',
+      complemento: usuario.complemento || '',
+      cidade: usuario.cidade || '',
+      estado: usuario.estado || '',
+      pais: usuario.pais || 'Brasil',
+      churchId: usuario.churchId || '',
+      cargo: usuario.cargo || ''
+    });
+    setUsuarioPhotoPreview(usuario.photoUrl || null);
+    setNewPasswordUsuario('');
+    setShowUsuarioEditModal(true);
+  };
+  
+  const openViewUsuarioModal = (usuario) => {
+    setSelectedUsuario(usuario);
+    setShowUsuarioViewModal(true);
+  };
+  
+  const openDeleteUsuarioModal = (usuario) => {
+    setSelectedUsuario(usuario);
+    setShowUsuarioDeleteModal(true);
+  };
+  
+  const handleUsuarioPhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setUsuarioPhotoFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUsuarioPhotoPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  const abrirWhatsApp = (telefone) => {
+    if (!telefone) {
+      toast.error('❌ Telefone não cadastrado');
+      return;
+    }
+    
+    // Remover caracteres não numéricos
+    const numero = telefone.replace(/\D/g, '');
+    
+    // Abrir WhatsApp no navegador
+    window.open(`https://wa.me/55${numero}`, '_blank');
+  };
+  
   const handleApproveUnlock = async (requestId, entryId) => {
     try {
       const res = await fetch('/api/unlock/approve', {
