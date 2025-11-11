@@ -59,6 +59,11 @@ export default function App() {
   const [publicChurches, setPublicChurches] = useState([]);
   const [publicRoles, setPublicRoles] = useState([]);
   
+  // Estados para recuperação de senha e visualização de senha
+  const [showPassword, setShowPassword] = useState(false);
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+  
   // Calendar states
   const [currentDate, setCurrentDate] = useState(new Date());
   const [entries, setEntries] = useState([]);
