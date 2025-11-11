@@ -216,6 +216,9 @@ export default function App() {
   // States para busca/filtro de usuários
   const [usuariosSearchQuery, setUsuariosSearchQuery] = useState('');
   
+  // Estados para busca de funções
+  const [funcoesSearchQuery, setFuncoesSearchQuery] = useState('');
+  
   // Filtrar usuários com base na busca
   const usuariosFiltrados = usuarios.filter(u => {
     if (!usuariosSearchQuery) return true;
