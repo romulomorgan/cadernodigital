@@ -1585,6 +1585,44 @@ export default function App() {
     }
   };
   
+  // Buscar CEP no formulário de registro
+  const handleBuscarCEPRegistro = async (cep) => {
+    if (!cep || cep.length < 8) return;
+    
+    setLoadingCEP(true);
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await res.json();
+      
+      if (!data.erro) {
+        setRegisterEndereco(data.logradouro || '');
+        setRegisterCidade(data.localidade || '');
+        setRegisterEstado(data.uf || '');
+        setRegisterPais('Brasil');
+        toast.success('✅ Endereço preenchido automaticamente!');
+      } else {
+        toast.error('❌ CEP não encontrado');
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao buscar CEP');
+    } finally {
+      setLoadingCEP(false);
+    }
+  };
+  
+  // Upload de foto no registro
+  const handleRegisterPhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setRegisterPhotoFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setRegisterPhotoPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
   const handleCreateUsuario = async () => {
     if (!usuarioForm.name || !usuarioForm.email || !usuarioForm.password) {
       toast.error('❌ Nome, e-mail e senha são obrigatórios');
