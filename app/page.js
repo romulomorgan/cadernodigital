@@ -3486,22 +3486,27 @@ export default function App() {
                       <div>
                         <Label>Telefone (WhatsApp)</Label>
                         <Input
-                          value={usuarioForm.telefone}
-                          onChange={(e) => setUsuarioForm({...usuarioForm, telefone: e.target.value})}
+                          value={maskPhone(usuarioForm.telefone)}
+                          onChange={(e) => {
+                            const masked = maskPhone(e.target.value);
+                            setUsuarioForm({...usuarioForm, telefone: masked});
+                          }}
+                          placeholder="(00) 00000-0000"
                         />
                       </div>
                       
                       <div>
                         <Label>CEP</Label>
                         <Input
-                          value={usuarioForm.cep}
+                          value={maskCEP(usuarioForm.cep)}
                           onChange={(e) => {
-                            const cep = e.target.value;
-                            setUsuarioForm({...usuarioForm, cep});
-                            if (cep.replace(/\D/g, '').length === 8) {
-                              handleBuscarCEP(cep.replace(/\D/g, ''));
+                            const masked = maskCEP(e.target.value);
+                            setUsuarioForm({...usuarioForm, cep: masked});
+                            if (masked.replace(/\D/g, '').length === 8) {
+                              handleBuscarCEP(masked.replace(/\D/g, ''));
                             }
                           }}
+                          placeholder="00000-000"
                         />
                       </div>
                       
