@@ -166,6 +166,7 @@ export default function App() {
   
   // CRUD states - Funções (Roles)
   const [allRoles, setAllRoles] = useState([]);
+  const [showRoleCreateModal, setShowRoleCreateModal] = useState(false);
   const [showRoleViewModal, setShowRoleViewModal] = useState(false);
   const [showRoleEditModal, setShowRoleEditModal] = useState(false);
   const [showRoleDeleteConfirm, setShowRoleDeleteConfirm] = useState(false);
