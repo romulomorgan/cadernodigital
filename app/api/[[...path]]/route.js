@@ -322,10 +322,23 @@ export async function POST(request) {
     // PUBLIC: GET ALL ROLES (para cadastro público)
     if (endpoint === 'public/roles') {
       try {
-        const roles = await db.collection('roles')
+        let roles = await db.collection('roles')
           .find({})
           .sort({ name: 1 })
           .toArray();
+        
+        // Se não houver roles no banco, criar os padrões
+        if (roles.length === 0) {
+          const defaultRoles = [
+            { roleId: crypto.randomUUID(), name: 'Secretário(a)', createdAt: getBrazilTime().toISOString() },
+            { roleId: crypto.randomUUID(), name: 'Tesoureiro(a)', createdAt: getBrazilTime().toISOString() },
+            { roleId: crypto.randomUUID(), name: 'Pastor(a)', createdAt: getBrazilTime().toISOString() },
+            { roleId: crypto.randomUUID(), name: 'Bispo(a)', createdAt: getBrazilTime().toISOString() }
+          ];
+          
+          await db.collection('roles').insertMany(defaultRoles);
+          roles = defaultRoles;
+        }
         
         return NextResponse.json({ roles });
       } catch (error) {
