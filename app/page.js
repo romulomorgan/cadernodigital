@@ -4083,6 +4083,24 @@ export default function App() {
                             />
                           </div>
                           <div>
+                            <Label>Telefone (opcional)</Label>
+                            <Input 
+                              value={maskPhone(newChurchPhone)}
+                              onChange={(e) => setNewChurchPhone(maskPhone(e.target.value))}
+                              placeholder="(00) 00000-0000" 
+                              className="mt-1" 
+                            />
+                          </div>
+                          <div>
+                            <Label>País</Label>
+                            <Input 
+                              value={newChurchCountry}
+                              onChange={(e) => setNewChurchCountry(e.target.value)}
+                              placeholder="Brasil" 
+                              className="mt-1" 
+                            />
+                          </div>
+                          <div>
                             <Label>Foto da Igreja (opcional)</Label>
                             <Input 
                               type="file" 
