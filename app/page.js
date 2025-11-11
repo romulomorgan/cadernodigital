@@ -2199,18 +2199,18 @@ export default function App() {
               </TabsContent>
               
               <TabsContent value="register">
-                <form onSubmit={handleAuth} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+                <form onSubmit={handleAuth} className="space-y-3">
                   {/* Foto */}
-                  <div className="flex flex-col items-center gap-2">
+                  <div className="flex flex-col items-center gap-2 py-2">
                     {registerPhotoPreview ? (
-                      <img src={registerPhotoPreview} alt="Preview" className="w-20 h-20 rounded-full object-cover" />
+                      <img src={registerPhotoPreview} alt="Preview" className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover" />
                     ) : (
-                      <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center">
-                        <Users className="w-10 h-10 text-gray-400" />
+                      <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-200 flex items-center justify-center">
+                        <Users className="w-8 h-8 md:w-10 md:h-10 text-gray-400" />
                       </div>
                     )}
                     <Label htmlFor="register-photo" className="cursor-pointer">
-                      <div className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                      <div className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-xs md:text-sm">
                         {registerPhotoPreview ? 'Trocar Foto' : 'Adicionar Foto (Opcional)'}
                       </div>
                       <Input
@@ -2223,7 +2223,7 @@ export default function App() {
                     </Label>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
                     <div>
                       <Label htmlFor="name">Nome Completo *</Label>
                       <Input
