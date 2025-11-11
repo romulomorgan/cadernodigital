@@ -383,6 +383,7 @@ export async function POST(request) {
         pais: pais || 'Brasil',
         cargo: cargo || '',
         photoUrl: null,
+        isActive: true, // NOVO: Usuário ativo por padrão
         isOnline: false,
         lastActivity: null,
         permissions: {
