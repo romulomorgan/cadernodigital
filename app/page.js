@@ -1574,7 +1574,7 @@ export default function App() {
     
     try {
       const formData = new FormData();
-      formData.append('file', usuarioPhotoFile);
+      formData.append('photo', usuarioPhotoFile);
       formData.append('userId', userId);
       
       const res = await fetch('/api/users/upload-photo', {
@@ -1586,10 +1586,16 @@ export default function App() {
       });
       
       if (res.ok) {
+        const data = await res.json();
         toast.success('✅ Foto do usuário carregada!');
+        return data.photoUrl;
+      } else {
+        const error = await res.json();
+        toast.error('❌ ' + error.error);
       }
     } catch (error) {
       console.error('Erro ao fazer upload da foto:', error);
+      toast.error('❌ Erro ao fazer upload da foto');
     }
   };
   
