@@ -391,6 +391,12 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Credenciais inválidas' }, { status: 401 });
       }
       
+      // Marcar como online
+      await db.collection('users').updateOne(
+        { userId: user.userId },
+        { $set: { isOnline: true, lastActivity: getBrazilTime().toISOString() } }
+      );
+      
       await db.collection('audit_logs').insertOne({
         logId: crypto.randomUUID(),
         action: 'login',
