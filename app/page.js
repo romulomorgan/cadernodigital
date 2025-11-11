@@ -3154,10 +3154,10 @@ export default function App() {
                       {Object.keys(usuariosGroupedFiltrado).length === 0 ? (
                         <div className="text-center py-8 text-gray-500">
                           <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                          <p>Nenhum usuário cadastrado ainda</p>
+                          <p>{usuariosSearchQuery ? 'Nenhum usuário encontrado com esses critérios' : 'Nenhum usuário cadastrado ainda'}</p>
                         </div>
                       ) : (
-                        Object.entries(usuariosGrouped).map(([churchName, cargos]) => (
+                        Object.entries(usuariosGroupedFiltrado).map(([churchName, cargos]) => (
                           <div key={churchName} className="border-2 border-blue-200 rounded-lg p-4">
                             <h4 className="font-bold text-lg text-blue-900 mb-4 flex items-center gap-2">
                               <MapPin className="w-5 h-5" />
