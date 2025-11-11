@@ -2170,34 +2170,54 @@ export default function App() {
               <TabsContent value="login">
                 <form onSubmit={handleAuth} className="space-y-4">
                   <div>
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email" className="text-sm font-medium">Email</Label>
                     <Input
                       id="email"
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="mt-1"
+                      placeholder="seu@email.com"
+                      className="mt-1 h-10"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="password">Senha</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      className="mt-1"
-                    />
+                    <div className="flex items-center justify-between mb-1">
+                      <Label htmlFor="password" className="text-sm font-medium">Senha</Label>
+                      <button
+                        type="button"
+                        onClick={() => setShowForgotPasswordModal(true)}
+                        className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                      >
+                        Esqueci minha senha
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        placeholder="••••••••"
+                        className="h-10 pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
                   {authError && (
-                    <div className="text-red-600 text-sm flex items-center gap-2">
+                    <div className="text-red-600 text-sm flex items-center gap-2 bg-red-50 p-3 rounded-lg">
                       <AlertCircle className="w-4 h-4" />
                       {authError}
                     </div>
                   )}
-                  <Button type="submit" className="w-full bg-blue-900 hover:bg-blue-800">
+                  <Button type="submit" className="w-full bg-blue-900 hover:bg-blue-800 h-10">
                     Entrar
                   </Button>
                 </form>
