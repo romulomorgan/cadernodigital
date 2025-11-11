@@ -3037,6 +3037,676 @@ export default function App() {
             </Card>
           </TabsContent>
           
+          {/* USUÁRIOS TAB */}
+          {user?.role === 'master' && (
+            <TabsContent value="usuarios">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="w-6 h-6" />
+                    Gerenciamento de Usuários
+                  </CardTitle>
+                  <CardDescription>Cadastro completo de usuários do sistema</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Botão Cadastrar Novo Usuário */}
+                  <div className="flex justify-end">
+                    <Button 
+                      onClick={() => {
+                        setUsuarioForm({
+                          name: '',
+                          email: '',
+                          password: '',
+                          telefone: '',
+                          cep: '',
+                          endereco: '',
+                          numero: '',
+                          complemento: '',
+                          cidade: '',
+                          estado: '',
+                          pais: 'Brasil',
+                          churchId: '',
+                          cargo: ''
+                        });
+                        setUsuarioPhotoFile(null);
+                        setUsuarioPhotoPreview(null);
+                        setShowUsuarioCreateModal(true);
+                      }}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      <Users className="w-4 h-4 mr-2" />
+                      Cadastrar Novo Usuário
+                    </Button>
+                  </div>
+
+                  {/* Listagem de Usuários */}
+                  <div className="border rounded-lg">
+                    <div className="bg-gray-50 p-4 border-b">
+                      <h3 className="font-semibold text-lg">Usuários Cadastrados ({usuarios.length})</h3>
+                    </div>
+                    
+                    <div className="p-4 space-y-6">
+                      {Object.keys(usuariosGrouped).length === 0 ? (
+                        <div className="text-center py-8 text-gray-500">
+                          <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                          <p>Nenhum usuário cadastrado ainda</p>
+                        </div>
+                      ) : (
+                        Object.entries(usuariosGrouped).map(([churchName, cargos]) => (
+                          <div key={churchName} className="border-2 border-blue-200 rounded-lg p-4">
+                            <h4 className="font-bold text-lg text-blue-900 mb-4 flex items-center gap-2">
+                              <MapPin className="w-5 h-5" />
+                              {churchName}
+                            </h4>
+                            
+                            {Object.entries(cargos).map(([cargo, usuariosList]) => (
+                              <div key={cargo} className="mb-4 last:mb-0">
+                                <h5 className="font-semibold text-md text-gray-700 mb-3 flex items-center gap-2">
+                                  <FileUser className="w-4 h-4" />
+                                  {cargo}
+                                </h5>
+                                
+                                <div className="space-y-2">
+                                  {usuariosList.map((usuario) => (
+                                    <div key={usuario.userId} className="flex items-center gap-3 p-3 bg-white border rounded-lg hover:shadow-md transition-shadow">
+                                      {/* Status Online/Offline */}
+                                      <div className="flex-shrink-0">
+                                        {usuario.isOnline ? (
+                                          <div className="w-3 h-3 bg-green-500 rounded-full" title="Online" />
+                                        ) : (
+                                          <div className="w-3 h-3 bg-red-500 rounded-full" title="Offline" />
+                                        )}
+                                      </div>
+                                      
+                                      {/* Foto */}
+                                      <div className="flex-shrink-0">
+                                        {usuario.photoUrl ? (
+                                          <img 
+                                            src={usuario.photoUrl} 
+                                            alt={usuario.name} 
+                                            className="w-12 h-12 rounded-full object-cover"
+                                          />
+                                        ) : (
+                                          <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                                            <Users className="w-6 h-6 text-blue-600" />
+                                          </div>
+                                        )}
+                                      </div>
+                                      
+                                      {/* Informações */}
+                                      <div className="flex-1 min-w-0">
+                                        <p className="font-semibold truncate">{usuario.name}</p>
+                                        <p className="text-sm text-gray-600 truncate">{usuario.email}</p>
+                                        {usuario.telefone && (
+                                          <p className="text-xs text-gray-500">{usuario.telefone}</p>
+                                        )}
+                                      </div>
+                                      
+                                      {/* Ações */}
+                                      <div className="flex gap-1 flex-shrink-0">
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          onClick={() => openViewUsuarioModal(usuario)}
+                                          title="Visualizar"
+                                        >
+                                          <Eye className="w-4 h-4" />
+                                        </Button>
+                                        
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          onClick={() => openEditUsuarioModal(usuario)}
+                                          title="Editar"
+                                        >
+                                          <Edit className="w-4 h-4" />
+                                        </Button>
+                                        
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          onClick={() => openDeleteUsuarioModal(usuario)}
+                                          title="Excluir"
+                                          className="text-red-600 hover:text-red-700"
+                                        >
+                                          <Trash2 className="w-4 h-4" />
+                                        </Button>
+                                        
+                                        {usuario.telefone && (
+                                          <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            onClick={() => abrirWhatsApp(usuario.telefone)}
+                                            title="WhatsApp"
+                                            className="text-green-600 hover:text-green-700"
+                                          >
+                                            <MessageCircle className="w-4 h-4" />
+                                          </Button>
+                                        )}
+                                        
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          onClick={() => {
+                                            // TODO: Implementar export PDF
+                                            toast.info('Export PDF em desenvolvimento');
+                                          }}
+                                          title="Export PDF"
+                                        >
+                                          <FileText className="w-4 h-4" />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              {/* Modal Criar Usuário */}
+              <Dialog open={showUsuarioCreateModal} onOpenChange={setShowUsuarioCreateModal}>
+                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Cadastrar Novo Usuário</DialogTitle>
+                  </DialogHeader>
+                  
+                  <div className="space-y-4">
+                    {/* Foto */}
+                    <div className="flex flex-col items-center gap-3">
+                      {usuarioPhotoPreview ? (
+                        <img src={usuarioPhotoPreview} alt="Preview" className="w-24 h-24 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
+                          <Users className="w-12 h-12 text-gray-400" />
+                        </div>
+                      )}
+                      <Label htmlFor="usuario-photo-create" className="cursor-pointer">
+                        <div className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                          {usuarioPhotoPreview ? 'Trocar Foto' : 'Adicionar Foto (Opcional)'}
+                        </div>
+                        <Input
+                          id="usuario-photo-create"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleUsuarioPhotoChange}
+                        />
+                      </Label>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label>Nome Completo *</Label>
+                        <Input
+                          value={usuarioForm.name}
+                          onChange={(e) => setUsuarioForm({...usuarioForm, name: e.target.value})}
+                          placeholder="Nome completo do usuário"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>E-mail *</Label>
+                        <Input
+                          type="email"
+                          value={usuarioForm.email}
+                          onChange={(e) => setUsuarioForm({...usuarioForm, email: e.target.value})}
+                          placeholder="email@exemplo.com"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>Senha *</Label>
+                        <Input
+                          type="password"
+                          value={usuarioForm.password}
+                          onChange={(e) => setUsuarioForm({...usuarioForm, password: e.target.value})}
+                          placeholder="Senha inicial"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>Telefone (WhatsApp)</Label>
+                        <Input
+                          value={usuarioForm.telefone}
+                          onChange={(e) => setUsuarioForm({...usuarioForm, telefone: e.target.value})}
+                          placeholder="(00) 00000-0000"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>CEP</Label>
+                        <Input
+                          value={usuarioForm.cep}
+                          onChange={(e) => {
+                            const cep = e.target.value;
+                            setUsuarioForm({...usuarioForm, cep});
+                            if (cep.replace(/\D/g, '').length === 8) {
+                              handleBuscarCEP(cep.replace(/\D/g, ''));
+                            }
+                          }}
+                          placeholder="00000-000"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>Endereço</Label>
+                        <Input
+                          value={usuarioForm.endereco}
+                          onChange={(e) => setUsuarioForm({...usuarioForm, endereco: e.target.value})}
+                          placeholder="Rua, Avenida..."
+                          disabled={loadingCEP}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>Número</Label>
+                        <Input
+                          value={usuarioForm.numero}
+                          onChange={(e) => setUsuarioForm({...usuarioForm, numero: e.target.value})}
+                          placeholder="Número"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>Complemento</Label>
+                        <Input
+                          value={usuarioForm.complemento}
+                          onChange={(e) => setUsuarioForm({...usuarioForm, complemento: e.target.value})}
+                          placeholder="Apto, Bloco..."
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>Cidade</Label>
+                        <Input
+                          value={usuarioForm.cidade}
+                          onChange={(e) => setUsuarioForm({...usuarioForm, cidade: e.target.value})}
+                          placeholder="Cidade"
+                          disabled={loadingCEP}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>Estado</Label>
+                        <Input
+                          value={usuarioForm.estado}
+                          onChange={(e) => setUsuarioForm({...usuarioForm, estado: e.target.value})}
+                          placeholder="UF"
+                          disabled={loadingCEP}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>País</Label>
+                        <Input
+                          value={usuarioForm.pais}
+                          onChange={(e) => setUsuarioForm({...usuarioForm, pais: e.target.value})}
+                          placeholder="País"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>Igreja *</Label>
+                        <Select 
+                          value={usuarioForm.churchId} 
+                          onValueChange={(v) => setUsuarioForm({...usuarioForm, churchId: v})}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione a igreja" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {churches.map(church => (
+                              <SelectItem key={church.churchId} value={church.churchId}>
+                                {church.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <Label>Cargo/Função</Label>
+                        <Select 
+                          value={usuarioForm.cargo} 
+                          onValueChange={(v) => setUsuarioForm({...usuarioForm, cargo: v})}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione o cargo" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Secretário(a)">Secretário(a)</SelectItem>
+                            <SelectItem value="Tesoureiro(a)">Tesoureiro(a)</SelectItem>
+                            <SelectItem value="Pastor(a)">Pastor(a)</SelectItem>
+                            <SelectItem value="Bispo(a)">Bispo(a)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-3 justify-end pt-4">
+                      <Button variant="outline" onClick={() => setShowUsuarioCreateModal(false)}>
+                        Cancelar
+                      </Button>
+                      <Button onClick={handleCreateUsuario} className="bg-green-600 hover:bg-green-700">
+                        Cadastrar Usuário
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              
+              {/* Modal Editar Usuário */}
+              <Dialog open={showUsuarioEditModal} onOpenChange={setShowUsuarioEditModal}>
+                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Editar Usuário</DialogTitle>
+                  </DialogHeader>
+                  
+                  <div className="space-y-4">
+                    {/* Foto */}
+                    <div className="flex flex-col items-center gap-3">
+                      {usuarioPhotoPreview ? (
+                        <img src={usuarioPhotoPreview} alt="Preview" className="w-24 h-24 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
+                          <Users className="w-12 h-12 text-gray-400" />
+                        </div>
+                      )}
+                      <Label htmlFor="usuario-photo-edit" className="cursor-pointer">
+                        <div className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                          Trocar Foto
+                        </div>
+                        <Input
+                          id="usuario-photo-edit"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleUsuarioPhotoChange}
+                        />
+                      </Label>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label>Nome Completo</Label>
+                        <Input
+                          value={usuarioForm.name}
+                          onChange={(e) => setUsuarioForm({...usuarioForm, name: e.target.value})}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>E-mail</Label>
+                        <Input
+                          type="email"
+                          value={usuarioForm.email}
+                          onChange={(e) => setUsuarioForm({...usuarioForm, email: e.target.value})}
+                        />
+                      </div>
+                      
+                      <div className="md:col-span-2">
+                        <Label>Nova Senha (deixe em branco para não alterar)</Label>
+                        <Input
+                          type="password"
+                          value={newPasswordUsuario}
+                          onChange={(e) => setNewPasswordUsuario(e.target.value)}
+                          placeholder="Nova senha (opcional)"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>Telefone (WhatsApp)</Label>
+                        <Input
+                          value={usuarioForm.telefone}
+                          onChange={(e) => setUsuarioForm({...usuarioForm, telefone: e.target.value})}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>CEP</Label>
+                        <Input
+                          value={usuarioForm.cep}
+                          onChange={(e) => {
+                            const cep = e.target.value;
+                            setUsuarioForm({...usuarioForm, cep});
+                            if (cep.replace(/\D/g, '').length === 8) {
+                              handleBuscarCEP(cep.replace(/\D/g, ''));
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>Endereço</Label>
+                        <Input
+                          value={usuarioForm.endereco}
+                          onChange={(e) => setUsuarioForm({...usuarioForm, endereco: e.target.value})}
+                          disabled={loadingCEP}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>Número</Label>
+                        <Input
+                          value={usuarioForm.numero}
+                          onChange={(e) => setUsuarioForm({...usuarioForm, numero: e.target.value})}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>Complemento</Label>
+                        <Input
+                          value={usuarioForm.complemento}
+                          onChange={(e) => setUsuarioForm({...usuarioForm, complemento: e.target.value})}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>Cidade</Label>
+                        <Input
+                          value={usuarioForm.cidade}
+                          onChange={(e) => setUsuarioForm({...usuarioForm, cidade: e.target.value})}
+                          disabled={loadingCEP}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>Estado</Label>
+                        <Input
+                          value={usuarioForm.estado}
+                          onChange={(e) => setUsuarioForm({...usuarioForm, estado: e.target.value})}
+                          disabled={loadingCEP}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>País</Label>
+                        <Input
+                          value={usuarioForm.pais}
+                          onChange={(e) => setUsuarioForm({...usuarioForm, pais: e.target.value})}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label>Igreja</Label>
+                        <Select 
+                          value={usuarioForm.churchId} 
+                          onValueChange={(v) => setUsuarioForm({...usuarioForm, churchId: v})}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione a igreja" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {churches.map(church => (
+                              <SelectItem key={church.churchId} value={church.churchId}>
+                                {church.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <Label>Cargo/Função</Label>
+                        <Select 
+                          value={usuarioForm.cargo} 
+                          onValueChange={(v) => setUsuarioForm({...usuarioForm, cargo: v})}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione o cargo" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Secretário(a)">Secretário(a)</SelectItem>
+                            <SelectItem value="Tesoureiro(a)">Tesoureiro(a)</SelectItem>
+                            <SelectItem value="Pastor(a)">Pastor(a)</SelectItem>
+                            <SelectItem value="Bispo(a)">Bispo(a)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-3 justify-end pt-4">
+                      <Button variant="outline" onClick={() => setShowUsuarioEditModal(false)}>
+                        Cancelar
+                      </Button>
+                      <Button onClick={handleUpdateUsuario} className="bg-blue-600 hover:bg-blue-700">
+                        Salvar Alterações
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              
+              {/* Modal Visualizar Usuário */}
+              <Dialog open={showUsuarioViewModal} onOpenChange={setShowUsuarioViewModal}>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>Detalhes do Usuário</DialogTitle>
+                  </DialogHeader>
+                  
+                  {selectedUsuario && (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4">
+                        {selectedUsuario.photoUrl ? (
+                          <img 
+                            src={selectedUsuario.photoUrl} 
+                            alt={selectedUsuario.name} 
+                            className="w-20 h-20 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center">
+                            <Users className="w-10 h-10 text-gray-400" />
+                          </div>
+                        )}
+                        
+                        <div>
+                          <h3 className="text-xl font-bold">{selectedUsuario.name}</h3>
+                          <p className="text-gray-600">{selectedUsuario.email}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            {selectedUsuario.isOnline ? (
+                              <>
+                                <div className="w-2 h-2 bg-green-500 rounded-full" />
+                                <span className="text-sm text-green-600">Online</span>
+                              </>
+                            ) : (
+                              <>
+                                <div className="w-2 h-2 bg-red-500 rounded-full" />
+                                <span className="text-sm text-red-600">Offline</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                        <div>
+                          <Label className="text-gray-500 text-sm">Telefone</Label>
+                          <p className="font-medium">{selectedUsuario.telefone || 'Não informado'}</p>
+                        </div>
+                        
+                        <div>
+                          <Label className="text-gray-500 text-sm">Cargo</Label>
+                          <p className="font-medium">{selectedUsuario.cargo || 'Não informado'}</p>
+                        </div>
+                        
+                        <div>
+                          <Label className="text-gray-500 text-sm">Igreja</Label>
+                          <p className="font-medium">{selectedUsuario.churchName || selectedUsuario.church || 'Não informado'}</p>
+                        </div>
+                        
+                        <div>
+                          <Label className="text-gray-500 text-sm">CEP</Label>
+                          <p className="font-medium">{selectedUsuario.cep || 'Não informado'}</p>
+                        </div>
+                        
+                        <div className="col-span-2">
+                          <Label className="text-gray-500 text-sm">Endereço Completo</Label>
+                          <p className="font-medium">
+                            {selectedUsuario.endereco ? `${selectedUsuario.endereco}${selectedUsuario.numero ? `, ${selectedUsuario.numero}` : ''}${selectedUsuario.complemento ? ` - ${selectedUsuario.complemento}` : ''}` : 'Não informado'}
+                          </p>
+                          {selectedUsuario.cidade && (
+                            <p className="text-sm text-gray-600">{selectedUsuario.cidade} - {selectedUsuario.estado} - {selectedUsuario.pais || 'Brasil'}</p>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-2 pt-4">
+                        <Button 
+                          onClick={() => {
+                            setShowUsuarioViewModal(false);
+                            openEditUsuarioModal(selectedUsuario);
+                          }}
+                          className="flex-1"
+                        >
+                          <Edit className="w-4 h-4 mr-2" />
+                          Editar
+                        </Button>
+                        
+                        {selectedUsuario.telefone && (
+                          <Button 
+                            onClick={() => {
+                              abrirWhatsApp(selectedUsuario.telefone);
+                            }}
+                            className="flex-1 bg-green-600 hover:bg-green-700"
+                          >
+                            <MessageCircle className="w-4 h-4 mr-2" />
+                            WhatsApp
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </DialogContent>
+              </Dialog>
+              
+              {/* Modal Deletar Usuário */}
+              <Dialog open={showUsuarioDeleteModal} onOpenChange={setShowUsuarioDeleteModal}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Confirmar Exclusão</DialogTitle>
+                    <DialogDescription>
+                      Tem certeza que deseja excluir o usuário <strong>{selectedUsuario?.name}</strong>? Esta ação não pode ser desfeita.
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  <div className="flex gap-3 justify-end pt-4">
+                    <Button variant="outline" onClick={() => setShowUsuarioDeleteModal(false)}>
+                      Cancelar
+                    </Button>
+                    <Button onClick={handleDeleteUsuario} className="bg-red-600 hover:bg-red-700">
+                      Sim, Excluir
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </TabsContent>
+          )}
           
           {/* GESTÃO: ACESSO & PERMISSÕES TAB */}
           {user?.role === 'master' && (
