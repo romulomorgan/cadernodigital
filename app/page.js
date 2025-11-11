@@ -2151,7 +2151,7 @@ export default function App() {
             <div className="flex justify-center mb-4">
               <div className="w-24 h-24 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-xl border-4 border-white">
                 <img 
-                  src="https://iudpoficial.com.br/wp-content/uploads/2024/10/cropped-LOGO-IUDP-TRANSPARENTE-1-270x270.png" 
+                  src="https://customer-assets.emergentagent.com/job_ministry-ledger/artifacts/nuvau05n_LOGO%20IUDP.jpg" 
                   alt="IUDP Logo" 
                   className="w-20 h-20 rounded-full object-cover"
                 />
