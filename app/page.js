@@ -166,6 +166,27 @@ export default function App() {
   const timeSlots = ['08:00', '10:00', '12:00', '15:00', '19:30'];
   const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
   
+  // Funções de máscara
+  const maskCEP = (value) => {
+    if (!value) return '';
+    return value
+      .replace(/\D/g, '')
+      .replace(/(\d{5})(\d)/, '$1-$2')
+      .slice(0, 9);
+  };
+  
+  const maskPhone = (value) => {
+    if (!value) return '';
+    const cleaned = value.replace(/\D/g, '');
+    if (cleaned.length <= 10) {
+      return cleaned.replace(/(\d{2})(\d{4})(\d)/, '($1) $2-$3');
+    }
+    return cleaned.replace(/(\d{2})(\d{5})(\d)/, '($1) $2-$3').slice(0, 15);
+  };
+  
+  // States para busca/filtro de usuários
+  const [usuariosSearchQuery, setUsuariosSearchQuery] = useState('');
+  
   const roleNames = {
     'master': 'Líder Máximo',
     'leader': 'Líder',
