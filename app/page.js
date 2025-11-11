@@ -2273,7 +2273,7 @@ export default function App() {
                     </div>
                     
                     <div>
-                      <Label>CEP</Label>
+                      <Label className="text-xs md:text-sm">CEP</Label>
                       <Input
                         value={maskCEP(registerCEP)}
                         onChange={(e) => {
@@ -2284,76 +2284,83 @@ export default function App() {
                           }
                         }}
                         placeholder="00000-000"
+                        className="text-sm h-9"
                       />
                       {loadingCEP && <p className="text-xs text-blue-600 mt-1">🔍 Buscando...</p>}
                     </div>
                     
                     <div>
-                      <Label>Endereço</Label>
+                      <Label className="text-xs md:text-sm">Endereço</Label>
                       <Input
                         value={registerEndereco}
                         onChange={(e) => setRegisterEndereco(e.target.value)}
                         placeholder="Rua, Avenida..."
                         disabled={loadingCEP}
+                        className="text-sm h-9"
                       />
                     </div>
                     
                     <div>
-                      <Label>Número</Label>
+                      <Label className="text-xs md:text-sm">Número</Label>
                       <Input
                         value={registerNumero}
                         onChange={(e) => setRegisterNumero(e.target.value)}
                         placeholder="Número"
+                        className="text-sm h-9"
                       />
                     </div>
                     
                     <div>
-                      <Label>Complemento</Label>
+                      <Label className="text-xs md:text-sm">Complemento</Label>
                       <Input
                         value={registerComplemento}
                         onChange={(e) => setRegisterComplemento(e.target.value)}
                         placeholder="Apto, Bloco..."
+                        className="text-sm h-9"
                       />
                     </div>
                     
                     <div>
-                      <Label>Cidade</Label>
+                      <Label className="text-xs md:text-sm">Cidade</Label>
                       <Input
                         value={registerCidade}
                         onChange={(e) => setRegisterCidade(e.target.value)}
                         placeholder="Cidade"
                         disabled={loadingCEP}
+                        className="text-sm h-9"
                       />
                     </div>
                     
                     <div>
-                      <Label>Estado</Label>
+                      <Label className="text-xs md:text-sm">Estado</Label>
                       <Input
                         value={registerEstado}
                         onChange={(e) => setRegisterEstado(e.target.value)}
                         placeholder="UF"
                         disabled={loadingCEP}
+                        className="text-sm h-9"
                       />
                     </div>
                     
                     <div>
-                      <Label>País</Label>
+                      <Label className="text-xs md:text-sm">País</Label>
                       <Input
                         value={registerPais}
                         onChange={(e) => setRegisterPais(e.target.value)}
                         placeholder="Brasil"
+                        className="text-sm h-9"
                       />
                     </div>
                     
                     <div>
-                      <Label>Igreja *</Label>
+                      <Label className="text-xs md:text-sm">Igreja *</Label>
                       <Select value={registerChurchId} onValueChange={setRegisterChurchId} required>
-                        <SelectTrigger>
+                        <SelectTrigger className="h-9 text-sm">
                           <SelectValue placeholder="Selecione sua igreja" />
                         </SelectTrigger>
                         <SelectContent>
                           {publicChurches.map(ch => (
-                            <SelectItem key={ch.churchId} value={ch.churchId}>
+                            <SelectItem key={ch.churchId} value={ch.churchId} className="text-sm">
                               {ch.name} - {ch.city}/{ch.state}
                             </SelectItem>
                           ))}
@@ -2362,24 +2369,24 @@ export default function App() {
                     </div>
                     
                     <div>
-                      <Label>Cargo/Função</Label>
+                      <Label className="text-xs md:text-sm">Cargo/Função</Label>
                       <Select value={registerCargo} onValueChange={setRegisterCargo}>
-                        <SelectTrigger>
+                        <SelectTrigger className="h-9 text-sm">
                           <SelectValue placeholder="Selecione sua função" />
                         </SelectTrigger>
                         <SelectContent>
                           {publicRoles.length > 0 ? (
                             publicRoles.map(r => (
-                              <SelectItem key={r.roleId} value={r.name}>
+                              <SelectItem key={r.roleId} value={r.name} className="text-sm">
                                 {r.name}
                               </SelectItem>
                             ))
                           ) : (
                             <>
-                              <SelectItem value="Secretário(a)">Secretário(a)</SelectItem>
-                              <SelectItem value="Tesoureiro(a)">Tesoureiro(a)</SelectItem>
-                              <SelectItem value="Pastor(a)">Pastor(a)</SelectItem>
-                              <SelectItem value="Bispo(a)">Bispo(a)</SelectItem>
+                              <SelectItem value="Secretário(a)" className="text-sm">Secretário(a)</SelectItem>
+                              <SelectItem value="Tesoureiro(a)" className="text-sm">Tesoureiro(a)</SelectItem>
+                              <SelectItem value="Pastor(a)" className="text-sm">Pastor(a)</SelectItem>
+                              <SelectItem value="Bispo(a)" className="text-sm">Bispo(a)</SelectItem>
                             </>
                           )}
                         </SelectContent>
