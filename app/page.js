@@ -5121,11 +5121,43 @@ export default function App() {
                 <div>
                   <Label>CEP</Label>
                   <Input 
-                    value={editChurchData.cep || selectedChurch.cep}
-                    onChange={(e) => setEditChurchData({...editChurchData, cep: e.target.value})}
+                    value={maskCEP(editChurchData.cep || selectedChurch.cep || '')}
+                    onChange={async (e) => {
+                      const masked = maskCEP(e.target.value);
+                      setEditChurchData({...editChurchData, cep: masked});
+                      
+                      // Buscar endereço quando CEP estiver completo
+                      if (masked.replace(/\D/g, '').length === 8) {
+                        setLoadingCEP(true);
+                        try {
+                          const response = await fetch(`https://viacep.com.br/ws/${masked.replace(/\D/g, '')}/json/`);
+                          const data = await response.json();
+                          
+                          if (!data.erro) {
+                            setEditChurchData({
+                              ...editChurchData,
+                              cep: masked,
+                              address: data.logradouro || '',
+                              neighborhood: data.bairro || '',
+                              city: data.localidade || '',
+                              state: data.uf || '',
+                              country: 'Brasil'
+                            });
+                            toast.success('✅ Endereço encontrado!');
+                          } else {
+                            toast.error('❌ CEP não encontrado');
+                          }
+                        } catch (error) {
+                          toast.error('❌ Erro ao buscar CEP');
+                        } finally {
+                          setLoadingCEP(false);
+                        }
+                      }
+                    }}
                     maxLength={9}
                     placeholder="00000-000"
                   />
+                  {loadingCEP && <p className="text-xs text-blue-600 mt-1">🔍 Buscando endereço...</p>}
                 </div>
               </div>
               <div>
