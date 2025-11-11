@@ -43,6 +43,22 @@ export default function App() {
   const [state, setState] = useState('');
   const [authError, setAuthError] = useState('');
   
+  // Novos campos para registro completo
+  const [registerTelefone, setRegisterTelefone] = useState('');
+  const [registerCEP, setRegisterCEP] = useState('');
+  const [registerEndereco, setRegisterEndereco] = useState('');
+  const [registerNumero, setRegisterNumero] = useState('');
+  const [registerComplemento, setRegisterComplemento] = useState('');
+  const [registerCidade, setRegisterCidade] = useState('');
+  const [registerEstado, setRegisterEstado] = useState('');
+  const [registerPais, setRegisterPais] = useState('Brasil');
+  const [registerChurchId, setRegisterChurchId] = useState('');
+  const [registerCargo, setRegisterCargo] = useState('');
+  const [registerPhotoFile, setRegisterPhotoFile] = useState(null);
+  const [registerPhotoPreview, setRegisterPhotoPreview] = useState(null);
+  const [publicChurches, setPublicChurches] = useState([]);
+  const [publicRoles, setPublicRoles] = useState([]);
+  
   // Calendar states
   const [currentDate, setCurrentDate] = useState(new Date());
   const [entries, setEntries] = useState([]);
