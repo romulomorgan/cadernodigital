@@ -424,6 +424,41 @@ export async function POST(request) {
       });
     }
     
+    // LOGOUT
+    if (endpoint === 'auth/logout') {
+      const user = verifyToken(request);
+      if (user) {
+        // Marcar como offline
+        await db.collection('users').updateOne(
+          { userId: user.userId },
+          { $set: { isOnline: false, lastActivity: getBrazilTime().toISOString() } }
+        );
+        
+        await db.collection('audit_logs').insertOne({
+          logId: crypto.randomUUID(),
+          action: 'logout',
+          userId: user.userId,
+          timestamp: getBrazilTime().toISOString(),
+          details: {}
+        });
+      }
+      
+      return NextResponse.json({ success: true, message: 'Logout realizado com sucesso!' });
+    }
+    
+    // HEARTBEAT - Manter usuário online
+    if (endpoint === 'auth/heartbeat') {
+      const user = verifyToken(request);
+      if (user) {
+        await db.collection('users').updateOne(
+          { userId: user.userId },
+          { $set: { isOnline: true, lastActivity: getBrazilTime().toISOString() } }
+        );
+      }
+      
+      return NextResponse.json({ success: true });
+    }
+    
     // UPLOAD RECEIPT - PATCH 3: Validação robusta
     if (endpoint === 'upload/receipt') {
       const user = verifyToken(request);
