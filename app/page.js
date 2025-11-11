@@ -507,6 +507,39 @@ export default function App() {
     }
   }, [isAuthenticated, activeTab, token, user]);
   
+  // Buscar igrejas e roles públicas para o formulário de registro (sem autenticação)
+  useEffect(() => {
+    const fetchPublicData = async () => {
+      try {
+        // Buscar igrejas
+        const churchesRes = await fetch('/api/public/churches', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        if (churchesRes.ok) {
+          const churchesData = await churchesRes.json();
+          setPublicChurches(churchesData.churches || []);
+        }
+        
+        // Buscar roles/funções
+        const rolesRes = await fetch('/api/public/roles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        if (rolesRes.ok) {
+          const rolesData = await rolesRes.json();
+          setPublicRoles(rolesData.roles || []);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar dados públicos:', error);
+      }
+    };
+    
+    if (!isAuthenticated) {
+      fetchPublicData();
+    }
+  }, [isAuthenticated]);
+  
   const fetchStats = async () => {
     try {
       const res = await fetch('/api/stats/overview', {
