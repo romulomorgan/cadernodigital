@@ -98,6 +98,36 @@ export default function App() {
   const [churchPhotoFile, setChurchPhotoFile] = useState(null);
   const [churchPhotoPreview, setChurchPhotoPreview] = useState(null);
   const [showUserViewModal, setShowUserViewModal] = useState(false);
+  
+  // Nova aba Usuários - states
+  const [usuarios, setUsuarios] = useState([]);
+  const [usuariosGrouped, setUsuariosGrouped] = useState({});
+  const [showUsuarioCreateModal, setShowUsuarioCreateModal] = useState(false);
+  const [showUsuarioEditModal, setShowUsuarioEditModal] = useState(false);
+  const [showUsuarioDeleteModal, setShowUsuarioDeleteModal] = useState(false);
+  const [showUsuarioViewModal, setShowUsuarioViewModal] = useState(false);
+  const [selectedUsuario, setSelectedUsuario] = useState(null);
+  const [usuarioForm, setUsuarioForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    telefone: '',
+    cep: '',
+    endereco: '',
+    numero: '',
+    complemento: '',
+    cidade: '',
+    estado: '',
+    pais: 'Brasil',
+    churchId: '',
+    cargo: ''
+  });
+  const [newPasswordUsuario, setNewPasswordUsuario] = useState('');
+  const [usuarioPhotoFile, setUsuarioPhotoFile] = useState(null);
+  const [usuarioPhotoPreview, setUsuarioPhotoPreview] = useState(null);
+  const [loadingCEP, setLoadingCEP] = useState(false);
+  const [usuariosPagination, setUsuariosPagination] = useState({ page: 1, perPage: 10 });
+  const [churches, setChurches] = useState([]);
   const [showUserEditModal, setShowUserEditModal] = useState(false);
   const [showUserDeleteConfirm, setShowUserDeleteConfirm] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
