@@ -3842,10 +3842,19 @@ export default function App() {
                             <SelectValue placeholder="Selecione o cargo" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Secretário(a)">Secretário(a)</SelectItem>
-                            <SelectItem value="Tesoureiro(a)">Tesoureiro(a)</SelectItem>
-                            <SelectItem value="Pastor(a)">Pastor(a)</SelectItem>
-                            <SelectItem value="Bispo(a)">Bispo(a)</SelectItem>
+                            {allRolesForDropdown.map(r => (
+                              <SelectItem key={r.roleId} value={r.name}>
+                                {r.name}
+                              </SelectItem>
+                            ))}
+                            {allRolesForDropdown.length === 0 && (
+                              <>
+                                <SelectItem value="Secretário(a)">Secretário(a)</SelectItem>
+                                <SelectItem value="Tesoureiro(a)">Tesoureiro(a)</SelectItem>
+                                <SelectItem value="Pastor(a)">Pastor(a)</SelectItem>
+                                <SelectItem value="Bispo(a)">Bispo(a)</SelectItem>
+                              </>
+                            )}
                           </SelectContent>
                         </Select>
                       </div>
@@ -4029,10 +4038,19 @@ export default function App() {
                             <SelectValue placeholder="Selecione o cargo" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Secretário(a)">Secretário(a)</SelectItem>
-                            <SelectItem value="Tesoureiro(a)">Tesoureiro(a)</SelectItem>
-                            <SelectItem value="Pastor(a)">Pastor(a)</SelectItem>
-                            <SelectItem value="Bispo(a)">Bispo(a)</SelectItem>
+                            {allRolesForDropdown.map(r => (
+                              <SelectItem key={r.roleId} value={r.name}>
+                                {r.name}
+                              </SelectItem>
+                            ))}
+                            {allRolesForDropdown.length === 0 && (
+                              <>
+                                <SelectItem value="Secretário(a)">Secretário(a)</SelectItem>
+                                <SelectItem value="Tesoureiro(a)">Tesoureiro(a)</SelectItem>
+                                <SelectItem value="Pastor(a)">Pastor(a)</SelectItem>
+                                <SelectItem value="Bispo(a)">Bispo(a)</SelectItem>
+                              </>
+                            )}
                           </SelectContent>
                         </Select>
                       </div>
