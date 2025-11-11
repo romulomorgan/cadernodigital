@@ -2626,9 +2626,10 @@ export default function App() {
             <TabsTrigger value="compare">📈 Comparações</TabsTrigger>
             {user?.role === 'master' && (
               <>
+                <TabsTrigger value="funcoes">📋 Funções</TabsTrigger>
                 <TabsTrigger value="usuarios">👤 Usuários</TabsTrigger>
-                <TabsTrigger value="gestao">👥 Acesso & Permissões</TabsTrigger>
                 <TabsTrigger value="igrejas">🏛️ Igrejas</TabsTrigger>
+                <TabsTrigger value="gestao">👥 Acesso & Permissões</TabsTrigger>
                 <TabsTrigger value="panel">⚙️ Painel Master</TabsTrigger>
                 <TabsTrigger value="audit">🔍 Auditoria</TabsTrigger>
               </>
