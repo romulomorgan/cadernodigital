@@ -1221,19 +1221,126 @@ export async function POST(request) {
       return NextResponse.json({ logs });
     }
     
-    // GET ALL USERS
+    // GET ALL USERS WITH ENHANCED DETAILS
     if (endpoint === 'users/list') {
       const user = verifyToken(request);
       if (!user || user.role !== 'master') {
         return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
       }
       
+      // Buscar todos os usuários
       const users = await db.collection('users')
         .find({}, { projection: { password: 0 } })
-        .sort({ createdAt: -1 })
         .toArray();
       
-      return NextResponse.json({ users });
+      // Buscar igreja de cada usuário (se tiver)
+      const usersWithChurch = await Promise.all(users.map(async (u) => {
+        if (u.churchId) {
+          const church = await db.collection('churches').findOne(
+            { churchId: u.churchId },
+            { projection: { name: 1 } }
+          );
+          return { ...u, churchName: church?.name || 'Sem igreja' };
+        }
+        return { ...u, churchName: u.church || 'Sem igreja' };
+      }));
+      
+      // Agrupar por igreja → cargo → alfabético
+      const grouped = usersWithChurch.reduce((acc, u) => {
+        const churchKey = u.churchName || 'Sem igreja';
+        const cargoKey = u.cargo || 'Sem cargo';
+        
+        if (!acc[churchKey]) acc[churchKey] = {};
+        if (!acc[churchKey][cargoKey]) acc[churchKey][cargoKey] = [];
+        
+        acc[churchKey][cargoKey].push(u);
+        return acc;
+      }, {});
+      
+      // Ordenar alfabeticamente dentro de cada grupo
+      Object.keys(grouped).forEach(church => {
+        Object.keys(grouped[church]).forEach(cargo => {
+          grouped[church][cargo].sort((a, b) => a.name.localeCompare(b.name));
+        });
+      });
+      
+      return NextResponse.json({ users: usersWithChurch, grouped });
+    }
+    
+    // CREATE USER (Master only)
+    if (endpoint === 'users/create') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const { name, email, password, telefone, cep, endereco, numero, complemento, cidade, estado, pais, churchId, cargo } = await request.json();
+      
+      // Validar email
+      const existing = await db.collection('users').findOne({ email });
+      if (existing) {
+        return NextResponse.json({ error: 'Email já cadastrado' }, { status: 400 });
+      }
+      
+      // Hash da senha
+      const hashedPassword = await bcrypt.hash(password, 10);
+      
+      // Buscar nome da igreja
+      let churchName = 'Sem igreja';
+      if (churchId) {
+        const church = await db.collection('churches').findOne({ churchId });
+        churchName = church?.name || 'Sem igreja';
+      }
+      
+      const newUser = {
+        userId: crypto.randomUUID(),
+        name,
+        email,
+        password: hashedPassword,
+        telefone: telefone || '',
+        cep: cep || '',
+        endereco: endereco || '',
+        numero: numero || '',
+        complemento: complemento || '',
+        cidade: cidade || '',
+        estado: estado || '',
+        pais: pais || 'Brasil',
+        churchId: churchId || null,
+        church: churchName,
+        cargo: cargo || '',
+        role: 'pastor', // default
+        photoUrl: null,
+        isOnline: false,
+        lastActivity: null,
+        permissions: {
+          canView: true,
+          canEdit: false,
+          canPrint: false,
+          canExport: false,
+          canShare: false
+        },
+        scope: 'church',
+        createdAt: getBrazilTime().toISOString(),
+        updatedAt: getBrazilTime().toISOString()
+      };
+      
+      await db.collection('users').insertOne(newUser);
+      
+      // Audit log
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'create_user',
+        userId: user.userId,
+        userName: user.name,
+        timestamp: getBrazilTime().toISOString(),
+        details: { newUserId: newUser.userId, email: newUser.email, cargo }
+      });
+      
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Usuário criado com sucesso!',
+        user: { ...newUser, password: undefined }
+      });
     }
     
     // UPDATE USER PERMISSIONS
