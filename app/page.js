@@ -1913,6 +1913,31 @@ export default function App() {
     window.open(`https://wa.me/55${numero}`, '_blank');
   };
   
+  const handleToggleUserActive = async (usuario) => {
+    if (!usuario) return;
+    
+    try {
+      const res = await fetch('/api/users/toggle-active', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ userId: usuario.userId })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        await fetchUsuarios(); // Recarregar lista
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao alterar status do usuário');
+    }
+  };
+  
   const handleApproveUnlock = async (requestId, entryId) => {
     try {
       const res = await fetch('/api/unlock/approve', {
