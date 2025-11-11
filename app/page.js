@@ -162,6 +162,8 @@ export default function App() {
   const [newChurchCity, setNewChurchCity] = useState('');
   const [newChurchState, setNewChurchState] = useState('');
   const [newChurchRegion, setNewChurchRegion] = useState('');
+  const [newChurchPhone, setNewChurchPhone] = useState('');
+  const [newChurchCountry, setNewChurchCountry] = useState('Brasil');
   
   const timeSlots = ['08:00', '10:00', '12:00', '15:00', '19:30'];
   const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
