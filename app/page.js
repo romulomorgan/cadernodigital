@@ -225,6 +225,24 @@ export default function App() {
     });
   });
   
+  // Filtrar igrejas com base na busca
+  const churchesFiltradas = allChurches.filter(c => {
+    if (!churchesSearchQuery) return true;
+    const query = churchesSearchQuery.toLowerCase();
+    return (
+      c.name?.toLowerCase().includes(query) ||
+      c.city?.toLowerCase().includes(query) ||
+      c.state?.toLowerCase().includes(query)
+    );
+  });
+  
+  // Paginação de igrejas
+  const totalChurchPages = Math.ceil(churchesFiltradas.length / churchesPagination.perPage);
+  const churchesPaginadas = churchesFiltradas.slice(
+    (churchesPagination.page - 1) * churchesPagination.perPage,
+    churchesPagination.page * churchesPagination.perPage
+  );
+  
   const roleNames = {
     'master': 'Líder Máximo',
     'leader': 'Líder',
