@@ -219,6 +219,13 @@ export default function App() {
   // Estados para busca de funções
   const [funcoesSearchQuery, setFuncoesSearchQuery] = useState('');
   
+  // Filtrar funções/roles com base na busca
+  const rolesFiltradas = allRoles.filter(r => {
+    if (!funcoesSearchQuery) return true;
+    const query = funcoesSearchQuery.toLowerCase();
+    return r.name?.toLowerCase().includes(query);
+  });
+  
   // Filtrar usuários com base na busca
   const usuariosFiltrados = usuarios.filter(u => {
     if (!usuariosSearchQuery) return true;
