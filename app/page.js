@@ -2224,7 +2224,7 @@ export default function App() {
               </TabsContent>
               
               <TabsContent value="register">
-                <form onSubmit={handleAuth} className="space-y-3">
+                <form onSubmit={handleAuth} className="space-y-4">
                   {/* Foto */}
                   <div className="flex flex-col items-center gap-2 py-2">
                     {registerPhotoPreview ? (
