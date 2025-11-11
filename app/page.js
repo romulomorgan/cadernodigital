@@ -1222,6 +1222,8 @@ export default function App() {
         setNewChurchCity('');
         setNewChurchState('');
         setNewChurchRegion('');
+        setNewChurchPhone('');
+        setNewChurchCountry('Brasil');
         setChurchPhotoFile(null);
         setChurchPhotoPreview(null);
         
