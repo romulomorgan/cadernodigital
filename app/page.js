@@ -1277,6 +1277,22 @@ export default function App() {
     }
   };
   
+  const fetchAllRolesForDropdowns = async () => {
+    try {
+      const res = await fetch('/api/public/roles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setAllRolesForDropdown(data.roles || []);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar roles:', error);
+    }
+  };
+  
   const handleCEPChange = async (cep) => {
     // Aplicar máscara
     const maskedCEP = cep.replace(/\D/g, '').replace(/(\d{5})(\d)/, '$1-$2').slice(0, 9);
