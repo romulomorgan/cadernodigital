@@ -3518,6 +3518,125 @@ export default function App() {
             </Card>
           </TabsContent>
           
+          {/* FUNÇÕES TAB */}
+          {user?.role === 'master' && (
+            <TabsContent value="funcoes">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileUser className="w-6 h-6" />
+                    Gerenciamento de Funções
+                  </CardTitle>
+                  <CardDescription>Cadastro de cargos e funções do sistema</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Botão Cadastrar Nova Função */}
+                  <div className="flex justify-end">
+                    <Button 
+                      onClick={() => {
+                        setNewRoleName('');
+                        setShowRoleCreateModal(true);
+                      }}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      <FileUser className="w-4 h-4 mr-2" />
+                      Cadastrar Nova Função
+                    </Button>
+                  </div>
+
+                  {/* Campo de Busca */}
+                  <div className="border rounded-lg">
+                    <div className="bg-gray-50 p-4 border-b space-y-3">
+                      <h3 className="font-semibold text-lg">Funções Cadastradas ({allRoles.length})</h3>
+                      
+                      <Input
+                        placeholder="🔍 Buscar função por nome..."
+                        value={funcoesSearchQuery}
+                        onChange={(e) => setFuncoesSearchQuery(e.target.value)}
+                        className="max-w-md"
+                      />
+                      
+                      {funcoesSearchQuery && (
+                        <p className="text-sm text-gray-600">
+                          Mostrando {rolesFiltradas.length} de {allRoles.length} funções
+                        </p>
+                      )}
+                    </div>
+                    
+                    {/* Listagem de Funções */}
+                    <div className="p-4">
+                      {rolesFiltradas.length === 0 ? (
+                        <div className="text-center py-8 text-gray-500">
+                          <FileUser className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                          <p>{funcoesSearchQuery ? 'Nenhuma função encontrada' : 'Nenhuma função cadastrada ainda'}</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {rolesFiltradas.map((role) => (
+                            <div key={role.roleId} className="flex items-center justify-between p-3 bg-white border rounded-lg hover:shadow-md transition-shadow">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                  <FileUser className="w-5 h-5 text-blue-600" />
+                                </div>
+                                <div>
+                                  <p className="font-semibold">{role.name}</p>
+                                  <p className="text-xs text-gray-500">
+                                    Criado em: {new Date(role.createdAt).toLocaleDateString('pt-BR')}
+                                  </p>
+                                </div>
+                              </div>
+                              
+                              {/* Ações */}
+                              <div className="flex gap-1">
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => {
+                                    setSelectedRole(role);
+                                    setShowRoleViewModal(true);
+                                  }}
+                                  title="Visualizar"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                                
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => {
+                                    setSelectedRole(role);
+                                    setNewRoleName(role.name);
+                                    setShowRoleEditModal(true);
+                                  }}
+                                  title="Editar"
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </Button>
+                                
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => {
+                                    setSelectedRole(role);
+                                    setShowRoleDeleteConfirm(true);
+                                  }}
+                                  title="Excluir"
+                                  className="text-red-600 hover:text-red-700"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+          
           {/* USUÁRIOS TAB */}
           {user?.role === 'master' && (
             <TabsContent value="usuarios">
