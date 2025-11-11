@@ -1160,6 +1160,7 @@ export default function App() {
           setNewChurchNeighborhood(data.bairro || '');
           setNewChurchCity(data.localidade || '');
           setNewChurchState(data.uf || '');
+          setNewChurchCountry('Brasil');
           toast.success('✅ Endereço encontrado!');
         } else {
           toast.error('❌ CEP não encontrado');
