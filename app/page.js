@@ -2420,15 +2420,17 @@ export default function App() {
                   </div>
                   
                   {authError && (
-                    <div className="text-red-600 text-sm flex items-center gap-2">
+                    <div className="text-red-600 text-sm flex items-center gap-2 bg-red-50 p-3 rounded-lg">
                       <AlertCircle className="w-4 h-4" />
                       {authError}
                     </div>
                   )}
                   
-                  <Button type="submit" className="w-full bg-blue-900 hover:bg-blue-800">
-                    Cadastrar
-                  </Button>
+                  <div className="pt-4 pb-6">
+                    <Button type="submit" className="w-full bg-blue-900 hover:bg-blue-800 h-10">
+                      Cadastrar
+                    </Button>
+                  </div>
                 </form>
               </TabsContent>
             </Tabs>
