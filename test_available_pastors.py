@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://financial-iudp.preview.emergentagent.com"
+BASE_URL = "https://ministry-finance-2.preview.emergentagent.com"
 API_URL = f"{BASE_URL}/api"
 
 # Test credentials
