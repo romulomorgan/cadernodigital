@@ -2434,6 +2434,59 @@ export default function App() {
             </Tabs>
           </CardContent>
         </Card>
+        
+        {/* Modal Recuperação de Senha */}
+        <Dialog open={showForgotPasswordModal} onOpenChange={setShowForgotPasswordModal}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold text-blue-900">Recuperar Senha</DialogTitle>
+              <DialogDescription>
+                Digite seu e-mail cadastrado e enviaremos as instruções para redefinir sua senha.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4 py-4">
+              <div>
+                <Label htmlFor="forgot-email" className="text-sm font-medium">E-mail</Label>
+                <Input
+                  id="forgot-email"
+                  type="email"
+                  value={forgotPasswordEmail}
+                  onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                  placeholder="seu@email.com"
+                  className="mt-1"
+                />
+              </div>
+              
+              <div className="flex gap-3 justify-end pt-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setShowForgotPasswordModal(false);
+                    setForgotPasswordEmail('');
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  onClick={() => {
+                    if (!forgotPasswordEmail) {
+                      toast.error('❌ Digite seu e-mail');
+                      return;
+                    }
+                    // TODO: Implementar envio de email
+                    toast.info('📧 Em breve: Link de recuperação será enviado para ' + forgotPasswordEmail);
+                    setShowForgotPasswordModal(false);
+                    setForgotPasswordEmail('');
+                  }}
+                  className="bg-blue-900 hover:bg-blue-800"
+                >
+                  Enviar Link
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
