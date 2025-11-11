@@ -439,6 +439,13 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Credenciais inválidas' }, { status: 401 });
       }
       
+      // Verificar se o usuário está ativo (se o campo existir)
+      if (user.hasOwnProperty('isActive') && user.isActive === false) {
+        return NextResponse.json({ 
+          error: 'Sua conta está desativada. Entre em contato com o administrador do sistema.' 
+        }, { status: 403 });
+      }
+      
       // Marcar como online
       await db.collection('users').updateOne(
         { userId: user.userId },
