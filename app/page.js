@@ -2160,7 +2160,7 @@ export default function App() {
             <CardTitle className="text-xl md:text-2xl font-bold text-blue-900">Caderno de Controle Online</CardTitle>
             <CardDescription className="text-lg font-semibold text-yellow-700">Igreja Unida Deus Proverá</CardDescription>
           </CardHeader>
-          <CardContent className="overflow-y-auto max-h-[calc(90vh-180px)]">
+          <CardContent className="overflow-y-auto max-h-[calc(85vh-180px)] pb-6">
             <Tabs value={authMode} onValueChange={setAuthMode}>
               <TabsList className="grid w-full grid-cols-2 mb-4">
                 <TabsTrigger value="login">Entrar</TabsTrigger>
