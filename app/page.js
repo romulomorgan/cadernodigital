@@ -1620,7 +1620,7 @@ export default function App() {
       
       const data = await res.json();
       if (res.ok) {
-        // Se tiver foto nova, fazer upload
+        // Se tiver foto nova, fazer upload ANTES de mostrar sucesso
         if (usuarioPhotoFile) {
           await handleUploadUsuarioPhoto(selectedUsuario.userId);
         }
@@ -1630,7 +1630,9 @@ export default function App() {
         setNewPasswordUsuario('');
         setUsuarioPhotoFile(null);
         setUsuarioPhotoPreview(null);
-        fetchUsuarios();
+        
+        // Recarregar lista para mostrar foto atualizada
+        await fetchUsuarios();
       } else {
         toast.error('❌ ' + data.error);
       }
