@@ -563,7 +563,25 @@ export default function App() {
       const endpoint = authMode === 'login' ? '/api/auth/login' : '/api/auth/register';
       const body = authMode === 'login' 
         ? { email, password }
-        : { name, email, password, role, church, region, state };
+        : { 
+            name, 
+            email, 
+            password, 
+            role, 
+            church, 
+            region, 
+            state,
+            telefone: registerTelefone,
+            cep: registerCEP,
+            endereco: registerEndereco,
+            numero: registerNumero,
+            complemento: registerComplemento,
+            cidade: registerCidade,
+            estado: registerEstado,
+            pais: registerPais,
+            churchId: registerChurchId,
+            cargo: registerCargo
+          };
       
       const res = await fetch(endpoint, {
         method: 'POST',
@@ -574,6 +592,23 @@ export default function App() {
       const data = await res.json();
       
       if (res.ok) {
+        // Se tiver foto no registro, fazer upload
+        if (authMode === 'register' && registerPhotoFile && data.user?.userId) {
+          try {
+            const formData = new FormData();
+            formData.append('photo', registerPhotoFile);
+            formData.append('userId', data.user.userId);
+            
+            await fetch('/api/users/upload-photo', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${data.token}` },
+              body: formData
+            });
+          } catch (error) {
+            console.error('Erro ao fazer upload da foto:', error);
+          }
+        }
+        
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         setToken(data.token);
