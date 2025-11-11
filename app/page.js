@@ -2141,12 +2141,12 @@ export default function App() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950 flex items-center justify-center p-4">
-        <Card className="w-full max-w-4xl max-h-[95vh] overflow-hidden border-2 border-yellow-500/20 shadow-2xl">
+        <Card className="w-full max-w-2xl max-h-[90vh] overflow-hidden border-2 border-yellow-500/20 shadow-2xl">
           <CardHeader className="text-center pb-2">
             <div className="flex justify-center mb-4">
               <div className="w-24 h-24 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-xl border-4 border-white">
                 <img 
-                  src="https://customer-assets.emergentagent.com/job_ministry-ledger/artifacts/nuvau05n_LOGO%20IUDP.jpg" 
+                  src="https://iudpoficial.com.br/wp-content/uploads/2024/10/cropped-LOGO-IUDP-TRANSPARENTE-1-270x270.png" 
                   alt="IUDP Logo" 
                   className="w-20 h-20 rounded-full object-cover"
                 />
@@ -2155,7 +2155,7 @@ export default function App() {
             <CardTitle className="text-xl md:text-2xl font-bold text-blue-900">Caderno de Controle Online</CardTitle>
             <CardDescription className="text-lg font-semibold text-yellow-700">Igreja Unida Deus Proverá</CardDescription>
           </CardHeader>
-          <CardContent className="overflow-y-auto max-h-[calc(95vh-120px)]">
+          <CardContent className="overflow-y-auto max-h-[calc(90vh-180px)]">
             <Tabs value={authMode} onValueChange={setAuthMode}>
               <TabsList className="grid w-full grid-cols-2 mb-4">
                 <TabsTrigger value="login">Entrar</TabsTrigger>
