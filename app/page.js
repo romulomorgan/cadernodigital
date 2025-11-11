@@ -2248,7 +2248,7 @@ export default function App() {
                     </Label>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="name" className="text-xs md:text-sm">Nome Completo *</Label>
                       <Input
