@@ -4392,6 +4392,192 @@ export default function App() {
             </TabsContent>
           )}
           
+          {/* MODAIS DA ABA FUNÇÕES */}
+          
+          {/* Modal Criar Função */}
+          <Dialog open={showRoleCreateModal} onOpenChange={setShowRoleCreateModal}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Cadastrar Nova Função</DialogTitle>
+                <DialogDescription>
+                  Digite o nome da função/cargo que deseja cadastrar
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4 py-4">
+                <div>
+                  <Label htmlFor="role-name">Nome da Função *</Label>
+                  <Input
+                    id="role-name"
+                    value={newRoleName}
+                    onChange={(e) => setNewRoleName(e.target.value)}
+                    placeholder="Ex: Pastor(a), Diácono(a)..."
+                    className="mt-1"
+                  />
+                </div>
+                
+                <div className="flex gap-3 justify-end pt-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setShowRoleCreateModal(false);
+                      setNewRoleName('');
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button 
+                    onClick={handleCreateRole}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    Salvar
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+          
+          {/* Modal Visualizar Função */}
+          <Dialog open={showRoleViewModal} onOpenChange={setShowRoleViewModal}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Detalhes da Função</DialogTitle>
+              </DialogHeader>
+              
+              {selectedRole && (
+                <div className="space-y-4 py-4">
+                  <div className="flex items-center gap-3 pb-4 border-b">
+                    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                      <FileUser className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold">{selectedRole.name}</h3>
+                      <p className="text-sm text-gray-500">Função/Cargo</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <Label className="text-gray-500 text-sm">ID da Função</Label>
+                      <p className="font-mono text-sm">{selectedRole.roleId}</p>
+                    </div>
+                    
+                    <div>
+                      <Label className="text-gray-500 text-sm">Data de Criação</Label>
+                      <p className="font-medium">
+                        {new Date(selectedRole.createdAt).toLocaleDateString('pt-BR', {
+                          day: '2-digit',
+                          month: 'long',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2 pt-4">
+                    <Button 
+                      onClick={() => {
+                        setShowRoleViewModal(false);
+                        setNewRoleName(selectedRole.name);
+                        setShowRoleEditModal(true);
+                      }}
+                      className="flex-1"
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Editar
+                    </Button>
+                    <Button 
+                      onClick={() => {
+                        setShowRoleViewModal(false);
+                        setShowRoleDeleteConfirm(true);
+                      }}
+                      className="flex-1 bg-red-600 hover:bg-red-700"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Excluir
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+          
+          {/* Modal Editar Função */}
+          <Dialog open={showRoleEditModal} onOpenChange={setShowRoleEditModal}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Editar Função</DialogTitle>
+                <DialogDescription>
+                  Altere o nome da função conforme necessário
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4 py-4">
+                <div>
+                  <Label htmlFor="edit-role-name">Nome da Função *</Label>
+                  <Input
+                    id="edit-role-name"
+                    value={newRoleName}
+                    onChange={(e) => setNewRoleName(e.target.value)}
+                    placeholder="Nome da função"
+                    className="mt-1"
+                  />
+                </div>
+                
+                <div className="flex gap-3 justify-end pt-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setShowRoleEditModal(false);
+                      setNewRoleName('');
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button 
+                    onClick={handleUpdateRole}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    Salvar Alterações
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+          
+          {/* Modal Confirmar Exclusão de Função */}
+          <Dialog open={showRoleDeleteConfirm} onOpenChange={setShowRoleDeleteConfirm}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Confirmar Exclusão</DialogTitle>
+                <DialogDescription>
+                  Tem certeza que deseja excluir a função <strong>{selectedRole?.name}</strong>? 
+                  Esta ação não pode ser desfeita.
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="flex gap-3 justify-end pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setShowRoleDeleteConfirm(false);
+                    setSelectedRole(null);
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  onClick={() => handleDeleteRole(selectedRole?.roleId)}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  Sim, Excluir
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+          
           {/* GESTÃO: ACESSO & PERMISSÕES TAB */}
           {user?.role === 'master' && (
             <TabsContent value="gestao">
