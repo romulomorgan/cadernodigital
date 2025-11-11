@@ -187,6 +187,37 @@ export default function App() {
   // States para busca/filtro de usuários
   const [usuariosSearchQuery, setUsuariosSearchQuery] = useState('');
   
+  // Filtrar usuários com base na busca
+  const usuariosFiltrados = usuarios.filter(u => {
+    if (!usuariosSearchQuery) return true;
+    const query = usuariosSearchQuery.toLowerCase();
+    return (
+      u.name?.toLowerCase().includes(query) ||
+      u.churchName?.toLowerCase().includes(query) ||
+      u.church?.toLowerCase().includes(query) ||
+      u.cargo?.toLowerCase().includes(query)
+    );
+  });
+  
+  // Reagrupar usuários filtrados
+  const usuariosGroupedFiltrado = usuariosFiltrados.reduce((acc, u) => {
+    const churchKey = u.churchName || u.church || 'Sem igreja';
+    const cargoKey = u.cargo || 'Sem cargo';
+    
+    if (!acc[churchKey]) acc[churchKey] = {};
+    if (!acc[churchKey][cargoKey]) acc[churchKey][cargoKey] = [];
+    
+    acc[churchKey][cargoKey].push(u);
+    return acc;
+  }, {});
+  
+  // Ordenar alfabeticamente dentro de cada grupo
+  Object.keys(usuariosGroupedFiltrado).forEach(church => {
+    Object.keys(usuariosGroupedFiltrado[church]).forEach(cargo => {
+      usuariosGroupedFiltrado[church][cargo].sort((a, b) => a.name.localeCompare(b.name));
+    });
+  });
+  
   const roleNames = {
     'master': 'Líder Máximo',
     'leader': 'Líder',
