@@ -1188,7 +1188,9 @@ export default function App() {
       neighborhood: newChurchNeighborhood,
       city: newChurchCity,
       state: newChurchState,
-      region: newChurchRegion
+      region: newChurchRegion,
+      phone: newChurchPhone,
+      country: newChurchCountry || 'Brasil'
     };
     
     try {
