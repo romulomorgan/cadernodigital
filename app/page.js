@@ -1535,12 +1535,12 @@ export default function App() {
       
       const data = await res.json();
       if (res.ok) {
-        toast.success('✅ ' + data.message);
-        
-        // Se tiver foto, fazer upload
+        // Se tiver foto, fazer upload ANTES de mostrar sucesso
         if (usuarioPhotoFile && data.user?.userId) {
           await handleUploadUsuarioPhoto(data.user.userId);
         }
+        
+        toast.success('✅ ' + data.message);
         
         setShowUsuarioCreateModal(false);
         setUsuarioForm({
@@ -1560,7 +1560,9 @@ export default function App() {
         });
         setUsuarioPhotoFile(null);
         setUsuarioPhotoPreview(null);
-        fetchUsuarios();
+        
+        // Recarregar lista para mostrar foto
+        await fetchUsuarios();
       } else {
         toast.error('❌ ' + data.error);
       }
