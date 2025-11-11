@@ -1492,6 +1492,50 @@ export async function POST(request) {
       });
     }
     
+    // TOGGLE USER ACTIVE STATUS
+    if (endpoint === 'users/toggle-active') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const { userId } = await request.json();
+      
+      // Não permitir desativar a si mesmo
+      if (userId === user.userId) {
+        return NextResponse.json({ error: 'Você não pode desativar sua própria conta' }, { status: 400 });
+      }
+      
+      // Buscar usuário atual
+      const targetUser = await db.collection('users').findOne({ userId });
+      if (!targetUser) {
+        return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
+      }
+      
+      // Toggle do status (se não existe, assume true e muda para false)
+      const newStatus = !(targetUser.isActive ?? true);
+      
+      await db.collection('users').updateOne(
+        { userId },
+        { $set: { isActive: newStatus, updatedAt: getBrazilTime().toISOString() } }
+      );
+      
+      // Audit log
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: newStatus ? 'activate_user' : 'deactivate_user',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { targetUserId: userId, targetUserName: targetUser.name, newStatus }
+      });
+      
+      return NextResponse.json({ 
+        success: true, 
+        message: newStatus ? 'Usuário ativado com sucesso!' : 'Usuário desativado com sucesso!',
+        isActive: newStatus
+      });
+    }
+    
     // UPDATE USER DATA (editar usuário completo)
     if (endpoint === 'users/update') {
       const user = verifyToken(request);
