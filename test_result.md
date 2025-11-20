@@ -1228,6 +1228,63 @@ agent_communication:
       - ✅ Filtro de igreja funciona automaticamente
       - ✅ Audit log completo de todas as operações
       - ✅ Impossível excluir acidentalmente (dupla confirmação)
+  - agent: "main"
+    message: |
+      ✅ NOVOS CAMPOS DE OFERTAS E SUPORTE A PDF - NOV 20, 2025
+      
+      🎯 OBJETIVO: Melhorar registro de ofertas e visualização de comprovantes
+      
+      MELHORIAS IMPLEMENTADAS:
+      
+      1. ✅ 3 CAMPOS SEPARADOS PARA OFERTAS:
+         Backend (route.js linha ~774):
+         - Recebe: dinheiro, pix, maquineta (valores separados)
+         - Calcula: valorTotal = dinheiro + pix + maquineta
+         - Salva: Todos os 4 valores no banco (value, dinheiro, pix, maquineta)
+         - Compatibilidade: Mantém suporte ao campo "value" antigo
+         
+         Frontend (page.js):
+         - 3 inputs separados no modal de lançamento:
+           • 💵 Dinheiro
+           • 📱 PIX
+           • 💳 Maquineta
+         - Cálculo automático do total em tempo real
+         - Display destacado: "💰 Valor Total: R$ X.XX"
+         - Observações: Campo separado para notas
+      
+      2. ✅ VISUALIZAÇÃO DE PDF INLINE:
+         Frontend (page.js linha ~5896):
+         - Iframe para visualização direta de PDF no modal
+         - Não precisa abrir nova aba para ver o PDF
+         - Botão "Abrir em Nova Aba" disponível
+         - Upload aceita: imagens (JPG, PNG, WebP) e PDF
+         
+         Backend (route.js linha ~2332):
+         - Content-Type correto para PDF: 'application/pdf'
+         - Já estava implementado e funcionando
+      
+      ARQUIVOS MODIFICADOS:
+      - /app/app/api/[[...path]]/route.js:
+        • Modificado endpoint /api/entries/save
+        • Adicionados campos: dinheiro, pix, maquineta
+        • Cálculo automático do valorTotal
+        • churchId adicionado ao entry
+      
+      - /app/app/page.js:
+        • Adicionados estados: entryDinheiro, entryPix, entryMaquineta
+        • Modal de lançamento redesenhado com 3 campos
+        • Total calculado automaticamente
+        • Visualização de PDF com iframe
+        • Atualizado handleSaveEntry para enviar 3 campos
+        • Atualizado abertura do modal para carregar valores existentes
+      
+      FUNCIONALIDADES:
+      - ✅ 3 campos separados para registro de ofertas
+      - ✅ Cálculo automático do valor total
+      - ✅ Visualização inline de PDF (não precisa baixar)
+      - ✅ Upload de PDF e imagens funcionando
+      - ✅ Compatibilidade com dados antigos (campo "value")
+      - ✅ Edição carrega valores corretos dos 3 campos
 
   - task: "POST /roles/list - Listar funções/roles"
     implemented: true
