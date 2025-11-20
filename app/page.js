@@ -5856,7 +5856,9 @@ export default function App() {
                 <Button 
                   onClick={() => {
                     setEditingEntry(null);
-                    setEntryValue('');
+                    setEntryDinheiro('');
+                    setEntryPix('');
+                    setEntryMaquineta('');
                     setEntryNotes('');
                   }}
                   variant="outline"
