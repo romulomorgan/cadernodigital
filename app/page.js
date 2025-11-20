@@ -238,6 +238,13 @@ export default function App() {
     return r.name?.toLowerCase().includes(query);
   });
   
+  // Filtrar custos com base na busca
+  const custosFiltrados = allCustos.filter(c => {
+    if (!custosSearchQuery) return true;
+    const query = custosSearchQuery.toLowerCase();
+    return c.name?.toLowerCase().includes(query);
+  });
+  
   // Filtrar entries (ofertas) por igreja selecionada (apenas para Master)
   const entriesFiltradas = user?.role === 'master' && selectedChurchFilter !== 'all'
     ? entries.filter(entry => entry.churchId === selectedChurchFilter)
