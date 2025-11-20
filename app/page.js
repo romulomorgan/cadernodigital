@@ -907,7 +907,9 @@ export default function App() {
   };
   
   const getEntry = (day, timeSlot) => {
-    return entries.find(e => 
+    // Usar entriesFiltradas para respeitar o filtro de igreja do Master
+    const entriesToUse = user?.role === 'master' && selectedChurchFilter !== 'all' ? entriesFiltradas : entries;
+    return entriesToUse.find(e => 
       e.day === day && 
       e.timeSlot === timeSlot &&
       e.month === (currentDate.getMonth() + 1) &&
