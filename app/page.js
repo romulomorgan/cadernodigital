@@ -90,7 +90,9 @@ export default function App() {
   const [dayObsText, setDayObsText] = useState('');
   
   // Receipt viewer - FASE 4
-  const [viewingReceipts, setViewingReceipts] = useState(null); // { entryId, receipts: [], currentIndex: 0 }
+  const [viewingReceipts, setViewingReceipts] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [detailsData, setDetailsData] = useState(null); // { entryId, receipts: [], currentIndex: 0 }
   
   // Confirmation dialogs
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
