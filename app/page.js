@@ -5926,17 +5926,18 @@ export default function App() {
                       className="max-w-full max-h-[600px] object-contain"
                       onError={(e) => {
                         e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'block';
-                    }}
-                  />
+                        e.target.nextSibling.style.display = 'block';
+                      }}
+                    />
+                    <div style={{ display: 'none' }} className="text-center p-8">
+                      <AlertCircle className="w-16 h-16 mx-auto mb-4 text-orange-600" />
+                      <p className="font-semibold">Erro ao carregar arquivo</p>
+                      <p className="text-sm text-gray-600 mt-2">
+                        O arquivo pode estar corrompido ou não estar disponível
+                      </p>
+                    </div>
+                  </div>
                 )}
-                <div style={{ display: 'none' }} className="text-center p-8">
-                  <AlertCircle className="w-16 h-16 mx-auto mb-4 text-orange-600" />
-                  <p className="font-semibold">Erro ao carregar arquivo</p>
-                  <p className="text-sm text-gray-600 mt-2">
-                    O arquivo pode estar corrompido ou não estar disponível
-                  </p>
-                </div>
               </div>
               
               {/* Navigation and Actions */}
