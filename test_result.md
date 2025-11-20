@@ -683,6 +683,129 @@ frontend:
           
           Minor: Teste interrompido por timeout no screenshot, mas funcionalidade completamente validada.
 
+  - task: "Aba Custos - UI completa com CRUD"
+    implemented: true
+    working: "NA"
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          ✅ IMPLEMENTADO - Aba Custos completa com UI e CRUD
+          
+          1. Estados adicionados (linhas 180-187):
+             - allCustos: Array de custos
+             - selectedCusto: Custo selecionado
+             - newCustoName: Nome do novo custo
+             - showCustoCreateModal: Modal de criação
+             - showCustoViewModal: Modal de visualização
+             - showCustoEditModal: Modal de edição
+             - showCustoDeleteConfirm: Modal de confirmação de exclusão
+             - custosSearchQuery: Query de busca
+          
+          2. Filtro de custos (linha ~242):
+             - custosFiltrados: Filtra custos por nome com base na busca
+          
+          3. useEffect para carregar custos (linha ~542):
+             - Carrega custos ao entrar na aba custos
+             - Apenas para usuários Master
+          
+          4. Funções CRUD implementadas (linhas ~1659-1771):
+             - fetchAllCustos(): Busca todos os custos
+             - handleCreateCusto(): Cria novo custo
+             - handleUpdateCusto(): Atualiza custo existente
+             - handleDeleteCusto(): Exclui custo
+          
+          5. TabsContent de Custos (após linha 5017):
+             - Card com título e descrição
+             - Botão "Cadastrar Novo Custo"
+             - Campo de busca
+             - Listagem de custos com botões de ação (Visualizar, Editar, Excluir)
+             - Mensagem quando não há custos cadastrados
+          
+          6. Modais CRUD (após linha 4737):
+             - Modal Criar Custo: Formulário com input de nome
+             - Modal Visualizar Custo: Mostra detalhes do custo
+             - Modal Editar Custo: Formulário de edição
+             - Modal Confirmar Exclusão: Confirmação antes de excluir
+          
+          PRECISA TESTAR:
+          - Criar novo custo
+          - Listar custos
+          - Buscar custos
+          - Editar custo existente
+          - Excluir custo
+          - Validações de campos obrigatórios
+
+  - task: "Aba Estatística - Dashboard com métricas"
+    implemented: true
+    working: "NA"
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          ✅ IMPLEMENTADO - Aba Estatística com métricas do sistema
+          
+          TabsContent de Estatística (após linha 5017):
+          - Card principal com título "Estatísticas do Sistema"
+          - Grid responsivo com 6 cards de métricas:
+            1. Total de Usuários (mostra usuarios.length)
+            2. Total de Igrejas (mostra allChurches.length)
+            3. Funções Cadastradas (mostra allRoles.length)
+            4. Tipos de Custos (mostra allCustos.length)
+            5. Ofertas Registradas (mostra entries.length)
+            6. Usuários Ativos (filtra usuarios com isActive)
+          
+          - Card de Resumo Geral:
+            - Total de ofertas no mês atual
+            - Usuários inativos
+            - Taxa de ativação de usuários (percentual)
+          
+          - Design:
+            - Cards coloridos com ícones
+            - Números grandes destacados
+            - Ícones representativos para cada métrica
+            - Layout responsivo (grid 3 colunas em desktop)
+          
+          PRECISA TESTAR:
+          - Verificar se métricas são exibidas corretamente
+          - Validar cálculos de percentuais
+          - Verificar se dados são carregados ao entrar na aba
+
+  - task: "Reorganização da ordem das abas Master"
+    implemented: true
+    working: "NA"
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          ✅ IMPLEMENTADO - Ordem das abas reorganizada conforme solicitado
+          
+          Nova ordem das abas Master (linha 2660):
+          1. 📋 Funções
+          2. 👤 Usuários
+          3. 🏛️ Igrejas
+          4. 💰 Custos (NOVA POSIÇÃO)
+          5. 📊 Estatística (NOVA)
+          6. 🔍 Auditoria
+          
+          Antes a ordem era: Funções > Custos > Usuários > Igrejas > Estatística > Auditoria
+          
+          PRECISA TESTAR:
+          - Verificar se abas aparecem na ordem correta
+          - Verificar se todas as abas são acessíveis
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
