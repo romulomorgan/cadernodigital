@@ -319,6 +319,102 @@ export async function POST(request) {
       }
     }
     
+    // ========== CUSTOS ENDPOINTS ==========
+    
+    // CREATE CUSTO
+    if (endpoint === 'custos/create') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const { name } = await request.json();
+      
+      if (!name || !name.trim()) {
+        return NextResponse.json({ error: 'Nome do custo é obrigatório' }, { status: 400 });
+      }
+      
+      const custo = {
+        custoId: crypto.randomUUID(),
+        name: name.trim(),
+        createdAt: getBrazilTime().toISOString()
+      };
+      
+      await db.collection('custos').insertOne(custo);
+      
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'create_custo',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { custoId: custo.custoId, name: custo.name }
+      });
+      
+      return NextResponse.json({ success: true, message: 'Custo cadastrado com sucesso!', custo });
+    }
+    
+    // LIST CUSTOS
+    if (endpoint === 'custos/list') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const custos = await db.collection('custos')
+        .find({})
+        .sort({ name: 1 })
+        .toArray();
+      
+      return NextResponse.json({ custos });
+    }
+    
+    // UPDATE CUSTO
+    if (endpoint === 'custos/update') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const { custoId, custoData } = await request.json();
+      
+      await db.collection('custos').updateOne(
+        { custoId },
+        { $set: { ...custoData, updatedAt: getBrazilTime().toISOString() } }
+      );
+      
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'update_custo',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { custoId, updates: Object.keys(custoData) }
+      });
+      
+      return NextResponse.json({ success: true, message: 'Custo atualizado com sucesso!' });
+    }
+    
+    // DELETE CUSTO
+    if (endpoint === 'custos/delete') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const { custoId } = await request.json();
+      
+      await db.collection('custos').deleteOne({ custoId });
+      
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'delete_custo',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { custoId }
+      });
+      
+      return NextResponse.json({ success: true, message: 'Custo excluído com sucesso!' });
+    }
+    
     // PUBLIC: GET ALL ROLES (para cadastro público)
     if (endpoint === 'public/roles') {
       try {
