@@ -3400,7 +3400,9 @@ export default function App() {
                                       className="w-full bg-blue-600 hover:bg-blue-700"
                                       onClick={() => {
                                         setEditingEntry({ day, timeSlot });
-                                        setEntryValue('');
+                                        setEntryDinheiro('');
+                                        setEntryPix('');
+                                        setEntryMaquineta('');
                                         setEntryNotes('');
                                       }}
                                     >
