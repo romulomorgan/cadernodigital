@@ -176,6 +176,16 @@ export default function App() {
   const [newRoleName, setNewRoleName] = useState('');
   const [newRoleDescription, setNewRoleDescription] = useState('');
   
+  // Estados para Custos
+  const [allCustos, setAllCustos] = useState([]);
+  const [selectedCusto, setSelectedCusto] = useState(null);
+  const [newCustoName, setNewCustoName] = useState('');
+  const [showCustoCreateModal, setShowCustoCreateModal] = useState(false);
+  const [showCustoViewModal, setShowCustoViewModal] = useState(false);
+  const [showCustoEditModal, setShowCustoEditModal] = useState(false);
+  const [showCustoDeleteConfirm, setShowCustoDeleteConfirm] = useState(false);
+  const [custosSearchQuery, setCustosSearchQuery] = useState('');
+  
   // States para formulário de igreja
   const [newChurchName, setNewChurchName] = useState('');
   const [newChurchCEP, setNewChurchCEP] = useState('');
