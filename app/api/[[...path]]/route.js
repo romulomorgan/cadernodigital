@@ -771,7 +771,13 @@ export async function POST(request) {
       }
       
       const userData = await db.collection('users').findOne({ userId: user.userId });
-      const { month, year, day, timeSlot, value, notes } = await request.json();
+      const { month, year, day, timeSlot, value, notes, dinheiro, pix, maquineta } = await request.json();
+      
+      // Calcular valor total a partir dos 3 campos (se fornecidos) ou usar o campo value (compatibilidade)
+      const valorDinheiro = parseFloat(dinheiro) || 0;
+      const valorPix = parseFloat(pix) || 0;
+      const valorMaquineta = parseFloat(maquineta) || 0;
+      const valorTotal = value !== undefined ? parseFloat(value) : (valorDinheiro + valorPix + valorMaquineta);
       
       const entryId = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}-${timeSlot}`;
       const existing = await db.collection('entries').findOne({ entryId });
