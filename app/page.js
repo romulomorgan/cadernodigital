@@ -3259,6 +3259,84 @@ export default function App() {
                           const isPending = hasPendingRequest(day, timeSlot);
                           const isApproved = hasActiveOverride(day, timeSlot);
                           
+                          // RENDERIZAÇÃO ESPECIAL PARA MASTER (VISUALIZAÇÃO APENAS)
+                          if (user?.role === 'master') {
+                            return (
+                              <div key={timeSlot} className="border-2 border-purple-200 rounded-lg p-3 bg-purple-50/30 hover:border-purple-400 transition-colors">
+                                <div className="flex items-center justify-between mb-2">
+                                  <Badge variant="outline" className="font-semibold text-purple-900">
+                                    {timeSlot}
+                                  </Badge>
+                                  {lockStatus.locked ? (
+                                    <Lock className="w-4 h-4 text-red-600" />
+                                  ) : (
+                                    <Unlock className="w-4 h-4 text-green-600" />
+                                  )}
+                                </div>
+                                
+                                {entry && entry.totalValue > 0 ? (
+                                  <div className="space-y-2">
+                                    {/* Total Geral */}
+                                    <div className="bg-blue-100 border-2 border-blue-400 rounded-lg p-2">
+                                      <p className="text-xs text-blue-700 font-semibold mb-1">💰 TOTAL GERAL</p>
+                                      <p className="text-2xl font-bold text-blue-900">
+                                        R$ {parseFloat(entry.totalValue || 0).toFixed(2).replace('.', ',')}
+                                      </p>
+                                    </div>
+                                    
+                                    {/* Discriminado */}
+                                    <div className="space-y-1 text-xs">
+                                      <div className="flex justify-between items-center">
+                                        <span className="text-green-700 font-semibold">💵 Dinheiro:</span>
+                                        <span className="font-bold text-green-800">R$ {parseFloat(entry.totalDinheiro || 0).toFixed(2).replace('.', ',')}</span>
+                                      </div>
+                                      <div className="flex justify-between items-center">
+                                        <span className="text-blue-700 font-semibold">📱 PIX:</span>
+                                        <span className="font-bold text-blue-800">R$ {parseFloat(entry.totalPix || 0).toFixed(2).replace('.', ',')}</span>
+                                      </div>
+                                      <div className="flex justify-between items-center">
+                                        <span className="text-purple-700 font-semibold">💳 Maquineta:</span>
+                                        <span className="font-bold text-purple-800">R$ {parseFloat(entry.totalMaquineta || 0).toFixed(2).replace('.', ',')}</span>
+                                      </div>
+                                    </div>
+                                    
+                                    {/* Contador de Igrejas */}
+                                    <div className="text-xs text-gray-600 text-center py-1">
+                                      🏛️ {entry.churchCount || 0} {entry.churchCount === 1 ? 'igreja' : 'igrejas'}
+                                    </div>
+                                    
+                                    {/* Botão Ver Detalhes */}
+                                    <Button
+                                      size="sm"
+                                      className="w-full bg-purple-600 hover:bg-purple-700"
+                                      onClick={() => {
+                                        setDetailsData({
+                                          day: entry.day,
+                                          timeSlot: entry.timeSlot,
+                                          month: entry.month,
+                                          year: entry.year,
+                                          totalValue: entry.totalValue,
+                                          totalDinheiro: entry.totalDinheiro,
+                                          totalPix: entry.totalPix,
+                                          totalMaquineta: entry.totalMaquineta,
+                                          churches: entry.churches || []
+                                        });
+                                        setShowDetailsModal(true);
+                                      }}
+                                    >
+                                      📊 Ver Detalhes
+                                    </Button>
+                                  </div>
+                                ) : (
+                                  <div className="text-center py-4 text-gray-400">
+                                    <p className="text-xs">Sem ofertas</p>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          }
+                          
+                          // RENDERIZAÇÃO NORMAL PARA PASTORES
                           return (
                             <div key={timeSlot} className="border-2 border-gray-200 rounded-lg p-3 hover:border-blue-300 transition-colors">
                               <div className="flex items-center justify-between mb-2">
