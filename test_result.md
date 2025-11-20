@@ -1056,3 +1056,81 @@ agent_communication:
           - ✅ Fotos existentes agora acessíveis via browser
           
           📊 RESULTADO: SERVIR FOTOS DE IGREJAS FUNCIONANDO 100%
+
+  - task: "POST /custos/create - Criar tipo de custo (Master apenas)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          ✅ IMPLEMENTADO - Backend de custos completo
+          
+          Endpoint implementado nas linhas 325-354 do route.js:
+          - ✅ Verifica autenticação Master
+          - ✅ Valida nome do custo (obrigatório)
+          - ✅ Gera custoId com UUID
+          - ✅ Salva na collection 'custos'
+          - ✅ Registra audit log com action 'create_custo'
+          - ✅ Retorna custo criado
+          
+          PRECISA TESTAR: Autenticação, validações, persistência no DB, audit log
+
+  - task: "POST /custos/list - Listar tipos de custos (Master apenas)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          ✅ IMPLEMENTADO - Endpoint implementado nas linhas 357-369
+          - ✅ Verifica autenticação Master
+          - ✅ Lista todos os custos ordenados por nome
+          - ✅ Retorna array de custos
+          
+          PRECISA TESTAR: Autenticação, listagem, ordenação
+
+  - task: "POST /custos/update - Atualizar tipo de custo (Master apenas)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          ✅ IMPLEMENTADO - Endpoint implementado nas linhas 372-394
+          - ✅ Verifica autenticação Master
+          - ✅ Atualiza custo com custoData
+          - ✅ Adiciona updatedAt timestamp
+          - ✅ Registra audit log com action 'update_custo'
+          
+          PRECISA TESTAR: Autenticação, atualização, timestamps, audit log
+
+  - task: "POST /custos/delete - Excluir tipo de custo (Master apenas)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          ✅ IMPLEMENTADO - Endpoint implementado nas linhas 397-416
+          - ✅ Verifica autenticação Master
+          - ✅ Exclui custo da collection
+          - ✅ Registra audit log com action 'delete_custo'
+          
+          PRECISA TESTAR: Autenticação, exclusão, audit log
