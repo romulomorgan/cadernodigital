@@ -5618,6 +5618,50 @@ export default function App() {
                         </ul>
                       </div>
                       
+                      {/* Botão: Limpar apenas ofertas órfãs */}
+                      <Button
+                        onClick={async () => {
+                          if (!confirm('🔍 Limpar Ofertas Órfãs?\n\nSerão removidas apenas ofertas que:\n- Não têm igreja associada\n- Estão ligadas a igrejas que não existem mais\n\nOfertas válidas serão mantidas.\n\nConfirmar?')) {
+                            return;
+                          }
+                          
+                          try {
+                            const res = await fetch('/api/entries/cleanup-orphans', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                              }
+                            });
+                            
+                            const data = await res.json();
+                            if (res.ok) {
+                              toast.success(
+                                `✅ ${data.message}\n\n` +
+                                `📊 Verificadas: ${data.stats.totalChecked}\n` +
+                                `🔍 Órfãs encontradas: ${data.stats.orphansFound}\n` +
+                                `🗑️ Removidas: ${data.stats.orphansDeleted}\n` +
+                                `✅ Válidas mantidas: ${data.stats.validEntriesRemaining}\n` +
+                                `🏛️ Igrejas válidas: ${data.stats.validChurches.join(', ')}`
+                              );
+                              // Recarregar dados
+                              fetchEntries();
+                              fetchDashboardData();
+                              fetchStats();
+                            } else {
+                              toast.error('❌ ' + data.error);
+                            }
+                          } catch (error) {
+                            toast.error('❌ Erro ao limpar ofertas órfãs');
+                          }
+                        }}
+                        className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+                      >
+                        <AlertCircle className="w-4 h-4 mr-2" />
+                        🧹 LIMPAR APENAS OFERTAS ÓRFÃS
+                      </Button>
+                      
+                      {/* Botão: Limpar TODAS as ofertas */}
                       <Button
                         onClick={async () => {
                           if (!confirm('⚠️ TEM CERTEZA ABSOLUTA?\n\nTodas as ofertas serão PERMANENTEMENTE excluídas!\n\nEsta ação NÃO pode ser desfeita.\n\nDigite OK para confirmar:') === true) {
