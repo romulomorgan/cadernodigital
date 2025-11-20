@@ -338,6 +338,7 @@ export default function App() {
       
       if (user?.role === 'master') {
         fetchUnlockRequests();
+        fetchAllChurches(); // Carregar igrejas para o filtro
         fetchAllUsers();
         fetchStats();
       }
