@@ -1107,6 +1107,65 @@ agent_communication:
       🎯 STATUS: CRUD COMPLETO DE IGREJAS E FUNÇÕES FUNCIONANDO 100%
       
       RECOMENDAÇÃO: Main agent pode finalizar e fazer summary do sistema completo.
+  - agent: "main"
+    message: |
+      ✅ NOVA IMPLEMENTAÇÃO CONCLUÍDA - NOV 20, 2025
+      
+      🎯 OBJETIVO: Substituir "Painel Master" por abas "Custos" e "Estatística"
+      
+      IMPLEMENTAÇÕES REALIZADAS:
+      
+      1. ✅ BACKEND - CUSTOS (route.js):
+         - POST /api/custos/create (linhas 325-354)
+         - POST /api/custos/list (linhas 357-369)
+         - POST /api/custos/update (linhas 372-394)
+         - POST /api/custos/delete (linhas 397-416)
+         - Todos com autenticação Master, validações e audit logs
+      
+      2. ✅ FRONTEND - ABA CUSTOS (page.js):
+         - Estados completos para gerenciamento (linhas 180-187)
+         - Filtro custosFiltrados (linha ~242)
+         - useEffect para auto-carregar (linha ~542)
+         - Funções CRUD completas (linhas ~1659-1771)
+         - TabsContent com listagem e busca
+         - 4 modais: Criar, Visualizar, Editar, Excluir (após linha 4737)
+      
+      3. ✅ FRONTEND - ABA ESTATÍSTICA (page.js):
+         - Dashboard com 6 cards de métricas:
+           • Total de Usuários
+           • Total de Igrejas
+           • Funções Cadastradas
+           • Tipos de Custos
+           • Ofertas Registradas
+           • Usuários Ativos
+         - Card de Resumo Geral com percentuais
+         - Design colorido e responsivo
+      
+      4. ✅ REORGANIZAÇÃO DAS ABAS (página 2660):
+         - Nova ordem: Funções > Usuários > Igrejas > Custos > Estatística > Auditoria
+         - Custos agora aparece DEPOIS de Igrejas conforme solicitado
+      
+      ARQUIVOS MODIFICADOS:
+      - /app/app/page.js: 
+        • Adicionados estados de Custos
+        • Adicionado filtro custosFiltrados
+        • Adicionado useEffect para carregar custos
+        • Implementadas funções CRUD de custos
+        • Adicionado TabsContent de Custos (completo com CRUD)
+        • Adicionado TabsContent de Estatística (dashboard com métricas)
+        • Reorganizada ordem dos TabsTrigger
+        • Adicionados 4 modais CRUD para Custos
+      
+      - /app/app/api/[[...path]]/route.js:
+        • Backend de Custos já estava implementado desde versão anterior
+      
+      PRÓXIMOS PASSOS:
+      1. Testar backend de Custos (CRUD completo)
+      2. Testar frontend da aba Custos (criar, listar, editar, excluir)
+      3. Testar aba Estatística (verificar se métricas são exibidas corretamente)
+      4. Verificar ordem das abas no navegador
+      
+      OBSERVAÇÃO: URL de desenvolvimento mantida conforme solicitado (NEXT_PUBLIC_BASE_URL no .env)
 
   - task: "POST /roles/list - Listar funções/roles"
     implemented: true
