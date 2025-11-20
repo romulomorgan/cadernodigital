@@ -6155,6 +6155,175 @@ export default function App() {
         </DialogContent>
       </Dialog>
       
+      {/* MODAL DE DETALHES (MASTER) - FASE 4 */}
+      <Dialog open={showDetailsModal} onOpenChange={setShowDetailsModal}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <BarChart3 className="w-6 h-6 text-purple-600" />
+              📊 Detalhes - Dia {detailsData?.day && String(detailsData.day).padStart(2, '0')}/{detailsData?.month && String(detailsData.month).padStart(2, '0')}/{detailsData?.year} às {detailsData?.timeSlot}
+            </DialogTitle>
+            <DialogDescription>
+              Visualização detalhada de todas as igrejas que fizeram ofertas neste horário
+            </DialogDescription>
+          </DialogHeader>
+          
+          {detailsData && (
+            <div className="space-y-6 py-4">
+              {/* Resumo Geral */}
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-300 rounded-lg p-4">
+                <h3 className="text-lg font-bold text-blue-900 mb-3">💰 RESUMO GERAL</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600">Total Geral</p>
+                    <p className="text-2xl font-bold text-blue-900">
+                      R$ {parseFloat(detailsData.totalValue || 0).toFixed(2).replace('.', ',')}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-green-700 font-semibold">💵 Dinheiro</p>
+                    <p className="text-xl font-bold text-green-800">
+                      R$ {parseFloat(detailsData.totalDinheiro || 0).toFixed(2).replace('.', ',')}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-blue-700 font-semibold">📱 PIX</p>
+                    <p className="text-xl font-bold text-blue-800">
+                      R$ {parseFloat(detailsData.totalPix || 0).toFixed(2).replace('.', ',')}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-purple-700 font-semibold">💳 Maquineta</p>
+                    <p className="text-xl font-bold text-purple-800">
+                      R$ {parseFloat(detailsData.totalMaquineta || 0).toFixed(2).replace('.', ',')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <hr className="border-gray-300" />
+              
+              {/* Lista de Igrejas */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-bold text-gray-800">🏛️ Detalhamento por Igreja</h3>
+                
+                {detailsData.churches && detailsData.churches.length > 0 ? (
+                  detailsData.churches.map((church, index) => (
+                    <Card key={index} className="border-2 border-gray-300">
+                      <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100">
+                        <CardTitle className="text-base flex items-center justify-between">
+                          <span className="flex items-center gap-2">
+                            🏛️ <span className="font-bold text-gray-800">{church.churchName || 'Igreja sem nome'}</span>
+                          </span>
+                          <Badge variant="outline" className="text-sm">
+                            💰 R$ {parseFloat(church.value || 0).toFixed(2).replace('.', ',')}
+                          </Badge>
+                        </CardTitle>
+                        <CardDescription>
+                          👤 Pastor: {church.userName || 'N/A'}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="pt-4 space-y-3">
+                        {/* Valores Discriminados */}
+                        <div className="grid grid-cols-3 gap-3">
+                          <div className="bg-green-50 border border-green-200 rounded p-2 text-center">
+                            <p className="text-xs text-green-700 font-semibold">💵 Dinheiro</p>
+                            <p className="text-lg font-bold text-green-800">
+                              R$ {parseFloat(church.dinheiro || 0).toFixed(2).replace('.', ',')}
+                            </p>
+                          </div>
+                          <div className="bg-blue-50 border border-blue-200 rounded p-2 text-center">
+                            <p className="text-xs text-blue-700 font-semibold">📱 PIX</p>
+                            <p className="text-lg font-bold text-blue-800">
+                              R$ {parseFloat(church.pix || 0).toFixed(2).replace('.', ',')}
+                            </p>
+                          </div>
+                          <div className="bg-purple-50 border border-purple-200 rounded p-2 text-center">
+                            <p className="text-xs text-purple-700 font-semibold">💳 Maquineta</p>
+                            <p className="text-lg font-bold text-purple-800">
+                              R$ {parseFloat(church.maquineta || 0).toFixed(2).replace('.', ',')}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* Observações */}
+                        {church.notes && (
+                          <div className="bg-amber-50 border border-amber-200 rounded p-3">
+                            <p className="text-xs text-amber-700 font-semibold mb-1">📝 Observações:</p>
+                            <p className="text-sm text-amber-900">{church.notes}</p>
+                          </div>
+                        )}
+                        
+                        {/* Comprovantes */}
+                        {church.receipts && church.receipts.length > 0 && (
+                          <div className="bg-blue-50 border border-blue-200 rounded p-3">
+                            <p className="text-xs text-blue-700 font-semibold mb-2">📎 Comprovantes ({church.receipts.length}):</p>
+                            <div className="flex flex-wrap gap-2">
+                              {church.receipts.map((receipt, idx) => (
+                                <div key={idx} className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => {
+                                      setViewingReceipts({
+                                        entryId: `${detailsData.year}-${String(detailsData.month).padStart(2, '0')}-${String(detailsData.day).padStart(2, '0')}-${detailsData.timeSlot}`,
+                                        receipts: church.receipts,
+                                        currentIndex: idx
+                                      });
+                                    }}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                                  >
+                                    <Eye className="w-3 h-3 mr-1" />
+                                    Ver
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={async () => {
+                                      try {
+                                        const link = document.createElement('a');
+                                        link.href = `/api/download/receipt/${receipt.filepath}`;
+                                        link.download = receipt.filename;
+                                        link.target = '_blank';
+                                        document.body.appendChild(link);
+                                        link.click();
+                                        document.body.removeChild(link);
+                                        toast.success('📥 Download iniciado: ' + receipt.filename);
+                                      } catch (error) {
+                                        toast.error('❌ Erro ao baixar comprovante');
+                                      }
+                                    }}
+                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                  >
+                                    <Download className="w-3 h-3 mr-1" />
+                                    Baixar
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>Nenhuma igreja registrada neste horário</p>
+                  </div>
+                )}
+              </div>
+              
+              {/* Botão Fechar */}
+              <div className="flex justify-end pt-4 border-t">
+                <Button onClick={() => setShowDetailsModal(false)} variant="outline">
+                  Fechar
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      
       {/* Dialog de Confirmação de Logout */}
       <Dialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
         <DialogContent className="sm:max-w-md">
