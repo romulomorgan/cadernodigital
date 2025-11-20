@@ -1023,7 +1023,7 @@ export async function POST(request) {
       
       const userData = await db.collection('users').findOne({ userId: user.userId });
       const body = await request.json();
-      const { month, year } = body;
+      const { month, year, churchFilter } = body;
       
       // Build filter based on user scope
       let filter = { 
@@ -1031,8 +1031,12 @@ export async function POST(request) {
         year: parseInt(year) 
       };
       
-      // MASTER vê tudo
+      // MASTER vê tudo (ou filtra por igreja se especificado)
       if (userData.role === 'master' || userData.scope === 'global') {
+        // Se há filtro de igreja específica, aplicar
+        if (churchFilter && churchFilter !== 'all') {
+          filter.churchId = churchFilter;
+        }
         // Sem filtros adicionais - vê tudo
       } 
       // LEADER vê por hierarquia (state/region/church)
