@@ -1166,6 +1166,68 @@ agent_communication:
       4. Verificar ordem das abas no navegador
       
       OBSERVAÇÃO: URL de desenvolvimento mantida conforme solicitado (NEXT_PUBLIC_BASE_URL no .env)
+  - agent: "main"
+    message: |
+      ✅ CORREÇÕES DE INTEGRIDADE DE DADOS - NOV 20, 2025
+      
+      🎯 OBJETIVO: Garantir consistência dos dados e facilitar reset completo
+      
+      PROBLEMAS IDENTIFICADOS PELO USUÁRIO:
+      1. Ofertas ligadas a igrejas inexistentes (ofertas órfãs)
+      2. Necessidade de limpar banco para recomeçar do zero
+      3. Somatórios de relatórios não correspondem à realidade
+      4. Dropdown de filtro de igreja não filtra automaticamente
+      
+      IMPLEMENTAÇÕES REALIZADAS:
+      
+      1. ✅ BACKEND - ENDPOINT DE LIMPEZA (route.js linha ~418):
+         - POST /api/entries/clear-all (Master apenas)
+         - Verifica e conta ofertas órfãs antes de excluir
+         - Deleta TODAS as ofertas do banco
+         - Registra detalhes no audit log:
+           • Total de ofertas excluídas
+           • Número de ofertas órfãs encontradas
+           • Detalhes das ofertas órfãs (churchId, date, value)
+         - Retorna estatísticas da operação
+      
+      2. ✅ FRONTEND - CARD DE LIMPEZA (page.js linha ~5584):
+         - Novo card "Limpeza de Dados" no Painel Master
+         - Avisos claros sobre irreversibilidade da ação
+         - Dupla confirmação:
+           1. Confirm dialog com aviso
+           2. Prompt exigindo digitação de "EXCLUIR TUDO"
+         - Mostra resultados: total excluído e ofertas órfãs
+         - Recarrega automaticamente: entries, dashboard, stats
+      
+      3. ✅ CORREÇÃO DO FILTRO AUTOMÁTICO (page.js linha ~2842):
+         - Corrigido: chamava fetchMonthEntries() que não existia
+         - Agora chama fetchEntries() corretamente
+         - Filtro aplica automaticamente ao selecionar igreja
+         - Botão "Limpar Filtro" funcional
+      
+      ARQUIVOS MODIFICADOS:
+      - /app/app/api/[[...path]]/route.js:
+        • Adicionado endpoint POST /api/entries/clear-all
+        • Verificação de ofertas órfãs
+        • Registro detalhado em audit_logs
+      
+      - /app/app/page.js:
+        • Adicionado card "Limpeza de Dados" no Painel Master
+        • Dupla confirmação de segurança
+        • Corrigido filtro automático de igreja (fetchMonthEntries → fetchEntries)
+      
+      PRÓXIMOS PASSOS:
+      1. Usuário pode limpar todas as ofertas via Painel Master
+      2. Recadastrar igrejas e usuários corretamente
+      3. Pastores se logar e fazer ofertas nas suas respectivas igrejas
+      4. Garantir que somatórios correspondam à realidade
+      
+      FUNCIONALIDADES GARANTIDAS:
+      - ✅ Limpeza completa de ofertas com um clique
+      - ✅ Detecção e remoção de ofertas órfãs
+      - ✅ Filtro de igreja funciona automaticamente
+      - ✅ Audit log completo de todas as operações
+      - ✅ Impossível excluir acidentalmente (dupla confirmação)
 
   - task: "POST /roles/list - Listar funções/roles"
     implemented: true
