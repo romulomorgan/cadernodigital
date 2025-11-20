@@ -5892,32 +5892,40 @@ export default function App() {
           {viewingReceipts && viewingReceipts.receipts && viewingReceipts.receipts.length > 0 && (
             <div className="space-y-4">
               {/* Receipt Display */}
-              <div className="relative border-2 border-gray-200 rounded-lg overflow-hidden bg-gray-50 min-h-[400px] flex items-center justify-center">
+              <div className="relative border-2 border-gray-200 rounded-lg overflow-hidden bg-gray-50 min-h-[400px]">
                 {viewingReceipts.receipts[viewingReceipts.currentIndex]?.fileType?.includes('pdf') ? (
-                  <div className="text-center p-8">
-                    <FileText className="w-16 h-16 mx-auto mb-4 text-red-600" />
-                    <p className="font-semibold mb-2">Arquivo PDF</p>
-                    <p className="text-sm text-gray-600 mb-4">
-                      {viewingReceipts.receipts[viewingReceipts.currentIndex]?.filename}
-                    </p>
-                    <Button
-                      onClick={() => {
-                        const receipt = viewingReceipts.receipts[viewingReceipts.currentIndex];
-                        window.open(`/api/view/receipt/${receipt.filepath}`, '_blank');
-                      }}
-                      className="bg-red-600 hover:bg-red-700"
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      Abrir PDF em Nova Aba
-                    </Button>
+                  <div className="w-full h-full min-h-[600px]">
+                    <iframe
+                      src={`/api/view/receipt/${viewingReceipts.receipts[viewingReceipts.currentIndex]?.filepath}`}
+                      className="w-full h-[600px] border-0"
+                      title="Visualizar PDF"
+                    />
+                    <div className="p-4 bg-gray-100 border-t flex justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-5 h-5 text-red-600" />
+                        <span className="text-sm font-semibold">Arquivo PDF</span>
+                      </div>
+                      <Button
+                        onClick={() => {
+                          const receipt = viewingReceipts.receipts[viewingReceipts.currentIndex];
+                          window.open(`/api/view/receipt/${receipt.filepath}`, '_blank');
+                        }}
+                        size="sm"
+                        className="bg-red-600 hover:bg-red-700"
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        Abrir em Nova Aba
+                      </Button>
+                    </div>
                   </div>
                 ) : (
-                  <img
-                    src={`/api/view/receipt/${viewingReceipts.receipts[viewingReceipts.currentIndex]?.filepath}`}
-                    alt="Comprovante"
-                    className="max-w-full max-h-[600px] object-contain"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
+                  <div className="flex items-center justify-center min-h-[400px]">
+                    <img
+                      src={`/api/view/receipt/${viewingReceipts.receipts[viewingReceipts.currentIndex]?.filepath}`}
+                      alt="Comprovante"
+                      className="max-w-full max-h-[600px] object-contain"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
                       e.target.nextSibling.style.display = 'block';
                     }}
                   />
