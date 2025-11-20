@@ -1657,6 +1657,116 @@ export default function App() {
     }
   };
   
+  // ========== FUNÇÕES CRUD - CUSTOS ==========
+  
+  const fetchAllCustos = async () => {
+    try {
+      const res = await fetch('/api/custos/list', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setAllCustos(data.custos || []);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar custos:', error);
+    }
+  };
+  
+  const handleCreateCusto = async () => {
+    if (!newCustoName || !newCustoName.trim()) {
+      toast.error('❌ Nome do custo é obrigatório');
+      return;
+    }
+    
+    try {
+      const res = await fetch('/api/custos/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ name: newCustoName.trim() })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        setShowCustoCreateModal(false);
+        setNewCustoName('');
+        await fetchAllCustos();
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao criar custo');
+    }
+  };
+  
+  const handleUpdateCusto = async () => {
+    if (!newCustoName || !newCustoName.trim()) {
+      toast.error('❌ Nome do custo é obrigatório');
+      return;
+    }
+    
+    try {
+      const res = await fetch('/api/custos/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          custoId: selectedCusto.custoId,
+          custoData: { name: newCustoName.trim() }
+        })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        setShowCustoEditModal(false);
+        setNewCustoName('');
+        setSelectedCusto(null);
+        await fetchAllCustos();
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao atualizar custo');
+    }
+  };
+  
+  const handleDeleteCusto = async (custoId) => {
+    try {
+      const res = await fetch('/api/custos/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ custoId })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        setShowCustoDeleteConfirm(false);
+        setSelectedCusto(null);
+        await fetchAllCustos();
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao excluir custo');
+    }
+  };
+  
   // ========== FUNÇÕES CRUD - USUÁRIOS ==========
   
   const fetchUsuarios = async () => {
