@@ -537,14 +537,14 @@ export default function App() {
     if (isAuthenticated && activeTab === 'funcoes' && token && user?.role === 'master') {
       fetchAllRoles();
     }
-  }, [isAuthenticated, activeTab, token, user]);
+  }, [isAuthenticated, activeTab, token]);
   
   // Carregar custos quando entrar na aba custos
   useEffect(() => {
     if (isAuthenticated && activeTab === 'custos' && token && user?.role === 'master') {
       fetchAllCustos();
     }
-  }, [isAuthenticated, activeTab, token, user]);
+  }, [isAuthenticated, activeTab, token]);
   
   // Carregar usuários e igrejas quando entrar na aba usuarios
   useEffect(() => {
@@ -553,7 +553,7 @@ export default function App() {
       fetchAllChurches();
       fetchAllRolesForDropdowns(); // Buscar roles para dropdowns
     }
-  }, [isAuthenticated, activeTab, token, user]);
+  }, [isAuthenticated, activeTab, token]);
   
   // Buscar igrejas e roles públicas para o formulário de registro (sem autenticação)
   useEffect(() => {
