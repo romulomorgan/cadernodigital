@@ -228,6 +228,11 @@ export default function App() {
     return r.name?.toLowerCase().includes(query);
   });
   
+  // Filtrar entries (ofertas) por igreja selecionada (apenas para Master)
+  const entriesFiltradas = user?.role === 'master' && selectedChurchFilter !== 'all'
+    ? entries.filter(entry => entry.churchId === selectedChurchFilter)
+    : entries;
+  
   // Filtrar usuários com base na busca
   const usuariosFiltrados = usuarios.filter(u => {
     if (!usuariosSearchQuery) return true;
