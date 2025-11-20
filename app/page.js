@@ -539,6 +539,13 @@ export default function App() {
     }
   }, [isAuthenticated, activeTab, token, user]);
   
+  // Carregar custos quando entrar na aba custos
+  useEffect(() => {
+    if (isAuthenticated && activeTab === 'custos' && token && user?.role === 'master') {
+      fetchAllCustos();
+    }
+  }, [isAuthenticated, activeTab, token, user]);
+  
   // Carregar usuários e igrejas quando entrar na aba usuarios
   useEffect(() => {
     if (isAuthenticated && activeTab === 'usuarios' && token && user?.role === 'master') {
