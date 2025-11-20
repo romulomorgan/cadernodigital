@@ -1051,7 +1051,61 @@ export async function POST(request) {
       
       console.log('[ENTRIES/MONTH] User:', userData.userId, 'Role:', userData.role, 'Filter:', JSON.stringify(filter));
       
-      const entries = await db.collection('entries').find(filter).toArray();
+      let entries = await db.collection('entries').find(filter).toArray();
+      
+      // Se for MASTER, agregar dados por horário
+      if (userData.role === 'master') {
+        const aggregatedEntries = {};
+        
+        entries.forEach(entry => {
+          const key = entry.entryId;
+          
+          if (!aggregatedEntries[key]) {
+            aggregatedEntries[key] = {
+              entryId: entry.entryId,
+              month: entry.month,
+              year: entry.year,
+              day: entry.day,
+              timeSlot: entry.timeSlot,
+              totalValue: 0,
+              totalDinheiro: 0,
+              totalPix: 0,
+              totalMaquineta: 0,
+              churchCount: 0,
+              churches: [],
+              timeWindowLocked: entry.timeWindowLocked,
+              masterUnlocked: entry.masterUnlocked,
+              createdAt: entry.createdAt,
+              updatedAt: entry.updatedAt
+            };
+          }
+          
+          // Agregar valores
+          aggregatedEntries[key].totalValue += (entry.value || 0);
+          aggregatedEntries[key].totalDinheiro += (entry.dinheiro || 0);
+          aggregatedEntries[key].totalPix += (entry.pix || 0);
+          aggregatedEntries[key].totalMaquineta += (entry.maquineta || 0);
+          aggregatedEntries[key].churchCount++;
+          
+          // Adicionar detalhes da igreja
+          aggregatedEntries[key].churches.push({
+            churchId: entry.churchId,
+            churchName: entry.church,
+            value: entry.value || 0,
+            dinheiro: entry.dinheiro || 0,
+            pix: entry.pix || 0,
+            maquineta: entry.maquineta || 0,
+            notes: entry.notes || '',
+            userName: entry.userName,
+            userId: entry.userId,
+            receipts: entry.receipts || [],
+            hasReceipts: (entry.receipts || []).length > 0
+          });
+        });
+        
+        // Converter para array
+        entries = Object.values(aggregatedEntries);
+      }
       
       // Get month status
       const monthStatus = await db.collection('month_status').findOne({ month: parseInt(month), year: parseInt(year) });
