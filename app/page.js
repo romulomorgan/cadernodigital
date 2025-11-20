@@ -2690,8 +2690,49 @@ export default function App() {
                   </Button>
                 </div>
                 
-                {/* Filtros Hierárquicos - FASE 3 */}
-                {(user?.role === 'master' || user?.scope === 'global') && (availableStates.length > 0 || availableRegions.length > 0 || availableChurches.length > 0) && (
+                {/* Filtro de Igreja - Líder Máximo */}
+                {user?.role === 'master' && (
+                  <div className="mt-4 p-4 bg-blue-50 rounded-lg border-2 border-blue-300">
+                    <div className="flex items-center gap-3">
+                      <Label className="text-sm font-semibold text-blue-900">🏛️ Filtrar por Igreja:</Label>
+                      <Select 
+                        value={selectedChurchFilter} 
+                        onValueChange={(value) => {
+                          setSelectedChurchFilter(value);
+                          // Recarregar dados com novo filtro
+                          fetchMonthEntries();
+                        }}
+                      >
+                        <SelectTrigger className="w-[300px] bg-white border-blue-300">
+                          <SelectValue placeholder="Selecione a igreja" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all" className="font-semibold">
+                            📊 Todas as Igrejas
+                          </SelectItem>
+                          {allChurches.map(church => (
+                            <SelectItem key={church.churchId} value={church.churchId}>
+                              🏛️ {church.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {selectedChurchFilter !== 'all' && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setSelectedChurchFilter('all')}
+                          className="h-8 text-xs text-blue-600"
+                        >
+                          Limpar Filtro ✕
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Filtros para outros usuários (mantidos) */}
+                {user?.role !== 'master' && (availableStates.length > 0 || availableRegions.length > 0 || availableChurches.length > 0) && (
                   <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                     <div className="flex items-center gap-2 mb-3">
                       <Badge className="bg-blue-600">🔍 Filtros Hierárquicos</Badge>
