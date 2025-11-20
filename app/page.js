@@ -68,6 +68,7 @@ export default function App() {
   // Calendar states
   const [currentDate, setCurrentDate] = useState(new Date());
   const [entries, setEntries] = useState([]);
+  const [selectedChurchFilter, setSelectedChurchFilter] = useState('all'); // Filtro de igreja
   const [monthClosed, setMonthClosed] = useState(false);
   const [monthObservation, setMonthObservation] = useState('');
   const [monthObservationActive, setMonthObservationActive] = useState(false);
