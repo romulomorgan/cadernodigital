@@ -3325,7 +3325,9 @@ export default function App() {
                                         className="w-full"
                                         onClick={() => {
                                           setEditingEntry({ day, timeSlot });
-                                          setEntryValue(entry.value.toString());
+                                          setEntryDinheiro((entry.dinheiro || 0).toString());
+                                          setEntryPix((entry.pix || 0).toString());
+                                          setEntryMaquineta((entry.maquineta || 0).toString());
                                           setEntryNotes(entry.notes || '');
                                         }}
                                       >
