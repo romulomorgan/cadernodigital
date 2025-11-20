@@ -3373,7 +3373,9 @@ export default function App() {
                                         className="w-full bg-green-600 hover:bg-green-700"
                                         onClick={() => {
                                           setEditingEntry({ day, timeSlot });
-                                          setEntryValue('');
+                                          setEntryDinheiro('');
+                                          setEntryPix('');
+                                          setEntryMaquineta('');
                                           setEntryNotes('');
                                         }}
                                       >
