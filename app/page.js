@@ -6225,8 +6225,14 @@ export default function App() {
                             💰 R$ {parseFloat(church.value || 0).toFixed(2).replace('.', ',')}
                           </Badge>
                         </CardTitle>
-                        <CardDescription>
-                          👤 Pastor: {church.userName || 'N/A'}
+                        <CardDescription className="mt-2 space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-blue-900">👤 Responsável:</span>
+                            <span className="text-blue-700 font-medium">{church.userName || 'N/A'}</span>
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            Lançamento realizado neste dia e horário
+                          </div>
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="pt-4 space-y-3">
