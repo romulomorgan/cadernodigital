@@ -403,6 +403,11 @@ export default function App() {
         year: currentDate.getFullYear()
       };
       
+      // Adicionar filtro de igreja para Master
+      if (user?.role === 'master' && selectedChurchFilter && selectedChurchFilter !== 'all') {
+        body.churchFilter = selectedChurchFilter;
+      }
+      
       // Adicionar filtros se definidos (FASE 3)
       if (filterState) body.state = filterState;
       if (filterRegion) body.region = filterRegion;
