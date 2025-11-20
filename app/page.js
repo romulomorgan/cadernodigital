@@ -4736,6 +4736,192 @@ export default function App() {
             </DialogContent>
           </Dialog>
           
+          {/* ========== MODAIS CUSTOS ========== */}
+          
+          {/* Modal Criar Custo */}
+          <Dialog open={showCustoCreateModal} onOpenChange={setShowCustoCreateModal}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Cadastrar Novo Custo</DialogTitle>
+                <DialogDescription>
+                  Digite o nome do tipo de custo que deseja cadastrar
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4 py-4">
+                <div>
+                  <Label htmlFor="custo-name">Nome do Custo *</Label>
+                  <Input
+                    id="custo-name"
+                    value={newCustoName}
+                    onChange={(e) => setNewCustoName(e.target.value)}
+                    placeholder="Ex: Aluguel, Água, Luz, Telefone..."
+                    className="mt-1"
+                  />
+                </div>
+                
+                <div className="flex gap-3 justify-end pt-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setShowCustoCreateModal(false);
+                      setNewCustoName('');
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button 
+                    onClick={handleCreateCusto}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    Salvar
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+          
+          {/* Modal Visualizar Custo */}
+          <Dialog open={showCustoViewModal} onOpenChange={setShowCustoViewModal}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Detalhes do Custo</DialogTitle>
+              </DialogHeader>
+              
+              {selectedCusto && (
+                <div className="space-y-4 py-4">
+                  <div className="flex items-center gap-3 pb-4 border-b">
+                    <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                      <span className="text-2xl">💰</span>
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold">{selectedCusto.name}</h3>
+                      <p className="text-sm text-gray-500">Tipo de Custo</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <Label className="text-gray-500 text-sm">ID do Custo</Label>
+                      <p className="font-mono text-sm">{selectedCusto.custoId}</p>
+                    </div>
+                    
+                    <div>
+                      <Label className="text-gray-500 text-sm">Data de Criação</Label>
+                      <p className="font-medium">
+                        {new Date(selectedCusto.createdAt).toLocaleDateString('pt-BR', {
+                          day: '2-digit',
+                          month: 'long',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2 pt-4">
+                    <Button 
+                      onClick={() => {
+                        setShowCustoViewModal(false);
+                        setNewCustoName(selectedCusto.name);
+                        setShowCustoEditModal(true);
+                      }}
+                      className="flex-1"
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Editar
+                    </Button>
+                    <Button 
+                      onClick={() => {
+                        setShowCustoViewModal(false);
+                        setShowCustoDeleteConfirm(true);
+                      }}
+                      className="flex-1 bg-red-600 hover:bg-red-700"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Excluir
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+          
+          {/* Modal Editar Custo */}
+          <Dialog open={showCustoEditModal} onOpenChange={setShowCustoEditModal}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Editar Custo</DialogTitle>
+                <DialogDescription>
+                  Altere o nome do custo conforme necessário
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4 py-4">
+                <div>
+                  <Label htmlFor="edit-custo-name">Nome do Custo *</Label>
+                  <Input
+                    id="edit-custo-name"
+                    value={newCustoName}
+                    onChange={(e) => setNewCustoName(e.target.value)}
+                    placeholder="Nome do custo"
+                    className="mt-1"
+                  />
+                </div>
+                
+                <div className="flex gap-3 justify-end pt-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setShowCustoEditModal(false);
+                      setNewCustoName('');
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button 
+                    onClick={handleUpdateCusto}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    Salvar Alterações
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+          
+          {/* Modal Confirmar Exclusão de Custo */}
+          <Dialog open={showCustoDeleteConfirm} onOpenChange={setShowCustoDeleteConfirm}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Confirmar Exclusão</DialogTitle>
+                <DialogDescription>
+                  Tem certeza que deseja excluir o custo <strong>{selectedCusto?.name}</strong>? 
+                  Esta ação não pode ser desfeita.
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="flex gap-3 justify-end pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setShowCustoDeleteConfirm(false);
+                    setSelectedCusto(null);
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  onClick={() => handleDeleteCusto(selectedCusto?.custoId)}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  Sim, Excluir
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+          
           {/* IGREJAS TAB */}
           {user?.role === 'master' && (
             <TabsContent value="igrejas">
