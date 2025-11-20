@@ -5770,20 +5770,62 @@ export default function App() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="value">Valor (R$)</Label>
-                <Input
-                  id="value"
-                  type="number"
-                  step="0.01"
-                  value={entryValue}
-                  onChange={(e) => setEntryValue(e.target.value)}
-                  placeholder="0,00"
-                  className="mt-1"
-                />
+              {/* 3 Campos Separados: Dinheiro, PIX, Maquineta */}
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <Label htmlFor="dinheiro" className="text-xs font-semibold text-green-700">💵 Dinheiro (R$)</Label>
+                  <Input
+                    id="dinheiro"
+                    type="number"
+                    step="0.01"
+                    value={entryDinheiro}
+                    onChange={(e) => setEntryDinheiro(e.target.value)}
+                    placeholder="0,00"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="pix" className="text-xs font-semibold text-blue-700">📱 PIX (R$)</Label>
+                  <Input
+                    id="pix"
+                    type="number"
+                    step="0.01"
+                    value={entryPix}
+                    onChange={(e) => setEntryPix(e.target.value)}
+                    placeholder="0,00"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="maquineta" className="text-xs font-semibold text-purple-700">💳 Maquineta (R$)</Label>
+                  <Input
+                    id="maquineta"
+                    type="number"
+                    step="0.01"
+                    value={entryMaquineta}
+                    onChange={(e) => setEntryMaquineta(e.target.value)}
+                    placeholder="0,00"
+                    className="mt-1"
+                  />
+                </div>
               </div>
+              
+              {/* Valor Total Calculado Automaticamente */}
+              <div className="p-3 bg-blue-50 border-2 border-blue-300 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-blue-900">💰 Valor Total:</span>
+                  <span className="text-2xl font-bold text-blue-700">
+                    R$ {(
+                      (parseFloat(entryDinheiro) || 0) + 
+                      (parseFloat(entryPix) || 0) + 
+                      (parseFloat(entryMaquineta) || 0)
+                    ).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+              
               <div>
-                <Label htmlFor="notes">Observações</Label>
+                <Label htmlFor="notes">📝 Observações</Label>
                 <Textarea
                   id="notes"
                   value={entryNotes}
