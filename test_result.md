@@ -105,7 +105,11 @@
 user_problem_statement: |
   Sistema de gestão financeira ministerial "Caderno de Controle Online — IUDP" com hierarquia robusta, 
   controle administrativo, bloqueio de edição, auditoria, comparações e governança. Sistema Next.js + MongoDB.
-  Atualmente em FASE 2 - Governança de período e fechamento.
+  
+  ÚLTIMA ATUALIZAÇÃO: Substituição do "Painel Master" por novas abas "Custos" e "Estatística".
+  - Reorganização da ordem das abas: Funções > Usuários > Igrejas > Custos > Estatística > Auditoria
+  - Implementação completa do módulo CRUD de Custos
+  - Implementação da aba Estatística com métricas do sistema
 
 backend:
   - task: "POST /users/update - Atualizar usuário (Master apenas)"
