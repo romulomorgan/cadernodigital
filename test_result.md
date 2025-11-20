@@ -809,12 +809,18 @@ frontend:
 metadata:
   created_by: "main_agent"
   version: "1.0"
-  test_sequence: 2
+  test_sequence: 3
   run_ui: true
 
 test_plan:
   current_focus:
-    - "Correção de URLs de fotos das igrejas"
+    - "POST /custos/create - Criar tipo de custo"
+    - "POST /custos/list - Listar tipos de custos"
+    - "POST /custos/update - Atualizar tipo de custo"
+    - "POST /custos/delete - Excluir tipo de custo"
+    - "Aba Custos - UI completa com CRUD"
+    - "Aba Estatística - Dashboard com métricas"
+    - "Reorganização da ordem das abas Master"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
