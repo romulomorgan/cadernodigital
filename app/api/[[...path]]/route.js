@@ -415,6 +415,60 @@ export async function POST(request) {
       return NextResponse.json({ success: true, message: 'Custo excluído com sucesso!' });
     }
     
+    // LIMPAR TODAS AS OFERTAS (Master apenas)
+    if (endpoint === 'entries/clear-all') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      try {
+        // Primeiro, vamos verificar quantas ofertas existem
+        const entriesCount = await db.collection('entries').countDocuments();
+        
+        // Verificar ofertas órfãs (ligadas a igrejas que não existem)
+        const entries = await db.collection('entries').find({}).toArray();
+        const churches = await db.collection('churches').find({}).toArray();
+        const churchIds = new Set(churches.map(c => c.churchId));
+        
+        const orphanEntries = entries.filter(e => e.churchId && !churchIds.has(e.churchId));
+        
+        // Deletar TODAS as ofertas
+        const deleteResult = await db.collection('entries').deleteMany({});
+        
+        // Registrar no audit log
+        await db.collection('audit_logs').insertOne({
+          logId: crypto.randomUUID(),
+          action: 'clear_all_entries',
+          userId: user.userId,
+          timestamp: getBrazilTime().toISOString(),
+          details: {
+            totalDeleted: deleteResult.deletedCount,
+            entriesCount: entriesCount,
+            orphanEntries: orphanEntries.length,
+            orphanDetails: orphanEntries.map(e => ({
+              entryId: e.entryId,
+              churchId: e.churchId,
+              date: e.date,
+              value: e.value
+            }))
+          }
+        });
+        
+        return NextResponse.json({
+          success: true,
+          message: `✅ Todas as ofertas foram excluídas com sucesso!`,
+          details: {
+            totalDeleted: deleteResult.deletedCount,
+            orphanEntriesFound: orphanEntries.length
+          }
+        });
+      } catch (error) {
+        console.error('Erro ao limpar ofertas:', error);
+        return NextResponse.json({ error: 'Erro ao limpar ofertas' }, { status: 500 });
+      }
+    }
+    
     // PUBLIC: GET ALL ROLES (para cadastro público)
     if (endpoint === 'public/roles') {
       try {
