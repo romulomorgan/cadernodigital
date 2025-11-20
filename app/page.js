@@ -75,6 +75,9 @@ export default function App() {
   const [dayObservations, setDayObservations] = useState([]);
   const [editingEntry, setEditingEntry] = useState(null);
   const [entryValue, setEntryValue] = useState('');
+  const [entryDinheiro, setEntryDinheiro] = useState('');
+  const [entryPix, setEntryPix] = useState('');
+  const [entryMaquineta, setEntryMaquineta] = useState('');
   const [entryNotes, setEntryNotes] = useState('');
   const [unlockRequests, setUnlockRequests] = useState([]);
   const [myPendingRequests, setMyPendingRequests] = useState([]);
