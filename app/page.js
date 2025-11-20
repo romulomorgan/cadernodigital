@@ -1040,7 +1040,9 @@ export default function App() {
           year: currentDate.getFullYear(),
           day: editingEntry.day,
           timeSlot: editingEntry.timeSlot,
-          value: entryValue,
+          dinheiro: entryDinheiro,
+          pix: entryPix,
+          maquineta: entryMaquineta,
           notes: entryNotes
         })
       });
@@ -1050,6 +1052,9 @@ export default function App() {
       if (res.ok) {
         setEditingEntry(null);
         setEntryValue('');
+        setEntryDinheiro('');
+        setEntryPix('');
+        setEntryMaquineta('');
         setEntryNotes('');
         toast.success('✅ Lançamento salvo com sucesso!');
         fetchEntries();
