@@ -2671,9 +2671,9 @@ export default function App() {
             {user?.role === 'master' && (
               <>
                 <TabsTrigger value="funcoes">📋 Funções</TabsTrigger>
-                <TabsTrigger value="custos">💰 Custos</TabsTrigger>
                 <TabsTrigger value="usuarios">👤 Usuários</TabsTrigger>
                 <TabsTrigger value="igrejas">🏛️ Igrejas</TabsTrigger>
+                <TabsTrigger value="custos">💰 Custos</TabsTrigger>
                 <TabsTrigger value="estatistica">📊 Estatística</TabsTrigger>
                 <TabsTrigger value="audit">🔍 Auditoria</TabsTrigger>
               </>
