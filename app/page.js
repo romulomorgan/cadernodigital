@@ -5016,6 +5016,262 @@ export default function App() {
               </Card>
             </TabsContent>
           )}
+          
+          {/* CUSTOS TAB */}
+          {user?.role === 'master' && (
+            <TabsContent value="custos">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    💰 Gerenciamento de Custos
+                  </CardTitle>
+                  <CardDescription>Cadastro de tipos de custos e despesas do sistema</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Botão Cadastrar Novo Custo */}
+                  <div className="flex justify-end">
+                    <Button 
+                      onClick={() => {
+                        setNewCustoName('');
+                        setShowCustoCreateModal(true);
+                      }}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      💰 Cadastrar Novo Custo
+                    </Button>
+                  </div>
+
+                  {/* Campo de Busca */}
+                  <div className="border rounded-lg">
+                    <div className="bg-gray-50 p-4 border-b space-y-3">
+                      <h3 className="font-semibold text-lg">Custos Cadastrados ({allCustos.length})</h3>
+                      
+                      <Input
+                        placeholder="🔍 Buscar custo por nome..."
+                        value={custosSearchQuery}
+                        onChange={(e) => setCustosSearchQuery(e.target.value)}
+                        className="max-w-md"
+                      />
+                      
+                      {custosSearchQuery && (
+                        <p className="text-sm text-gray-600">
+                          Mostrando {custosFiltrados.length} de {allCustos.length} custos
+                        </p>
+                      )}
+                    </div>
+                    
+                    {/* Listagem de Custos */}
+                    <div className="p-4">
+                      {custosFiltrados.length === 0 ? (
+                        <div className="text-center py-8 text-gray-500">
+                          <div className="text-6xl mb-2">💰</div>
+                          <p>{custosSearchQuery ? 'Nenhum custo encontrado' : 'Nenhum custo cadastrado ainda'}</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {custosFiltrados.map((custo) => (
+                            <div key={custo.custoId} className="flex items-center justify-between p-3 bg-white border rounded-lg hover:shadow-md transition-shadow">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                                  <span className="text-xl">💰</span>
+                                </div>
+                                <div>
+                                  <p className="font-semibold">{custo.name}</p>
+                                  <p className="text-xs text-gray-500">
+                                    Criado em: {new Date(custo.createdAt).toLocaleDateString('pt-BR')}
+                                  </p>
+                                </div>
+                              </div>
+                              
+                              {/* Ações */}
+                              <div className="flex gap-1">
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => {
+                                    setSelectedCusto(custo);
+                                    setShowCustoViewModal(true);
+                                  }}
+                                  title="Visualizar"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                                
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => {
+                                    setSelectedCusto(custo);
+                                    setNewCustoName(custo.name);
+                                    setShowCustoEditModal(true);
+                                  }}
+                                  title="Editar"
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </Button>
+                                
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => {
+                                    setSelectedCusto(custo);
+                                    setShowCustoDeleteConfirm(true);
+                                  }}
+                                  title="Excluir"
+                                  className="text-red-600 hover:text-red-700"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+          
+          {/* ESTATÍSTICA TAB */}
+          {user?.role === 'master' && (
+            <TabsContent value="estatistica">
+              <div className="space-y-6">
+                <Card className="border-2 border-purple-400">
+                  <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100">
+                    <CardTitle className="flex items-center gap-2">
+                      <BarChart3 className="w-6 h-6" />
+                      Estatísticas do Sistema
+                    </CardTitle>
+                    <CardDescription>Métricas e indicadores gerais do sistema IUDP</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {/* Card Usuários */}
+                      <Card className="border-2 border-blue-300">
+                        <CardContent className="pt-6">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm text-gray-600">Total de Usuários</p>
+                              <p className="text-3xl font-bold text-blue-600">{usuarios.length || 0}</p>
+                            </div>
+                            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                              <Users className="w-6 h-6 text-blue-600" />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      
+                      {/* Card Igrejas */}
+                      <Card className="border-2 border-green-300">
+                        <CardContent className="pt-6">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm text-gray-600">Total de Igrejas</p>
+                              <p className="text-3xl font-bold text-green-600">{allChurches.length || 0}</p>
+                            </div>
+                            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                              <span className="text-2xl">🏛️</span>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      
+                      {/* Card Funções */}
+                      <Card className="border-2 border-yellow-300">
+                        <CardContent className="pt-6">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm text-gray-600">Funções Cadastradas</p>
+                              <p className="text-3xl font-bold text-yellow-600">{allRoles.length || 0}</p>
+                            </div>
+                            <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                              <FileUser className="w-6 h-6 text-yellow-600" />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      
+                      {/* Card Custos */}
+                      <Card className="border-2 border-purple-300">
+                        <CardContent className="pt-6">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm text-gray-600">Tipos de Custos</p>
+                              <p className="text-3xl font-bold text-purple-600">{allCustos.length || 0}</p>
+                            </div>
+                            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                              <span className="text-2xl">💰</span>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      
+                      {/* Card Ofertas */}
+                      <Card className="border-2 border-red-300">
+                        <CardContent className="pt-6">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm text-gray-600">Ofertas Registradas</p>
+                              <p className="text-3xl font-bold text-red-600">{entries.length || 0}</p>
+                            </div>
+                            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                              <TrendingUp className="w-6 h-6 text-red-600" />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      
+                      {/* Card Usuários Ativos */}
+                      <Card className="border-2 border-teal-300">
+                        <CardContent className="pt-6">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm text-gray-600">Usuários Ativos</p>
+                              <p className="text-3xl font-bold text-teal-600">
+                                {usuarios.filter(u => u.isActive).length || 0}
+                              </p>
+                            </div>
+                            <div className="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center">
+                              <CheckCircle className="w-6 h-6 text-teal-600" />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                    
+                    {/* Informações adicionais */}
+                    <Card className="mt-6 border-2 border-gray-300">
+                      <CardHeader>
+                        <CardTitle className="text-lg">📊 Resumo Geral</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Total de ofertas no mês atual:</span>
+                            <span className="font-semibold">{entries.length}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Usuários inativos:</span>
+                            <span className="font-semibold">{usuarios.filter(u => !u.isActive).length || 0}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Taxa de ativação de usuários:</span>
+                            <span className="font-semibold">
+                              {usuarios.length > 0 
+                                ? Math.round((usuarios.filter(u => u.isActive).length / usuarios.length) * 100) 
+                                : 0}%
+                            </span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          )}
 
           {/* MASTER PANEL TAB */}
           {user?.role === 'master' && (
