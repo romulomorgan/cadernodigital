@@ -469,6 +469,83 @@ export async function POST(request) {
       }
     }
     
+    // LIMPAR APENAS OFERTAS ÓRFÃS (Master apenas)
+    if (endpoint === 'entries/cleanup-orphans') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      try {
+        // Buscar todas as igrejas válidas
+        const churches = await db.collection('churches').find({}).toArray();
+        const validChurchIds = new Set(churches.map(c => c.churchId));
+        
+        console.log('[CLEANUP ORPHANS] Igrejas válidas:', Array.from(validChurchIds));
+        
+        // Buscar todas as ofertas
+        const allEntries = await db.collection('entries').find({}).toArray();
+        
+        // Identificar ofertas órfãs
+        const orphanEntries = allEntries.filter(entry => {
+          // Oferta órfã se:
+          // 1. Não tem churchId OU
+          // 2. churchId não está na lista de igrejas válidas
+          return !entry.churchId || !validChurchIds.has(entry.churchId);
+        });
+        
+        console.log('[CLEANUP ORPHANS] Total de ofertas:', allEntries.length);
+        console.log('[CLEANUP ORPHANS] Ofertas órfãs encontradas:', orphanEntries.length);
+        
+        // Deletar ofertas órfãs
+        const orphanEntryIds = orphanEntries.map(e => e.entryId);
+        let deleteResult = { deletedCount: 0 };
+        
+        if (orphanEntryIds.length > 0) {
+          deleteResult = await db.collection('entries').deleteMany({
+            entryId: { $in: orphanEntryIds }
+          });
+        }
+        
+        // Registrar no audit log
+        await db.collection('audit_logs').insertOne({
+          logId: crypto.randomUUID(),
+          action: 'cleanup_orphan_entries',
+          userId: user.userId,
+          timestamp: getBrazilTime().toISOString(),
+          details: {
+            totalChecked: allEntries.length,
+            orphansFound: orphanEntries.length,
+            orphansDeleted: deleteResult.deletedCount,
+            validChurches: Array.from(validChurchIds),
+            validEntriesRemaining: allEntries.length - orphanEntries.length,
+            orphanDetails: orphanEntries.map(e => ({
+              entryId: e.entryId,
+              churchId: e.churchId || 'SEM_CHURCH_ID',
+              churchName: e.church || 'SEM_CHURCH_NAME',
+              value: e.value,
+              date: `${e.year}-${String(e.month).padStart(2, '0')}-${String(e.day).padStart(2, '0')}`
+            }))
+          }
+        });
+        
+        return NextResponse.json({
+          success: true,
+          message: `✅ Limpeza concluída! ${deleteResult.deletedCount} ofertas órfãs removidas.`,
+          stats: {
+            totalChecked: allEntries.length,
+            orphansFound: orphanEntries.length,
+            orphansDeleted: deleteResult.deletedCount,
+            validChurches: churches.map(c => c.name),
+            validEntriesRemaining: allEntries.length - orphanEntries.length
+          }
+        });
+      } catch (error) {
+        console.error('Erro ao limpar ofertas órfãs:', error);
+        return NextResponse.json({ error: 'Erro ao limpar ofertas órfãs' }, { status: 500 });
+      }
+    }
+    
     // PUBLIC: GET ALL ROLES (para cadastro público)
     if (endpoint === 'public/roles') {
       try {
