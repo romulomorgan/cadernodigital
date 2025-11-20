@@ -5579,6 +5579,75 @@ export default function App() {
                   </CardContent>
                 </Card>
                 
+                {/* Limpeza de Dados */}
+                <Card className="border-2 border-red-400">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Trash2 className="w-6 h-6 text-red-600" />
+                      Limpeza de Dados
+                    </CardTitle>
+                    <CardDescription>
+                      ⚠️ Atenção: Esta ação é irreversível!
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                        <p className="text-sm text-amber-800 mb-2">
+                          <strong>⚠️ ATENÇÃO:</strong> Esta ação irá:
+                        </p>
+                        <ul className="text-sm text-amber-800 space-y-1 ml-4 list-disc">
+                          <li>Excluir TODAS as ofertas do banco de dados</li>
+                          <li>Remover ofertas órfãs (ligadas a igrejas inexistentes)</li>
+                          <li>Zerar todos os relatórios e estatísticas</li>
+                          <li>Esta ação NÃO pode ser desfeita</li>
+                        </ul>
+                      </div>
+                      
+                      <Button
+                        onClick={async () => {
+                          if (!confirm('⚠️ TEM CERTEZA ABSOLUTA?\n\nTodas as ofertas serão PERMANENTEMENTE excluídas!\n\nEsta ação NÃO pode ser desfeita.\n\nDigite OK para confirmar:') === true) {
+                            return;
+                          }
+                          
+                          const confirmText = prompt('Digite "EXCLUIR TUDO" para confirmar (em letras maiúsculas):');
+                          if (confirmText !== 'EXCLUIR TUDO') {
+                            toast.error('❌ Confirmação incorreta. Operação cancelada.');
+                            return;
+                          }
+                          
+                          try {
+                            const res = await fetch('/api/entries/clear-all', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                              }
+                            });
+                            
+                            const data = await res.json();
+                            if (res.ok) {
+                              toast.success(`✅ ${data.message}\n\n📊 Ofertas excluídas: ${data.details.totalDeleted}\n🔍 Ofertas órfãs encontradas: ${data.details.orphanEntriesFound}`);
+                              // Recarregar dados
+                              fetchEntries();
+                              fetchDashboardData();
+                              fetchStats();
+                            } else {
+                              toast.error('❌ ' + data.error);
+                            }
+                          } catch (error) {
+                            toast.error('❌ Erro ao limpar ofertas');
+                          }
+                        }}
+                        className="w-full bg-red-600 hover:bg-red-700 text-white"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        🗑️ LIMPAR TODAS AS OFERTAS
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+                
                 {/* User Management */}
                 <Card>
                   <CardHeader>
