@@ -2842,7 +2842,7 @@ export default function App() {
                         onValueChange={(value) => {
                           setSelectedChurchFilter(value);
                           // Recarregar dados com novo filtro
-                          fetchMonthEntries();
+                          fetchEntries();
                         }}
                       >
                         <SelectTrigger className="w-[300px] bg-white border-blue-300">
