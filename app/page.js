@@ -494,8 +494,13 @@ export default function App() {
       });
       const data = await res.json();
       if (data.requests) {
-        setUnlockRequests(data.requests);
-        setUnlockRequestsCount(data.requests.length);
+        // Separar pendentes e histórico
+        const pending = data.requests.filter(r => r.status === 'pending');
+        const history = data.requests.filter(r => r.status !== 'pending');
+        
+        setUnlockRequests(pending);
+        setUnlockRequestsCount(pending.length);
+        setUnlockRequestsHistory(history);
       }
     } catch (error) {
       console.error('Error fetching unlock requests:', error);
