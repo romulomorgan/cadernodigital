@@ -2099,3 +2099,95 @@ agent_communication:
           3. Testar janela de 60 min: validar contador e bloqueio
           4. Testar Master: verificar se pode editar/pagar a qualquer momento
 
+
+agent_communication:
+  - agent: "main"
+    message: |
+      ✅ ATUALIZAÇÃO EM TEMPO REAL E LÓGICA DE BOTÕES IMPLEMENTADA - $(date +%Y-%m-%d)
+      
+      🎯 SOLICITAÇÕES DO USUÁRIO ATENDIDAS:
+      
+      1. ✅ ATUALIZAÇÃO AUTOMÁTICA EM TEMPO REAL
+         - Implementado polling a cada 10 segundos
+         - Quando Master aprova → aparece imediatamente para Pastor
+         - Quando Pastor paga → aparece imediatamente para Master
+         - Sem necessidade de atualizar página manualmente
+      
+      2. ✅ LÓGICA DE BOTÕES CORRIGIDA (Pastor)
+         
+         FLUXO CLARO:
+         - Status PENDING: apenas "Visualizar" (aguarda aprovação)
+         - Status APPROVED: "Visualizar" + "Editar" (registrar pagamento)
+         - Status PAID < 60min: "Visualizar" + "Editar" + contador "⏱️ Xmin"
+         - Status PAID > 60min: apenas "Visualizar" + badge "🔒 Bloqueado"
+         - Status REJECTED: apenas "Visualizar"
+      
+      3. ✅ JANELA DE 60 MINUTOS
+         - Contador visual em tempo real (⏱️ 59min, 58min, etc.)
+         - Ao atingir 0 min: botão "Editar" desaparece
+         - Badge "🔒 Bloqueado" aparece após 60 min
+         - Atualização automática via polling
+      
+      🔧 IMPLEMENTAÇÕES TÉCNICAS:
+      
+      Frontend (page.js linha ~627):
+      ```javascript
+      // Polling automático a cada 10 segundos
+      useEffect(() => {
+        if (!isAuthenticated || !token) return;
+        
+        const isOnCostsTab = (activeTab === 'custos' && user?.role === 'master') || 
+                             (activeTab === 'costs-pastor' && user?.role !== 'master');
+        
+        if (!isOnCostsTab) return;
+        
+        const intervalId = setInterval(() => {
+          fetchCostsList(costsFilterStatus, costsFilterChurch);
+        }, 10000);
+        
+        return () => clearInterval(intervalId);
+      }, [isAuthenticated, token, activeTab, user?.role, costsFilterStatus, costsFilterChurch]);
+      ```
+      
+      Frontend (page.js linha ~4690):
+      - Lógica de botões refatorada com IIFE
+      - APPROVED: botão verde "Editar" (registrar pagamento)
+      - PAID < 60min: botão azul "Editar" (corrigir pagamento)
+      - PAID > 60min: NÃO mostra botão "Editar"
+      - Contador: calcula e mostra minutos restantes em tempo real
+      - Badge "Bloqueado": aparece após 60 minutos
+      
+      📊 COMPORTAMENTO ESPERADO:
+      
+      CENÁRIO 1 - Pastor lança custo:
+      1. Pastor cria custo → Status: PENDING
+      2. Lista atualiza automaticamente (polling)
+      3. Master vê novo custo em sua lista (polling)
+      4. Master aprova → Status: APPROVED
+      5. Pastor vê status "APPROVED" automaticamente (polling)
+      6. Botão "Editar" aparece para o Pastor
+      
+      CENÁRIO 2 - Pastor registra pagamento:
+      1. Pastor clica em "Editar" (custo APPROVED)
+      2. Preenche: data, valor pago, comprovante
+      3. Clica "Confirmar Pagamento"
+      4. Status muda para PAID
+      5. Contador de 60 min começa: "⏱️ 60min"
+      6. Botão "Editar" continua visível
+      7. Contador decrementa: 59min, 58min, 57min...
+      8. Ao chegar em 0: botão "Editar" desaparece
+      9. Badge "🔒 Bloqueado" aparece
+      10. Apenas botão "Visualizar" fica disponível
+      
+      CENÁRIO 3 - Sincronização Master ↔ Pastor:
+      1. Qualquer ação do Master → reflete em 10s na lista do Pastor
+      2. Qualquer ação do Pastor → reflete em 10s na lista do Master
+      3. Status, valores, arquivos: tudo sincronizado
+      
+      ⏱️ TEMPO DE ATUALIZAÇÃO:
+      - Máximo: 10 segundos
+      - Intervalo de polling: 10000ms
+      - Atualização do contador: a cada renderização
+      
+      🎯 STATUS: SISTEMA TOTALMENTE SINCRONIZADO E AUTOMÁTICO
+
