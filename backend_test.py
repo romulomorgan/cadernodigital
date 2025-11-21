@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
 """
-Backend Test - Photo URLs for Churches and Users
-Testing and fixing photo URL issues where URLs should start with /api/uploads/ not /uploads/
+Backend Test Suite - Financial Calculations Validation
+Testing critical financial calculation fixes in Master calendar
 """
 
 import requests
 import json
-import os
+import sys
 from datetime import datetime
 
-# Configuration
-BASE_URL = "https://iudp-control.preview.emergentagent.com"
-API_URL = f"{BASE_URL}/api"
+# Get base URL from environment
+BASE_URL = "https://iudp-control.preview.emergentagent.com/api"
 
 # Test credentials
-MASTER_EMAIL = "joao.silva@iudp.org.br"
-MASTER_PASSWORD = "LiderMaximo2025!"
+MASTER_CREDENTIALS = {
+    "email": "joao.silva@iudp.org.br",
+    "password": "LiderMaximo2025!"
+}
 
 def login_master():
     """Login as master user and return token"""
