@@ -625,6 +625,24 @@ export default function App() {
     }
   }, [isAuthenticated, activeTab, token]);
   
+  // Polling automático para atualizar lista de custos em tempo real
+  useEffect(() => {
+    if (!isAuthenticated || !token) return;
+    
+    // Verificar se está na aba de custos (Master ou Pastor)
+    const isOnCostsTab = (activeTab === 'custos' && user?.role === 'master') || 
+                         (activeTab === 'costs-pastor' && user?.role !== 'master');
+    
+    if (!isOnCostsTab) return;
+    
+    // Atualizar lista a cada 10 segundos
+    const intervalId = setInterval(() => {
+      fetchCostsList(costsFilterStatus, costsFilterChurch);
+    }, 10000);
+    
+    return () => clearInterval(intervalId);
+  }, [isAuthenticated, token, activeTab, user?.role, costsFilterStatus, costsFilterChurch]);
+  
   // Carregar usuários e igrejas quando entrar na aba usuarios
   useEffect(() => {
     if (isAuthenticated && activeTab === 'usuarios' && token && user?.role === 'master') {
