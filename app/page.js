@@ -131,6 +131,8 @@ export default function App() {
   const [uploadingProof, setUploadingProof] = useState(false);
   const [showCostEditModalMaster, setShowCostEditModalMaster] = useState(false);
   const [showCostDeleteConfirm, setShowCostDeleteConfirm] = useState(false);
+  const [showBillFile, setShowBillFile] = useState(null);
+  const [showProofFile, setShowProofFile] = useState(null);
   
   // Confirmation dialogs
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
