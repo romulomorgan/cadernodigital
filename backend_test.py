@@ -56,14 +56,33 @@ class BackendTester:
         except Exception as e:
             self.log_result("Master Login", False, f"Erro: {str(e)}")
             return False
-                self.log_test("Master Login", True, f"Logged in as {user_info.get('name', 'Unknown')} ({user_info.get('role', 'Unknown')})")
-                return True
-            else:
-                self.log_test("Master Login", False, f"Status: {response.status_code}, Response: {response.text}")
-                return False
-                
+    
+    def find_pastor_user(self):
+        """Encontra um usuário Pastor para testes"""
+        try:
+            # Usar endpoint de listar usuários (se existir) ou criar um usuário de teste
+            # Por enquanto, vamos assumir que existe um pastor no sistema
+            # Vamos tentar fazer login com credenciais genéricas de pastor
+            
+            # Primeiro, vamos listar igrejas para encontrar pastores
+            headers = {"Authorization": f"Bearer {self.master_token}"}
+            response = requests.post(f"{BASE_URL}/churches/list", headers=headers)
+            
+            if response.status_code == 200:
+                churches = response.json().get('churches', [])
+                for church in churches:
+                    if church.get('pastor'):
+                        pastor = church['pastor']
+                        # Tentar fazer login com email do pastor
+                        # Como não temos a senha, vamos criar um usuário de teste
+                        break
+                        
+            # Criar usuário pastor de teste se necessário
+            self.create_test_pastor()
+            return True
+            
         except Exception as e:
-            self.log_test("Master Login", False, f"Exception: {str(e)}")
+            self.log_result("Find Pastor User", False, f"Erro: {str(e)}")
             return False
     
     def get_churches_list(self):
