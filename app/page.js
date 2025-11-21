@@ -573,6 +573,7 @@ export default function App() {
   useEffect(() => {
     if (isAuthenticated && activeTab === 'custos' && token && user?.role === 'master') {
       fetchAllCustos();
+      fetchCostsList(costsFilterStatus); // Carregar também os lançamentos para aprovação
     }
   }, [isAuthenticated, activeTab, token]);
   
