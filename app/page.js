@@ -607,6 +607,25 @@ export default function App() {
       fetchEntries();
     }
   }, [selectedChurchFilter]);
+  
+  // Buscar solicitações de liberação quando Master entrar na aba
+  useEffect(() => {
+    if (isAuthenticated && token && user?.role === 'master' && activeTab === 'requests') {
+      fetchUnlockRequests();
+    }
+  }, [isAuthenticated, activeTab, token]);
+  
+  // Polling para atualizar contador de solicitações a cada 30 segundos (quando autenticado como Master)
+  useEffect(() => {
+    if (isAuthenticated && token && user?.role === 'master') {
+      fetchUnlockRequests();
+      const interval = setInterval(() => {
+        fetchUnlockRequests();
+      }, 30000); // 30 segundos
+      
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, token, user?.role]);
 
   // Buscar igrejas e roles públicas para o formulário de registro (sem autenticação)
   useEffect(() => {
