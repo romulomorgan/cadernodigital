@@ -6418,7 +6418,7 @@ export default function App() {
                           </tr>
                         </thead>
                         <tbody className="divide-y">
-                          {costsList.map((cost) => {
+                          {groupedByChurch[churchName].map((cost) => {
                             const statusColors = {
                               'PENDING': 'bg-yellow-100 text-yellow-800 border-yellow-300',
                               'APPROVED': 'bg-green-100 text-green-800 border-green-300',
