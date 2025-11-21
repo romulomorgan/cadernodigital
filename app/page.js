@@ -4604,11 +4604,13 @@ export default function App() {
                               const statusColors = {
                                 'PENDING': 'bg-yellow-100 text-yellow-800 border-yellow-300',
                                 'APPROVED': 'bg-green-100 text-green-800 border-green-300',
+                                'PAID': 'bg-emerald-100 text-emerald-800 border-emerald-300',
                                 'REJECTED': 'bg-red-100 text-red-800 border-red-300'
                               };
                               const statusLabels = {
                                 'PENDING': '🟡 Pendente',
                                 'APPROVED': '🟢 Aprovado',
+                                'PAID': '💚 Pago',
                                 'REJECTED': '🔴 Reprovado'
                               };
                               
