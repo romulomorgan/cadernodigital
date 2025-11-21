@@ -6403,9 +6403,9 @@ export default function App() {
                             
                             {/* Tabela de Custos da Igreja */}
                             <div className="overflow-x-auto">
-                      <table className="w-full">
-                        <thead className="bg-gray-100">
-                          <tr>
+                              <table className="w-full">
+                                <thead className="bg-gray-100">
+                                  <tr>
                             <th className="text-left p-3 text-sm font-semibold">Igreja</th>
                             <th className="text-left p-3 text-sm font-semibold">Pastor</th>
                             <th className="text-left p-3 text-sm font-semibold">Tipo</th>
