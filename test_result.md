@@ -1954,3 +1954,148 @@ agent_communication:
           - Upload de PDF funciona
           - Visualização inline no modal
           - Download/abertura em nova aba
+  - task: "Fluxo Completo de Gerenciamento de Custos"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js e /app/app/page.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          ✅ IMPLEMENTAÇÃO COMPLETA CONCLUÍDA - $(date +%Y-%m-%d)
+          
+          🎯 OBJETIVO: Implementar fluxo completo de gerenciamento de custos com estados e permissões específicas
+          
+          📋 WORKFLOW IMPLEMENTADO:
+          
+          1. **CRIAÇÃO (Pastor)** - Status: PENDING
+             - Pastor cria custo com: tipo, vencimento, valor, conta/boleto
+             - Campos DESABILITADOS: data pagamento, valor pago, comprovante
+             - Status inicial: PENDING
+             - Backend: POST /api/costs-entries/create
+             - Campos adicionados: paidAt, paidBy
+          
+          2. **APROVAÇÃO (Master)** - Status: PENDING → APPROVED
+             - Master aprova o custo
+             - Status muda para APPROVED
+             - Isso LIBERA os campos de pagamento para o Pastor
+             - Backend: POST /api/costs-entries/approve (já existia)
+          
+          3. **PAGAMENTO (Pastor)** - Status: APPROVED → PAID
+             - Após aprovação, Pastor pode registrar pagamento
+             - Campos: data de pagamento, valor pago, comprovante
+             - Ao salvar, status muda para PAID
+             - Campo paidAt é salvo automaticamente
+             - Pastor tem 60 MINUTOS para editar após pagar
+             - Backend: POST /api/costs-entries/pay (NOVO)
+          
+          4. **EDIÇÃO COM JANELA DE 60 MIN**
+             - Pastor só pode editar se:
+               • Status = APPROVED (registrar pagamento)
+               • Status = PAID e dentro de 60 minutos
+             - Após 60 min, custo fica bloqueado
+             - Backend: POST /api/costs-entries/update (ATUALIZADO)
+          
+          5. **MASTER - CONTROLE TOTAL**
+             - Master pode editar qualquer campo a qualquer momento
+             - Master pode pagar diretamente (sem aprovação prévia)
+             - Master pode excluir custos a qualquer momento
+             - Backend: POST /api/costs-entries/update-master (ATUALIZADO)
+          
+          🔧 MUDANÇAS NO BACKEND (route.js):
+          
+          1. ✅ Endpoint de Criação (linhas 552-610):
+             - Campos payment* inicializados como null/0
+             - Adicionados campos: paidAt: null, paidBy: null
+          
+          2. ✅ Novo Endpoint de Pagamento (linha ~750):
+             - POST /api/costs-entries/pay
+             - Valida: paymentDate, valuePaid obrigatórios
+             - Verifica: status deve ser APPROVED
+             - Define: status = PAID, paidAt = now, paidBy = userId
+             - Retorna mensagem sobre janela de 60 min
+          
+          3. ✅ Endpoint de Update refatorado (linhas 649-790):
+             - Verifica permissão (Master ou dono)
+             - Se Pastor:
+               • Bloqueia se status = PENDING (ainda não aprovado)
+               • Bloqueia se status = PAID e > 60 minutos
+               • Permite se status = APPROVED ou PAID (< 60 min)
+             - Se Master: permite sempre
+             - Mantém status atual se não for Master
+          
+          4. ✅ Endpoint Update-Master refatorado (linhas 826-875):
+             - Master pode editar todos os campos, incluindo status
+             - Se Master muda para PAID, adiciona paidAt e paidBy
+          
+          🎨 MUDANÇAS NO FRONTEND (page.js):
+          
+          1. ✅ Estado costFormData expandido (linha 107):
+             - Adicionados: costId, status, paidAt
+          
+          2. ✅ Nova função handlePayCost (linha ~1950):
+             - Registra pagamento via POST /api/costs-entries/pay
+             - Valida campos obrigatórios
+             - Toast com mensagem sobre 60 minutos
+          
+          3. ✅ Função handleUpdateCost refatorada (linha ~1990):
+             - Usa costFormData.costId
+             - Envia apenas campos editáveis
+          
+          4. ✅ Modal de Edição/Pagamento completamente refatorado (linha 8661):
+             - Título dinâmico baseado no status
+             - Descrição explicativa por status
+             - Campos desabilitados condicionalmente:
+               • PENDING: payment* desabilitados com opacity
+               • APPROVED: payment* habilitados, dados básicos desabilitados
+               • PAID: todos habilitados (dentro de 60 min)
+             - Botão dinâmico:
+               • "Confirmar Pagamento" se APPROVED
+               • "Salvar Alterações" se PAID (dentro de 60 min)
+               • Desabilitado se PENDING
+             - Mensagens de ajuda contextuais
+          
+          5. ✅ Listagem de Custos - Pastor (linha 4635):
+             - Botão "💳 Pagar" se status = APPROVED
+             - Botão "Editar" se status = PAID e < 60 min
+             - Contador de tempo restante (⏱️ Xmin)
+             - Removidos botões de edição/exclusão para status APPROVED
+          
+          6. ✅ Listagem de Custos - Master (linha 6476):
+             - Status PAID adicionado às cores e labels
+             - Botão Editar sempre disponível
+             - Campos status e paidAt incluídos ao abrir modal
+          
+          📊 VALIDAÇÕES IMPLEMENTADAS:
+          - ✅ Pastor não pode editar custo PENDING
+          - ✅ Pastor não pode editar custo PAID após 60 min
+          - ✅ Pastor só pode registrar pagamento em custo APPROVED
+          - ✅ Master pode fazer tudo a qualquer momento
+          - ✅ Campos de pagamento desabilitados na criação
+          - ✅ Mensagens de erro descritivas
+          
+          🔍 ARQUIVOS MODIFICADOS:
+          - /app/app/api/[[...path]]/route.js:
+            • Endpoint create: campos paidAt/paidBy adicionados
+            • Endpoint pay: NOVO endpoint para pagamento
+            • Endpoint update: validação de janela de 60 min
+            • Endpoint update-master: lógica de paidAt ao mudar para PAID
+          
+          - /app/app/page.js:
+            • Estado costFormData: campos adicionados
+            • handlePayCost: NOVA função
+            • handleCreateCost: enviando apenas campos necessários
+            • handleUpdateCost: usando costFormData.costId
+            • Modal de edição: completamente refatorado
+            • Listagem Pastor: botões dinâmicos + contador
+            • Listagem Master: status PAID adicionado
+          
+          ⏳ PRÓXIMOS PASSOS:
+          1. Testar backend: criar custo → aprovar → pagar → tentar editar após 60 min
+          2. Testar frontend: verificar desabilitação de campos conforme status
+          3. Testar janela de 60 min: validar contador e bloqueio
+          4. Testar Master: verificar se pode editar/pagar a qualquer momento
+
