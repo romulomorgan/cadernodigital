@@ -969,9 +969,8 @@ export default function App() {
   };
   
   const getEntry = (day, timeSlot) => {
-    // Usar entriesFiltradas para respeitar o filtro de igreja do Master
-    const entriesToUse = user?.role === 'master' && selectedChurchFilter !== 'all' ? entriesFiltradas : entries;
-    return entriesToUse.find(e => 
+    // Backend já faz agregação e filtro, apenas buscar entry correspondente
+    return entries.find(e => 
       e.day === day && 
       e.timeSlot === timeSlot &&
       e.month === (currentDate.getMonth() + 1) &&
