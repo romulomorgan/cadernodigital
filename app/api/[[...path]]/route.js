@@ -645,7 +645,7 @@ export async function POST(request) {
       }
     }
     
-    // UPDATE COST ENTRY
+    // UPDATE COST ENTRY (Pastor - com regras de janela de 60 min)
     if (endpoint === 'costs-entries/update') {
       const user = verifyToken(request);
       if (!user) {
@@ -664,7 +664,26 @@ export async function POST(request) {
         // Verificar permissão
         const userData = await db.collection('users').findOne({ userId: user.userId });
         if (userData.role !== 'master' && existingCost.userId !== user.userId) {
-          return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
+          return NextResponse.json({ error: 'Sem permissão para editar este custo' }, { status: 403 });
+        }
+        
+        // Se não for Master, verificar regras de edição
+        if (userData.role !== 'master') {
+          // Se status = PENDING, não pode editar (custo ainda não foi aprovado)
+          if (existingCost.status === 'PENDING') {
+            return NextResponse.json({ error: 'Custo pendente de aprovação. Aguarde aprovação do Líder Máximo.' }, { status: 403 });
+          }
+          
+          // Se status = PAID, verificar janela de 60 minutos
+          if (existingCost.status === 'PAID' && existingCost.paidAt) {
+            const paidTime = new Date(existingCost.paidAt);
+            const now = getBrazilTime();
+            const diffMinutes = (now - paidTime) / (1000 * 60);
+            
+            if (diffMinutes > 60) {
+              return NextResponse.json({ error: 'Prazo de 60 minutos para edição expirado. Entre em contato com o Líder Máximo.' }, { status: 403 });
+            }
+          }
         }
         
         // Calcular diferença se valuePaid ou value mudaram
@@ -678,9 +697,13 @@ export async function POST(request) {
         const updateData = {
           ...costData,
           difference,
-          status: 'PENDING', // Volta para pendente ao editar
           updatedAt: getBrazilTime().toISOString()
         };
+        
+        // Se não for Master e estava APPROVED, não altera o status
+        if (userData.role !== 'master') {
+          delete updateData.status; // Mantém o status atual
+        }
         
         await db.collection('costs_entries').updateOne(
           { costId },
@@ -700,6 +723,72 @@ export async function POST(request) {
       } catch (error) {
         console.error('Erro ao atualizar custo:', error);
         return NextResponse.json({ error: 'Erro ao atualizar custo' }, { status: 500 });
+      }
+    }
+    
+    // PAY COST ENTRY (Pastor submete pagamento após aprovação)
+    if (endpoint === 'costs-entries/pay') {
+      const user = verifyToken(request);
+      if (!user) {
+        return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      }
+      
+      try {
+        const body = await request.json();
+        const { costId, paymentDate, valuePaid, proofFile } = body;
+        
+        const existingCost = await db.collection('costs_entries').findOne({ costId });
+        if (!existingCost) {
+          return NextResponse.json({ error: 'Custo não encontrado' }, { status: 404 });
+        }
+        
+        // Verificar se é o dono do custo
+        if (existingCost.userId !== user.userId) {
+          return NextResponse.json({ error: 'Sem permissão para pagar este custo' }, { status: 403 });
+        }
+        
+        // Verificar se status = APPROVED
+        if (existingCost.status !== 'APPROVED') {
+          return NextResponse.json({ error: 'Custo precisa estar APROVADO para registrar pagamento' }, { status: 403 });
+        }
+        
+        // Validar campos obrigatórios
+        if (!paymentDate || !valuePaid) {
+          return NextResponse.json({ error: 'Data de pagamento e valor pago são obrigatórios' }, { status: 400 });
+        }
+        
+        // Calcular diferença
+        const difference = parseFloat(valuePaid) - parseFloat(existingCost.value);
+        
+        const updateData = {
+          paymentDate,
+          valuePaid: parseFloat(valuePaid),
+          proofFile: proofFile || null,
+          difference,
+          status: 'PAID',
+          paidAt: getBrazilTime().toISOString(),
+          paidBy: user.userId,
+          updatedAt: getBrazilTime().toISOString()
+        };
+        
+        await db.collection('costs_entries').updateOne(
+          { costId },
+          { $set: updateData }
+        );
+        
+        // Audit log
+        await db.collection('audit_logs').insertOne({
+          logId: crypto.randomUUID(),
+          action: 'pay_cost_entry',
+          userId: user.userId,
+          timestamp: getBrazilTime().toISOString(),
+          details: { costId, valuePaid, paymentDate }
+        });
+        
+        return NextResponse.json({ success: true, message: 'Pagamento registrado com sucesso! Você tem 60 minutos para editar.' });
+      } catch (error) {
+        console.error('Erro ao registrar pagamento:', error);
+        return NextResponse.json({ error: 'Erro ao registrar pagamento' }, { status: 500 });
       }
     }
     
