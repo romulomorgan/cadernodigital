@@ -1,0 +1,90 @@
+<analysis>
+The trajectory details an intensive, feature-rich development process for a church management application, Caderno de Controle Online — IUDP. The process is characterized by rapid, iterative cycles driven by highly specific user feedback delivered in Portuguese. The core of the application was built progressively, starting with User, Church, and Role management (CRUD), and then expanding significantly into a sophisticated Financial Calendar for offerings and a comprehensive Cost Management system with a hierarchical approval workflow.
+
+The architecture is a clear monolith within a Next.js framework, with nearly all backend logic consolidated in  and frontend logic in . This has led to extremely large and complex files.
+
+Key development patterns include:
+1.  **Backend First:** New features typically start with creating or modifying Mongoose schemas and API endpoints in .
+2.  **Frontend State:** Corresponding state variables () and data-fetching functions are added to .
+3.  **UI Implementation:** JSX for new tabs, modals, and lists is then implemented in , often reusing patterns from existing modules like Funções (Roles).
+
+The work history shows a constant cycle of feature implementation (e.g., 3-field offering entry, PDF viewing, cost approval system) followed by immediate bug-fixing based on user reports (e.g., infinite loops from  dependencies, syntax errors, data persistence/caching issues). The most recent user request concerns critical bugs in the financial calculation logic on the Master Leader's calendar, which is the immediate task at hand.
+
+The user's primary language is Portuguese. The next agent must respond in **Portuguese only**.
+</analysis>
+
+<product_requirements>
+The Caderno de Controle Online — IUDP is a comprehensive management application for a church organization, designed for two primary roles: a Líder Máximo (Master Leader) with full administrative oversight, and Pastors/Bishops who manage their individual churches.
+
+**Implemented Core Modules:**
+*   **Financial Calendar (Offerings):** A calendar interface where Pastors can log daily offerings, categorized into Cash, PIX, and Card Machine, and upload receipts (images/PDFs). The Master Leader has a read-only, aggregated view showing totals from all churches, with a drill-down modal to see details per church. The calendar has a filtering system by church.
+*   **Cost Management System:** A full-featured module where Pastors submit church expenses (rent, utilities, etc.) with attached bills and payment proofs. These submissions enter a Pending state.
+*   **Approval Workflow:** The Master Leader has a dashboard to review all submitted costs, with the ability to Approve or Reject them, updating the status for the Pastor.
+*   **User/Church/Role Management:** Full CRUD interfaces for managing users, churches, and user roles.
+*   **Statistics:** A dashboard for the Master Leader displaying key metrics on user growth and financial data, including cost summaries.
+
+The system is built to enforce data consistency, with frequent requests from the user to purge all data to ensure a clean start for testing new logic.
+</product_requirements>
+
+<key_technical_concepts>
+- **Framework:** Next.js (App Router)
+- **Architecture:** Monolithic Full-Stack. Backend logic is centralized in a single dynamic route file, and the entire frontend is in a single page component.
+- **Database:** MongoDB with Mongoose.
+- **Backend:** API endpoints handled via a single  file.
+- **Frontend:** Client-side rendered app using  with React Hooks (, ) for state management.
+- **Styling:** TailwindCSS and shadcn/ui.
+- **Authentication:** JWT-based, with role-based access control ( vs. other roles) implemented through conditional rendering.
+</key_technical_concepts>
+
+<code_architecture>
+The application follows a monolithic structure where frontend and backend logic are heavily concentrated in two files.
+
+**Directory Structure:**
+
+
+-   ****
+    -   **Importance:** This is the single backend for the entire application. It uses Next.js dynamic routing () to handle all API requests.
+    -   **Summary of Changes:** This file has been modified extensively. It contains endpoints for:
+        -   Full CRUD on , , .
+        -   Creating, reading, and updating financial  (offerings), including a complex aggregation pipeline for the Master Leader's view that groups by time slot and filters by church.
+        -   Deleting specific offerings or receipts.
+        -   A complete CRUD and approval workflow for  (, , , ).
+        -   Utility endpoints for data cleanup (, ).
+
+-   ****
+    -   **Importance:** This is the single frontend file for the entire logged-in experience. It manages all application state, API calls, and renders all UI components conditionally based on the active tab and user role.
+    -   **Summary of Changes:** This file is extremely large and complex. Key changes include:
+        -   State management for over six modules (Calendar, Users, Churches, Roles, Costs, Statistics) using dozens of  hooks.
+        -   Implementation of the Calendário view with two distinct UIs: one for Pastors (data entry) and one for the Master Leader (aggregated, read-only view).
+        -   Implementation of the Custos tab for both Pastors (data entry form and list) and the Master Leader (approval dashboard with filters).
+        -   Numerous modals for all CRUD operations, viewing receipts, and viewing detailed reports.
+        -   Conditional rendering logic based on  is used pervasively to control access to features.
+        -   Functions for fetching data from all backend endpoints and handling UI logic like opening/closing modals and updating state.
+
+-   ****
+    -   **Importance:** Serves as a manual log for development progress, feature lists, and communication between agents.
+    -   **Summary of Changes:** This file was frequently updated throughout the trajectory to document newly implemented features and confirm the completion of user requests.
+</code_architecture>
+
+<pending_tasks>
+- **Fix Financial Calculations:** The primary task is to debug and correct the logic for calculating and displaying totals on the Master Leader's calendar. The monthly total, daily subtotals, and their response to the church filter are all reported as incorrect.
+</pending_tasks>
+
+<current_work>
+Immediately before this summary request, the user reported a critical bug regarding the financial summaries on the Master Leader's calendar.
+
+**The specific problems are:**
+1.  **Incorrect Monthly Total:** The main total do mês at the top of the calendar does not accurately reflect the sum of all offerings within the month.
+2.  **Incorrect Daily Subtotals:** The subtotal displayed for each day does not correctly sum up the values from all time-slot cards within that day.
+3.  **Filter Ineffectiveness:** When the Master Leader uses the dropdown to filter by a specific church, the totals and subtotals do not update correctly to reflect only that church's data.
+
+The previous engineer had just acknowledged the user's detailed report and was at the very beginning of the analysis phase to identify the root cause of these calculation errors. No code has been modified yet to address this specific issue. The work involves investigating the data aggregation pipeline in  and the state management/rendering logic for totals in .
+</current_work>
+
+<optional_next_step>
+Analyze and debug the financial calculation logic. Start by examining the  backend endpoint in  to verify the aggregation query, and then check the frontend logic in  that sums these values for display.
+</optional_next_step>
+
+<direct_quotes>
+**User's Last Request (Chat Message 484):** Por que no painel do líder máximo, o valor total lá no calendário, ele não tá correspondendo exatamente ao somatório de todos os subtotais? [...] verifica se o subtotal de cada dia está somando todas as horas das ofertas [...] e se todos os subtotais estão sendo somados para aparecer no total do mês, lá em cima. E que isso também deve justamente funcionar mediante filtros. Os filtros, quando forem escolhidos uma única igreja, o total representará o total arrecadado nesse mês por esta igreja selecionada. [...] Faça um planejamento, entenda qual é esse objetivo, pra que que serve essa ferramenta e faça funcionar. Faça teste e me entregue.
+</direct_quotes>

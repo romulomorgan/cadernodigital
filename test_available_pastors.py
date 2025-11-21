@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://iudp-manager.preview.emergentagent.com"
+BASE_URL = "https://iudp-control.preview.emergentagent.com"
 API_URL = f"{BASE_URL}/api"
 
 # Test credentials
