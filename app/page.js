@@ -1938,25 +1938,6 @@ export default function App() {
   
   // ========== FUNÇÕES - SOLICITAÇÕES DE LIBERAÇÃO ==========
   
-  const fetchUnlockRequests = async () => {
-    try {
-      const res = await fetch('/api/unlock/requests', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      if (res.ok) {
-        const data = await res.json();
-        setUnlockRequests(data.requests || []);
-        setUnlockRequestsCount(data.requests?.length || 0);
-      }
-    } catch (error) {
-      console.error('Erro ao buscar solicitações:', error);
-    }
-  };
-  
   const handleApproveUnlockRequest = async (requestId, entryId, durationMinutes = 60) => {
     try {
       const res = await fetch('/api/unlock/approve', {
