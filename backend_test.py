@@ -18,36 +18,44 @@ BASE_URL = "https://iudp-control.preview.emergentagent.com/api"
 MASTER_EMAIL = "joao.silva@iudp.org.br"
 MASTER_PASSWORD = "LiderMaximo2025!"
 
-class FinancialCalculationTester:
+class BackendTester:
     def __init__(self):
-        self.token = None
-        self.session = requests.Session()
+        self.master_token = None
+        self.pastor_token = None
+        self.pastor_user = None
         self.test_results = []
         
-    def log_test(self, test_name, success, details=""):
+    def log_result(self, test_name, success, details=""):
         """Log test result"""
-        status = "✅ PASS" if success else "❌ FAIL"
-        print(f"{status} {test_name}")
+        status = "✅ PASSOU" if success else "❌ FALHOU"
+        print(f"{status} - {test_name}")
         if details:
-            print(f"   Details: {details}")
-        
+            print(f"   {details}")
         self.test_results.append({
-            "test": test_name,
-            "success": success,
-            "details": details
+            'test': test_name,
+            'success': success,
+            'details': details
         })
-    
+        
     def login_master(self):
-        """Login as Master user"""
+        """Login como Master"""
         try:
-            response = self.session.post(f"{BASE_URL}/auth/login", json=MASTER_CREDENTIALS)
+            response = requests.post(f"{BASE_URL}/auth/login", json={
+                "email": MASTER_EMAIL,
+                "password": MASTER_PASSWORD
+            })
             
             if response.status_code == 200:
                 data = response.json()
-                self.token = data.get('token')
-                self.session.headers.update({'Authorization': f'Bearer {self.token}'})
-                
-                user_info = data.get('user', {})
+                self.master_token = data['token']
+                self.log_result("Master Login", True, f"Token obtido para {data['user']['name']}")
+                return True
+            else:
+                self.log_result("Master Login", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_result("Master Login", False, f"Erro: {str(e)}")
+            return False
                 self.log_test("Master Login", True, f"Logged in as {user_info.get('name', 'Unknown')} ({user_info.get('role', 'Unknown')})")
                 return True
             else:
