@@ -6502,6 +6502,56 @@ export default function App() {
                             </div>
                           </div>
                         )}
+                        
+                        {/* Botão Excluir Oferta (Master apenas) */}
+                        <div className="mt-4 pt-4 border-t border-red-200">
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="w-full bg-red-600 hover:bg-red-700"
+                            onClick={async () => {
+                              if (!confirm(`⚠️ ATENÇÃO!\n\nTem certeza que deseja EXCLUIR PERMANENTEMENTE esta oferta?\n\nIgreja: ${church.churchName}\nValor: R$ ${parseFloat(church.value || 0).toFixed(2)}\n\nEsta ação NÃO pode ser desfeita!`)) {
+                                return;
+                              }
+                              
+                              try {
+                                // Precisamos do entryId específico desta igreja
+                                const entryId = `${detailsData.year}-${String(detailsData.month).padStart(2, '0')}-${String(detailsData.day).padStart(2, '0')}-${detailsData.timeSlot}`;
+                                
+                                const res = await fetch('/api/entries/delete-specific', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                                  },
+                                  body: JSON.stringify({
+                                    entryId,
+                                    userId: church.userId
+                                  })
+                                });
+                                
+                                const data = await res.json();
+                                if (res.ok) {
+                                  toast.success('✅ Oferta excluída com sucesso!');
+                                  
+                                  // Recarregar dados
+                                  fetchEntries();
+                                  
+                                  // Fechar modal
+                                  setShowDetailsModal(false);
+                                  setDetailsData(null);
+                                } else {
+                                  toast.error('❌ ' + data.error);
+                                }
+                              } catch (error) {
+                                toast.error('❌ Erro ao excluir oferta');
+                              }
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            🗑️ Excluir Esta Oferta
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                   ))
