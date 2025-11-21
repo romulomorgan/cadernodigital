@@ -6302,16 +6302,16 @@ export default function App() {
                       
                       {/* Filtros de Status */}
                       <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant={costsFilterStatus === 'ALL' ? 'default' : 'outline'}
-                        onClick={() => {
-                          setCostsFilterStatus('ALL');
-                          fetchCostsList('ALL');
-                        }}
-                      >
-                        Todos
-                      </Button>
+                        <Button
+                          size="sm"
+                          variant={costsFilterStatus === 'ALL' ? 'default' : 'outline'}
+                          onClick={() => {
+                            setCostsFilterStatus('ALL');
+                            fetchCostsList('ALL', costsFilterChurch);
+                          }}
+                        >
+                          Todos
+                        </Button>
                       <Button
                         size="sm"
                         variant={costsFilterStatus === 'PENDING' ? 'default' : 'outline'}
