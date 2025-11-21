@@ -1889,7 +1889,13 @@ export default function App() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(costFormData)
+        body: JSON.stringify({
+          costTypeId: costFormData.costTypeId,
+          costTypeName: costFormData.costTypeName,
+          dueDate: costFormData.dueDate,
+          value: costFormData.value,
+          billFile: costFormData.billFile
+        })
       });
       
       const data = await res.json();
@@ -1897,6 +1903,7 @@ export default function App() {
         toast.success('✅ ' + data.message);
         setShowCostCreateModal(false);
         setCostFormData({
+          costId: '',
           costTypeId: '',
           costTypeName: '',
           dueDate: '',
@@ -1904,7 +1911,9 @@ export default function App() {
           billFile: '',
           paymentDate: '',
           valuePaid: '',
-          proofFile: ''
+          proofFile: '',
+          status: '',
+          paidAt: null
         });
         fetchCostsList(costsFilterStatus);
       } else {
@@ -1912,6 +1921,41 @@ export default function App() {
       }
     } catch (error) {
       toast.error('❌ Erro ao criar custo');
+    }
+  };
+  
+  const handlePayCost = async () => {
+    if (!costFormData.paymentDate || !costFormData.valuePaid) {
+      toast.error('❌ Data de pagamento e valor pago são obrigatórios');
+      return;
+    }
+    
+    try {
+      const res = await fetch('/api/costs-entries/pay', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          costId: costFormData.costId,
+          paymentDate: costFormData.paymentDate,
+          valuePaid: costFormData.valuePaid,
+          proofFile: costFormData.proofFile
+        })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        setShowCostEditModal(false);
+        setSelectedCost(null);
+        fetchCostsList(costsFilterStatus);
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao registrar pagamento');
     }
   };
   
@@ -1929,8 +1973,17 @@ export default function App() {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          costId: selectedCost.costId,
-          costData: costFormData
+          costId: costFormData.costId,
+          costData: {
+            costTypeId: costFormData.costTypeId,
+            costTypeName: costFormData.costTypeName,
+            dueDate: costFormData.dueDate,
+            value: costFormData.value,
+            billFile: costFormData.billFile,
+            paymentDate: costFormData.paymentDate,
+            valuePaid: costFormData.valuePaid,
+            proofFile: costFormData.proofFile
+          }
         })
       });
       
