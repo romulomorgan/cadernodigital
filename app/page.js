@@ -2801,6 +2801,9 @@ export default function App() {
             <TabsTrigger value="calendar">📅 Calendário</TabsTrigger>
             <TabsTrigger value="dashboard">📊 Dashboard</TabsTrigger>
             <TabsTrigger value="compare">📈 Comparações</TabsTrigger>
+            {user?.role !== 'master' && (
+              <TabsTrigger value="costs-pastor">💰 Custos</TabsTrigger>
+            )}
             {user?.role === 'master' && (
               <>
                 <TabsTrigger value="funcoes">📋 Funções</TabsTrigger>
