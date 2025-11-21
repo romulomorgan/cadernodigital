@@ -6359,7 +6359,6 @@ export default function App() {
                       </div>
                     </div>
                   </div>
-                </div>
               </CardHeader>
               <CardContent className="pt-6">
                 {costsList.length === 0 ? (
