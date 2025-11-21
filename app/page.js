@@ -105,6 +105,7 @@ export default function App() {
   const [showCostDeleteModal, setShowCostDeleteModal] = useState(false);
   const [selectedCost, setSelectedCost] = useState(null);
   const [costFormData, setCostFormData] = useState({
+    costId: '',
     costTypeId: '',
     costTypeName: '',
     dueDate: '',
@@ -112,7 +113,9 @@ export default function App() {
     billFile: '',
     paymentDate: '',
     valuePaid: '',
-    proofFile: ''
+    proofFile: '',
+    status: '',
+    paidAt: null
   });
   const [costsFilterStatus, setCostsFilterStatus] = useState('ALL');
   const [costsFilterChurch, setCostsFilterChurch] = useState('ALL');
