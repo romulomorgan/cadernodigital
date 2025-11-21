@@ -814,10 +814,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Corrigir cálculos financeiros no calendário do Master"
+    - "Aba Solicitações de Liberação - Master"
+    - "Sistema de Upload de Arquivos em Custos"
+    - "Fluxo Completo de Custos com Aprovação"
   stuck_tasks: []
   test_all: false
-  test_priority: "critical_first"
+  test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
