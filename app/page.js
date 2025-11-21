@@ -129,6 +129,8 @@ export default function App() {
   // Estados para upload de arquivos de custos
   const [uploadingBill, setUploadingBill] = useState(false);
   const [uploadingProof, setUploadingProof] = useState(false);
+  const [showCostEditModalMaster, setShowCostEditModalMaster] = useState(false);
+  const [showCostDeleteConfirm, setShowCostDeleteConfirm] = useState(false);
   
   // Confirmation dialogs
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
