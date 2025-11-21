@@ -3920,6 +3920,82 @@ export default function App() {
                     ))}
                   </div>
                 )}
+                
+                {/* HISTÓRICO DE SOLICITAÇÕES */}
+                {unlockRequestsHistory.length > 0 && (
+                  <div className="mt-8 pt-8 border-t-2 border-gray-300">
+                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                      📋 Histórico de Solicitações
+                      <Badge variant="outline" className="text-sm">
+                        {unlockRequestsHistory.length} registros
+                      </Badge>
+                    </h3>
+                    
+                    <div className="space-y-3">
+                      {unlockRequestsHistory.map((req) => (
+                        <Card key={req.requestId} className={`border-2 ${
+                          req.status === 'approved' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
+                        }`}>
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between gap-4">
+                              {/* Info */}
+                              <div className="flex-1 grid grid-cols-5 gap-3 text-sm">
+                                <div>
+                                  <p className="text-xs text-gray-500">Pastor</p>
+                                  <p className="font-semibold">{req.requesterName}</p>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-gray-500">Igreja</p>
+                                  <p className="font-semibold">{req.requesterChurch || 'N/A'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-gray-500">Data/Horário</p>
+                                  <p className="font-semibold">{req.day}/{req.month}/{req.year} - {req.timeSlot}</p>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-gray-500">Status</p>
+                                  <Badge className={req.status === 'approved' ? 'bg-green-600' : 'bg-red-600'}>
+                                    {req.status === 'approved' ? '✅ Aprovado' : '❌ Rejeitado'}
+                                  </Badge>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-gray-500">Processado em</p>
+                                  <p className="text-xs font-medium">
+                                    {new Date(req.approvedAt || req.rejectedAt).toLocaleString('pt-BR')}
+                                  </p>
+                                </div>
+                              </div>
+                              
+                              {/* Ações */}
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setSelectedRequest(req);
+                                    setShowRequestViewModal(true);
+                                  }}
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => {
+                                    setSelectedRequest(req);
+                                    setShowRequestDeleteConfirm(true);
+                                  }}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
