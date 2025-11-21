@@ -1970,24 +1970,18 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
       }
       
-      let month, year;
-      try {
-        const body = await request.json();
-        month = body.month;
-        year = body.year;
-      } catch (e) {
-        // Se não houver body, usar mês/ano atual
-        const now = getBrazilTime();
-        month = now.month() + 1;
-        year = now.year();
-      }
+      // Buscar time_overrides ativos do usuário (não precisa de month/year no filtro)
+      const activeOverrides = await db.collection('time_overrides')
+        .find({
+          userId: user.userId,
+          expiresAt: { $gt: getBrazilTime().toISOString() }
+        })
+        .toArray();
       
       // Buscar solicitações pendentes do usuário
       const pendingRequests = await db.collection('unlock_requests')
         .find({ 
           requesterId: user.userId,
-          month: parseInt(month),
-          year: parseInt(year),
           status: 'pending'
         })
         .toArray();
