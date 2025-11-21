@@ -8658,90 +8658,241 @@ export default function App() {
         </DialogContent>
       </Dialog>
       
-      {/* Modal Editar Custo */}
+      {/* Modal Editar/Pagar Custo */}
       <Dialog open={showCostEditModal} onOpenChange={setShowCostEditModal}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>✏️ Editar Custo</DialogTitle>
-            <DialogDescription>Altere as informações e salve novamente</DialogDescription>
+            <DialogTitle>
+              {costFormData.status === 'APPROVED' ? '💰 Registrar Pagamento' : '✏️ Editar Custo'}
+            </DialogTitle>
+            <DialogDescription>
+              {costFormData.status === 'PENDING' && '⏳ Custo pendente de aprovação'}
+              {costFormData.status === 'APPROVED' && '✅ Custo aprovado - Registre o pagamento'}
+              {costFormData.status === 'PAID' && '💳 Custo já pago - Edição disponível por 60 minutos'}
+            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Tipo de Custo *</Label>
-                <Select 
-                  value={costFormData.costTypeId}
-                  onValueChange={(value) => {
-                    const tipo = allCustos.find(c => c.custoId === value);
-                    setCostFormData({
-                      ...costFormData,
-                      costTypeId: value,
-                      costTypeName: tipo?.name || ''
-                    });
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o tipo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {allCustos.map(custo => (
-                      <SelectItem key={custo.custoId} value={custo.custoId}>
-                        {custo.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            {/* Seção de dados básicos do custo */}
+            <div className="border-b pb-4">
+              <p className="text-sm font-semibold text-gray-600 mb-3">📝 Dados do Custo</p>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Tipo de Custo *</Label>
+                  <Select 
+                    value={costFormData.costTypeId}
+                    disabled={costFormData.status === 'APPROVED'}
+                    onValueChange={(value) => {
+                      const tipo = allCustos.find(c => c.custoId === value);
+                      setCostFormData({
+                        ...costFormData,
+                        costTypeId: value,
+                        costTypeName: tipo?.name || ''
+                      });
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o tipo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {allCustos.map(custo => (
+                        <SelectItem key={custo.custoId} value={custo.custoId}>
+                          {custo.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <Label>Data de Vencimento *</Label>
+                  <Input
+                    type="date"
+                    disabled={costFormData.status === 'APPROVED'}
+                    value={costFormData.dueDate}
+                    onChange={(e) => setCostFormData({...costFormData, dueDate: e.target.value})}
+                  />
+                </div>
               </div>
               
-              <div>
-                <Label>Data de Vencimento *</Label>
-                <Input
-                  type="date"
-                  value={costFormData.dueDate}
-                  onChange={(e) => setCostFormData({...costFormData, dueDate: e.target.value})}
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Valor do Custo *</Label>
+              <div className="mt-3">
+                <Label>Valor do Custo (R$) *</Label>
                 <Input
                   type="number"
                   step="0.01"
+                  disabled={costFormData.status === 'APPROVED'}
                   value={costFormData.value}
                   onChange={(e) => setCostFormData({...costFormData, value: e.target.value})}
                 />
               </div>
               
-              <div>
-                <Label>Data do Pagamento</Label>
-                <Input
-                  type="date"
-                  value={costFormData.paymentDate}
-                  onChange={(e) => setCostFormData({...costFormData, paymentDate: e.target.value})}
-                />
+              <div className="mt-3">
+                <Label>Conta/Boleto (Upload) 📎</Label>
+                <div className="flex gap-2">
+                  <Input
+                    type="file"
+                    accept="image/*,application/pdf"
+                    disabled={costFormData.status === 'APPROVED' || uploadingBill}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setUploadingBill(true);
+                        const filePath = await handleUploadCostFile(file, 'bill');
+                        if (filePath) {
+                          setCostFormData({...costFormData, billFile: filePath});
+                        }
+                        setUploadingBill(false);
+                        e.target.value = '';
+                      }
+                    }}
+                    className="flex-1"
+                  />
+                  {uploadingBill && <span className="text-xs text-blue-600">Enviando...</span>}
+                </div>
+                {costFormData.billFile && (
+                  <div className="flex gap-2 mt-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => window.open(costFormData.billFile, '_blank')}
+                      className="flex-1"
+                    >
+                      <Eye className="w-3 h-3 mr-2" />
+                      Visualizar
+                    </Button>
+                    {costFormData.status !== 'APPROVED' && (
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDeleteCostFile('bill')}
+                        className="flex-1"
+                      >
+                        <Trash2 className="w-3 h-3 mr-2" />
+                        Excluir
+                      </Button>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             
-            <div>
-              <Label>Valor Pago</Label>
-              <Input
-                type="number"
-                step="0.01"
-                value={costFormData.valuePaid}
-                onChange={(e) => setCostFormData({...costFormData, valuePaid: e.target.value})}
-              />
+            {/* Seção de pagamento */}
+            <div className="border-t-2 border-orange-300 pt-4">
+              <p className="text-sm font-semibold text-orange-700 mb-3 flex items-center gap-2">
+                <span>💳 Informações de Pagamento</span>
+                {costFormData.status === 'PENDING' && (
+                  <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+                    Aguardando aprovação do Líder Máximo
+                  </span>
+                )}
+                {costFormData.status === 'APPROVED' && (
+                  <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                    Liberado para pagamento
+                  </span>
+                )}
+                {costFormData.status === 'PAID' && (
+                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                    Pago
+                  </span>
+                )}
+              </p>
+              
+              <div className={`grid grid-cols-2 gap-4 ${costFormData.status === 'PENDING' ? 'opacity-50' : ''}`}>
+                <div>
+                  <Label>Data do Pagamento {costFormData.status === 'APPROVED' && '*'}</Label>
+                  <Input
+                    type="date"
+                    disabled={costFormData.status === 'PENDING'}
+                    className={costFormData.status === 'PENDING' ? 'bg-gray-100' : ''}
+                    value={costFormData.paymentDate}
+                    onChange={(e) => setCostFormData({...costFormData, paymentDate: e.target.value})}
+                    title={costFormData.status === 'PENDING' ? 'Este campo será liberado após aprovação do Master' : ''}
+                  />
+                </div>
+                
+                <div>
+                  <Label>Valor Pago (R$) {costFormData.status === 'APPROVED' && '*'}</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    disabled={costFormData.status === 'PENDING'}
+                    className={costFormData.status === 'PENDING' ? 'bg-gray-100' : ''}
+                    value={costFormData.valuePaid}
+                    onChange={(e) => setCostFormData({...costFormData, valuePaid: e.target.value})}
+                    title={costFormData.status === 'PENDING' ? 'Este campo será liberado após aprovação do Master' : ''}
+                  />
+                </div>
+              </div>
+              
+              <div className={`mt-3 ${costFormData.status === 'PENDING' ? 'opacity-50' : ''}`}>
+                <Label>Comprovante de Pagamento 📎 {costFormData.status === 'APPROVED' && '(Recomendado)'}</Label>
+                <div className="flex gap-2">
+                  <Input
+                    type="file"
+                    accept="image/*,application/pdf"
+                    disabled={costFormData.status === 'PENDING' || uploadingProof}
+                    className={costFormData.status === 'PENDING' ? 'flex-1 bg-gray-100' : 'flex-1'}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setUploadingProof(true);
+                        const filePath = await handleUploadCostFile(file, 'proof');
+                        if (filePath) {
+                          setCostFormData({...costFormData, proofFile: filePath});
+                        }
+                        setUploadingProof(false);
+                        e.target.value = '';
+                      }
+                    }}
+                    title={costFormData.status === 'PENDING' ? 'Este campo será liberado após aprovação do Master' : ''}
+                  />
+                  {uploadingProof && <span className="text-xs text-blue-600">Enviando...</span>}
+                </div>
+                {costFormData.proofFile && (
+                  <div className="flex gap-2 mt-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => window.open(costFormData.proofFile, '_blank')}
+                      className="flex-1"
+                    >
+                      <Eye className="w-3 h-3 mr-2" />
+                      Visualizar
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => handleDeleteCostFile('proof')}
+                      className="flex-1"
+                    >
+                      <Trash2 className="w-3 h-3 mr-2" />
+                      Excluir
+                    </Button>
+                  </div>
+                )}
+                {costFormData.status === 'PENDING' && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    🔒 Este campo será habilitado após o Líder Máximo aprovar o custo
+                  </p>
+                )}
+              </div>
             </div>
             
             <div className="flex gap-3 justify-end pt-4">
               <Button variant="outline" onClick={() => setShowCostEditModal(false)}>
                 Cancelar
               </Button>
-              <Button onClick={handleUpdateCost} className="bg-blue-600 hover:bg-blue-700">
-                💾 Salvar Alterações
-              </Button>
+              {costFormData.status === 'APPROVED' ? (
+                <Button onClick={handlePayCost} className="bg-green-600 hover:bg-green-700">
+                  💳 Confirmar Pagamento
+                </Button>
+              ) : (
+                <Button onClick={handleUpdateCost} className="bg-blue-600 hover:bg-blue-700" disabled={costFormData.status === 'PENDING'}>
+                  💾 Salvar Alterações
+                </Button>
+              )}
             </div>
           </div>
         </DialogContent>
