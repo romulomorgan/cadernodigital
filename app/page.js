@@ -6061,6 +6061,128 @@ export default function App() {
                       </Card>
                     </div>
                     
+                    {/* Estatísticas de Custos */}
+                    <Card className="mt-6 border-2 border-orange-300">
+                      <CardHeader className="bg-gradient-to-r from-orange-50 to-orange-100">
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <DollarSign className="w-5 h-5" />
+                          💰 Estatísticas de Custos
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          {/* Custos Pendentes */}
+                          <Card className="border-2 border-yellow-300">
+                            <CardContent className="pt-6">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="text-sm text-gray-600">Pendentes</p>
+                                  <p className="text-3xl font-bold text-yellow-600">
+                                    {costsList.filter(c => c.status === 'PENDING').length || 0}
+                                  </p>
+                                </div>
+                                <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                                  <span className="text-2xl">🟡</span>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                          
+                          {/* Custos Aprovados */}
+                          <Card className="border-2 border-green-300">
+                            <CardContent className="pt-6">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="text-sm text-gray-600">Aprovados</p>
+                                  <p className="text-3xl font-bold text-green-600">
+                                    {costsList.filter(c => c.status === 'APPROVED').length || 0}
+                                  </p>
+                                </div>
+                                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                  <span className="text-2xl">🟢</span>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                          
+                          {/* Custos Reprovados */}
+                          <Card className="border-2 border-red-300">
+                            <CardContent className="pt-6">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="text-sm text-gray-600">Reprovados</p>
+                                  <p className="text-3xl font-bold text-red-600">
+                                    {costsList.filter(c => c.status === 'REJECTED').length || 0}
+                                  </p>
+                                </div>
+                                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                                  <span className="text-2xl">🔴</span>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                          
+                          {/* Total em Juros */}
+                          <Card className="border-2 border-pink-300">
+                            <CardContent className="pt-6">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="text-sm text-gray-600">Total em Juros</p>
+                                  <p className="text-2xl font-bold text-pink-600">
+                                    R$ {costsList
+                                      .filter(c => c.difference > 0)
+                                      .reduce((sum, c) => sum + c.difference, 0)
+                                      .toFixed(2)}
+                                  </p>
+                                </div>
+                                <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center">
+                                  <TrendingUp className="w-6 h-6 text-pink-600" />
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                          
+                          {/* Valor Total de Custos */}
+                          <Card className="border-2 border-indigo-300">
+                            <CardContent className="pt-6">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="text-sm text-gray-600">Valor Total</p>
+                                  <p className="text-2xl font-bold text-indigo-600">
+                                    R$ {costsList
+                                      .reduce((sum, c) => sum + parseFloat(c.value || 0), 0)
+                                      .toFixed(2)}
+                                  </p>
+                                </div>
+                                <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+                                  <DollarSign className="w-6 h-6 text-indigo-600" />
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                          
+                          {/* Valor Total Pago */}
+                          <Card className="border-2 border-cyan-300">
+                            <CardContent className="pt-6">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="text-sm text-gray-600">Total Pago</p>
+                                  <p className="text-2xl font-bold text-cyan-600">
+                                    R$ {costsList
+                                      .reduce((sum, c) => sum + parseFloat(c.valuePaid || 0), 0)
+                                      .toFixed(2)}
+                                  </p>
+                                </div>
+                                <div className="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center">
+                                  <CheckCircle className="w-6 h-6 text-cyan-600" />
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
                     {/* Informações adicionais */}
                     <Card className="mt-6 border-2 border-gray-300">
                       <CardHeader>
