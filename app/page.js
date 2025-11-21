@@ -270,9 +270,8 @@ export default function App() {
   });
   
   // Filtrar entries (ofertas) por igreja selecionada (apenas para Master)
-  const entriesFiltradas = user?.role === 'master' && selectedChurchFilter !== 'all'
-    ? entries.filter(entry => entry.churchId === selectedChurchFilter)
-    : entries;
+  // Não precisa mais filtrar no frontend - o backend já faz o filtro e agregação
+  const entriesFiltradas = entries;
   
   // Filtrar usuários com base na busca
   const usuariosFiltrados = usuarios.filter(u => {
