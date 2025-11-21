@@ -1207,6 +1207,47 @@ export async function POST(request) {
       });
     }
     
+    // DELETE SPECIFIC ENTRY (Master apenas)
+    if (endpoint === 'entries/delete-specific') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      try {
+        const body = await request.json();
+        const { entryId, userId } = body;
+        
+        // Buscar e deletar oferta específica
+        const entry = await db.collection('entries').findOne({ entryId, userId });
+        
+        if (!entry) {
+          return NextResponse.json({ error: 'Oferta não encontrada' }, { status: 404 });
+        }
+        
+        await db.collection('entries').deleteOne({ entryId, userId });
+        
+        // Audit log
+        await db.collection('audit_logs').insertOne({
+          logId: crypto.randomUUID(),
+          action: 'delete_entry_by_master',
+          userId: user.userId,
+          timestamp: getBrazilTime().toISOString(),
+          details: {
+            entryId,
+            deletedUserId: userId,
+            church: entry.church,
+            value: entry.value
+          }
+        });
+        
+        return NextResponse.json({ success: true, message: 'Oferta excluída com sucesso!' });
+      } catch (error) {
+        console.error('Erro ao deletar oferta:', error);
+        return NextResponse.json({ error: 'Erro ao deletar oferta' }, { status: 500 });
+      }
+    }
+    
     // SAVE DAY OBSERVATION
     if (endpoint === 'observations/day') {
       const user = verifyToken(request);
