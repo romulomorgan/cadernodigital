@@ -1845,7 +1845,7 @@ export default function App() {
   
   // ========== FUNÇÕES CRUD - CUSTOS ENTRIES (LANÇAMENTOS) ==========
   
-  const fetchCostsList = async (filterStatus = 'ALL') => {
+  const fetchCostsList = async (filterStatus = 'ALL', filterChurch = 'ALL') => {
     try {
       const res = await fetch('/api/costs-entries/list', {
         method: 'POST',
@@ -1853,12 +1853,20 @@ export default function App() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ status: filterStatus })
+        body: JSON.stringify({ 
+          status: filterStatus,
+          churchId: filterChurch !== 'ALL' ? filterChurch : null
+        })
       });
       
       if (res.ok) {
         const data = await res.json();
-        setCostsList(data.costs || []);
+        let costs = data.costs || [];
+        
+        // Ordenar por data (mais recentes primeiro)
+        costs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        setCostsList(costs);
       }
     } catch (error) {
       console.error('Erro ao buscar custos:', error);
