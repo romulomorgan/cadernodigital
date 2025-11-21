@@ -3630,8 +3630,8 @@ export default function App() {
                         </div>
                       )}
                       
-                      {/* Show day observation if exists and not editing */}
-                      {!editingDayObs && getDayObservation(day) && (
+                      {/* Show day observation if exists and not editing - APENAS PARA PASTOR (Master vê no modal de detalhes) */}
+                      {user?.role !== 'master' && !editingDayObs && getDayObservation(day) && (
                         <div className="mb-4 p-3 border border-blue-200 rounded-lg bg-blue-50">
                           <div className="flex items-center gap-2 mb-1">
                             <FileText className="w-4 h-4 text-blue-600" />
