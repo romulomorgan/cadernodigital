@@ -6305,6 +6305,17 @@ export default function App() {
                       </Button>
                       <Button
                         size="sm"
+                        variant={costsFilterStatus === 'PAID' ? 'default' : 'outline'}
+                        onClick={() => {
+                          setCostsFilterStatus('PAID');
+                          fetchCostsList('PAID');
+                        }}
+                        className="bg-emerald-600 hover:bg-emerald-700"
+                      >
+                        💚 Pagos
+                      </Button>
+                      <Button
+                        size="sm"
                         variant={costsFilterStatus === 'REJECTED' ? 'default' : 'outline'}
                         onClick={() => {
                           setCostsFilterStatus('REJECTED');
