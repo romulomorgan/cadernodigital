@@ -1595,3 +1595,95 @@ agent_communication:
           2. Subtotal de cada dia soma todos os horários
           3. Filtrar por igreja específica atualiza todos os totais
           4. Limpar filtro volta a mostrar todas as igrejas agregadas
+
+  - task: "Aba Solicitações de Liberação (Master)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/page.js e /app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          ✅ IMPLEMENTADO - NOV 21, 2025
+          
+          NOVA ABA "SOLICITAÇÕES" NO MASTER:
+          - Posição: Logo após a 1ª aba (Calendário)
+          - Badge piscando com número de solicitações pendentes
+          - Lista todas as solicitações de todas as igrejas
+          - Informações exibidas: Igreja, Pastor, Data, Horário, Motivo
+          - Botão "Aprovar" (libera por 60 minutos)
+          - Botão "Rejeitar" (desabilitado por enquanto)
+          - Polling automático a cada 30 segundos
+          - useEffect carrega solicitações ao entrar na aba
+          
+          BACKEND (já existia):
+          - POST /api/unlock/request - Pastor solicita liberação
+          - GET /api/unlock/requests - Master lista pendentes
+          - POST /api/unlock/approve - Master aprova (cria time_override de 60min)
+          
+          FRONTEND (novo):
+          - Estado unlockRequests e unlockRequestsCount (linha 117-118)
+          - Função fetchUnlockRequests() (linha 1920-1935)
+          - Função handleApproveUnlockRequest() (linha 1937-1955)
+          - useEffect para polling (linha 620-628)
+          - TabsTrigger com badge animado (linha 3108-3117)
+          - TabsContent completo com listagem (linha 3851-3941)
+          
+          PRECISA TESTAR:
+          - Badge atualiza automaticamente
+          - Listagem mostra todas as informações
+          - Aprovação funciona e libera por 60min
+          - Após 60min, card trava novamente
+
+  - task: "Sistema de Upload de Arquivos em Custos"
+    implemented: true
+    working: "NA"
+    file: "/app/app/page.js e /app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          ✅ IMPLEMENTADO - NOV 21, 2025
+          
+          PROBLEMA CORRIGIDO:
+          - Upload de arquivos em custos era apenas INPUT TEXT
+          - Mensagem: "Em breve: upload de arquivos PDF/Imagem"
+          
+          SOLUÇÃO IMPLEMENTADA:
+          
+          Backend (route.js linha 821-890):
+          - Novo endpoint: POST /api/upload/cost-file
+          - Aceita FormData com file e fileType ('bill' ou 'proof')
+          - Validações: tipo (JPG, PNG, WebP, PDF) e tamanho (máx 5MB)
+          - Salva em /app/uploads/costs/
+          - Retorna caminho: /api/uploads/costs/filename
+          - Servir arquivos via GET /api/uploads/costs/ (já existia)
+          
+          Frontend (page.js):
+          - Estados uploadingBill e uploadingProof (linha 120-121)
+          - Função handleUploadCostFile() (linha 1891-1915)
+          - Modal Criar: Input type="file" para billFile (linha 7881-7899)
+          - Modal Criar: Input type="file" para proofFile (linha 7901-7919)
+          - Modal Editar: Mesmos campos de upload
+          - Modal Visualizar: Exibe imagens/PDFs inline (linha 8136-8189)
+          - Botões para abrir/baixar arquivos
+          
+          FUNCIONALIDADES:
+          - ✅ Upload real de imagens (JPG, PNG, WebP)
+          - ✅ Upload real de PDF
+          - ✅ Preview inline no modal de visualização
+          - ✅ Botão para abrir em nova aba/baixar
+          - ✅ Indicador de "Enviando..." durante upload
+          - ✅ Mensagem de confirmação "✅ Arquivo anexado"
+          
+          PRECISA TESTAR:
+          - Upload de imagem funciona
+          - Upload de PDF funciona
+          - Visualização inline no modal
+          - Download/abertura em nova aba
