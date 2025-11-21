@@ -5774,6 +5774,182 @@ export default function App() {
                   </div>
                 </CardContent>
               </Card>
+              
+              {/* SEÇÃO DE APROVAÇÃO DE CUSTOS (MASTER) */}
+              <Card className="mt-6 border-2 border-purple-300">
+                <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <CheckCircle className="w-6 h-6" />
+                        Aprovação de Custos das Igrejas
+                      </CardTitle>
+                      <CardDescription>Visualize e aprove/reprove os custos lançados pelos pastores</CardDescription>
+                    </div>
+                    
+                    {/* Filtros */}
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant={costsFilterStatus === 'ALL' ? 'default' : 'outline'}
+                        onClick={() => {
+                          setCostsFilterStatus('ALL');
+                          fetchCostsList('ALL');
+                        }}
+                      >
+                        Todos
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={costsFilterStatus === 'PENDING' ? 'default' : 'outline'}
+                        onClick={() => {
+                          setCostsFilterStatus('PENDING');
+                          fetchCostsList('PENDING');
+                        }}
+                        className="bg-yellow-600 hover:bg-yellow-700"
+                      >
+                        🟡 Pendentes
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={costsFilterStatus === 'APPROVED' ? 'default' : 'outline'}
+                        onClick={() => {
+                          setCostsFilterStatus('APPROVED');
+                          fetchCostsList('APPROVED');
+                        }}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        🟢 Aprovados
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={costsFilterStatus === 'REJECTED' ? 'default' : 'outline'}
+                        onClick={() => {
+                          setCostsFilterStatus('REJECTED');
+                          fetchCostsList('REJECTED');
+                        }}
+                        className="bg-red-600 hover:bg-red-700"
+                      >
+                        🔴 Reprovados
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  {costsList.length === 0 ? (
+                    <div className="text-center py-12 text-gray-400">
+                      <DollarSign className="w-16 h-16 mx-auto mb-4" />
+                      <p className="text-lg font-semibold">Nenhum custo lançado ainda</p>
+                      <p className="text-sm mt-2">
+                        {costsFilterStatus === 'ALL' && 'Aguardando lançamentos dos pastores'}
+                        {costsFilterStatus === 'PENDING' && 'Nenhum custo pendente no momento'}
+                        {costsFilterStatus === 'APPROVED' && 'Nenhum custo aprovado ainda'}
+                        {costsFilterStatus === 'REJECTED' && 'Nenhum custo reprovado'}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="bg-gray-100">
+                          <tr>
+                            <th className="text-left p-3 text-sm font-semibold">Igreja</th>
+                            <th className="text-left p-3 text-sm font-semibold">Pastor</th>
+                            <th className="text-left p-3 text-sm font-semibold">Tipo</th>
+                            <th className="text-left p-3 text-sm font-semibold">Vencimento</th>
+                            <th className="text-left p-3 text-sm font-semibold">Valor</th>
+                            <th className="text-left p-3 text-sm font-semibold">Pago</th>
+                            <th className="text-left p-3 text-sm font-semibold">Juros</th>
+                            <th className="text-center p-3 text-sm font-semibold">Status</th>
+                            <th className="text-center p-3 text-sm font-semibold">Ações</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {costsList.map((cost) => {
+                            const statusColors = {
+                              'PENDING': 'bg-yellow-100 text-yellow-800 border-yellow-300',
+                              'APPROVED': 'bg-green-100 text-green-800 border-green-300',
+                              'REJECTED': 'bg-red-100 text-red-800 border-red-300'
+                            };
+                            const statusLabels = {
+                              'PENDING': '🟡 Pendente',
+                              'APPROVED': '🟢 Aprovado',
+                              'REJECTED': '🔴 Reprovado'
+                            };
+                            
+                            return (
+                              <tr key={cost.costId} className="hover:bg-gray-50">
+                                <td className="p-3 text-sm font-medium">{cost.churchName}</td>
+                                <td className="p-3 text-sm">{cost.userName}</td>
+                                <td className="p-3 text-sm font-medium">{cost.costTypeName}</td>
+                                <td className="p-3 text-sm">{new Date(cost.dueDate).toLocaleDateString('pt-BR')}</td>
+                                <td className="p-3 text-sm font-semibold">R$ {parseFloat(cost.value).toFixed(2)}</td>
+                                <td className="p-3 text-sm font-semibold">
+                                  {cost.valuePaid ? `R$ ${parseFloat(cost.valuePaid).toFixed(2)}` : '-'}
+                                </td>
+                                <td className="p-3 text-sm">
+                                  {cost.difference > 0 ? (
+                                    <span className="text-red-600 font-bold">+R$ {cost.difference.toFixed(2)}</span>
+                                  ) : cost.difference < 0 ? (
+                                    <span className="text-green-600 font-bold">-R$ {Math.abs(cost.difference).toFixed(2)}</span>
+                                  ) : (
+                                    <span className="text-gray-400">-</span>
+                                  )}
+                                </td>
+                                <td className="p-3 text-center">
+                                  <Badge className={`${statusColors[cost.status]} border`}>
+                                    {statusLabels[cost.status]}
+                                  </Badge>
+                                </td>
+                                <td className="p-3">
+                                  <div className="flex items-center justify-center gap-1">
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => {
+                                        setSelectedCost(cost);
+                                        setShowCostViewModal(true);
+                                      }}
+                                      title="Visualizar Detalhes"
+                                    >
+                                      <Eye className="w-4 h-4" />
+                                    </Button>
+                                    
+                                    {cost.status === 'PENDING' && (
+                                      <>
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          onClick={() => handleApproveCost(cost.costId)}
+                                          title="Aprovar"
+                                          className="text-green-600 hover:text-green-700"
+                                        >
+                                          <CheckCircle className="w-4 h-4" />
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          onClick={() => {
+                                            const reason = prompt('Motivo da reprovação (opcional):');
+                                            handleRejectCost(cost.costId, reason || 'Sem motivo especificado');
+                                          }}
+                                          title="Reprovar"
+                                          className="text-red-600 hover:text-red-700"
+                                        >
+                                          <XCircle className="w-4 h-4" />
+                                        </Button>
+                                      </>
+                                    )}
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </TabsContent>
           )}
           
