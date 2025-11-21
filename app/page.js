@@ -3103,6 +3103,16 @@ export default function App() {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6">
             <TabsTrigger value="calendar">📅 Calendário</TabsTrigger>
+            {user?.role === 'master' && (
+              <TabsTrigger value="requests" className="relative">
+                🔔 Solicitações
+                {unlockRequestsCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+                    {unlockRequestsCount}
+                  </span>
+                )}
+              </TabsTrigger>
+            )}
             <TabsTrigger value="dashboard">📊 Dashboard</TabsTrigger>
             <TabsTrigger value="compare">📈 Comparações</TabsTrigger>
             {user?.role !== 'master' && (
