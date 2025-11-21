@@ -579,14 +579,16 @@ export async function POST(request) {
           dueDate,
           value: parseFloat(value),
           billFile: billFile || null,
-          paymentDate: paymentDate || null,
-          valuePaid: parseFloat(valuePaid) || 0,
-          difference: difference,
-          proofFile: proofFile || null,
+          paymentDate: null, // Pastor não pode preencher na criação
+          valuePaid: 0, // Será preenchido após aprovação
+          difference: 0,
+          proofFile: null, // Será preenchido após aprovação
           status: 'PENDING',
           reviewedBy: null,
           reviewedAt: null,
           rejectionReason: null,
+          paidAt: null,
+          paidBy: null,
           createdAt: getBrazilTime().toISOString(),
           updatedAt: getBrazilTime().toISOString()
         };
