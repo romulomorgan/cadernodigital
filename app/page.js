@@ -111,7 +111,15 @@ export default function App() {
     valuePaid: '',
     proofFile: ''
   });
-  const [costsFilterStatus, setCostsFilterStatus] = useState('ALL'); // { entryId, receipts: [], currentIndex: 0 }
+  const [costsFilterStatus, setCostsFilterStatus] = useState('ALL');
+  
+  // Estados para Solicitações de Liberação (Master)
+  const [unlockRequests, setUnlockRequests] = useState([]);
+  const [unlockRequestsCount, setUnlockRequestsCount] = useState(0);
+  
+  // Estados para upload de arquivos de custos
+  const [uploadingBill, setUploadingBill] = useState(false);
+  const [uploadingProof, setUploadingProof] = useState(false);
   
   // Confirmation dialogs
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
