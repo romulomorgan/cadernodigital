@@ -62,6 +62,9 @@ export default function App() {
   
   // Estados para recuperação de senha e visualização de senha
   const [showPassword, setShowPassword] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [showUserPassword, setShowUserPassword] = useState(false);
+  const [showEditUserPassword, setShowEditUserPassword] = useState(false);
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
   
