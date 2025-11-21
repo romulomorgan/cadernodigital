@@ -8432,52 +8432,20 @@ export default function App() {
               <p className="text-xs text-gray-500 mt-1">Aceita: Imagens (JPG, PNG, WebP) e PDF (máx. 5MB)</p>
             </div>
             
-            <div>
-              <Label>Comprovante de Pagamento (Upload) 📎</Label>
+            <div className="opacity-50">
+              <Label>Comprovante de Pagamento 📎</Label>
               <div className="flex gap-2">
                 <Input
                   type="file"
                   accept="image/*,application/pdf"
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      setUploadingProof(true);
-                      const filePath = await handleUploadCostFile(file, 'proof');
-                      if (filePath) {
-                        setCostFormData({...costFormData, proofFile: filePath});
-                      }
-                      setUploadingProof(false);
-                      e.target.value = ''; // Limpar input
-                    }
-                  }}
-                  disabled={uploadingProof}
-                  className="flex-1"
+                  disabled
+                  className="flex-1 bg-gray-100"
+                  title="Este campo será liberado após aprovação do Master"
                 />
-                {uploadingProof && <span className="text-xs text-blue-600">Enviando...</span>}
               </div>
-              {costFormData.proofFile && (
-                <div className="flex gap-2 mt-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => window.open(costFormData.proofFile, '_blank')}
-                    className="flex-1"
-                  >
-                    <Eye className="w-3 h-3 mr-2" />
-                    Visualizar
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => handleDeleteCostFile('proof')}
-                    className="flex-1"
-                  >
-                    <Trash2 className="w-3 h-3 mr-2" />
-                    Excluir
-                  </Button>
-                </div>
-              )}
-              <p className="text-xs text-gray-500 mt-1">Aceita: Imagens (JPG, PNG, WebP) e PDF (máx. 5MB)</p>
+              <p className="text-xs text-gray-500 mt-1">
+                🔒 Este campo será habilitado após o Master aprovar o custo
+              </p>
             </div>
             
             <div className="flex gap-3 justify-end pt-4">
