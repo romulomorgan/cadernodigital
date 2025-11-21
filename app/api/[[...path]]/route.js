@@ -1936,15 +1936,16 @@ export async function POST(request) {
       return NextResponse.json({ success: true, message: 'Solicitação enviada ao Líder Máximo' });
     }
     
-    // GET UNLOCK REQUESTS (Master vê todas pendentes)
+    // GET UNLOCK REQUESTS (Master vê todas: pendentes + histórico)
     if (endpoint === 'unlock/requests') {
       const user = verifyToken(request);
       if (!user || user.role !== 'master') {
         return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
       }
       
+      // Buscar todas as solicitações (pendentes, aprovadas e rejeitadas)
       const requests = await db.collection('unlock_requests')
-        .find({ status: 'pending' })
+        .find({})
         .sort({ createdAt: -1 })
         .toArray();
       
