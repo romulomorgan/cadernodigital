@@ -2876,15 +2876,24 @@ export default function App() {
                     
                     <div>
                       <Label htmlFor="reg-password" className="text-xs md:text-sm">Senha *</Label>
-                      <Input
-                        id="reg-password"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        placeholder="Senha segura"
-                        className="text-sm h-9"
-                      />
+                      <div className="relative">
+                        <Input
+                          id="reg-password"
+                          type={showRegisterPassword ? "text" : "password"}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                          placeholder="Senha segura"
+                          className="text-sm h-9 pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                        >
+                          {showRegisterPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
                     </div>
                     
                     <div>
