@@ -1104,6 +1104,27 @@ export default function App() {
   const isEntryLocked = (entry, currentTime, day, timeSlot) => {
     if (!currentTime) return { locked: false, reason: null, timeLeft: null };
     
+    // PRIORIDADE 1: Verificar se há um activeOverride (liberação do Master)
+    const override = myActiveOverrides.find(o => 
+      o.day === day && o.timeSlot === timeSlot
+    );
+    
+    if (override && override.expiresAt) {
+      const expiresAt = new Date(override.expiresAt);
+      const now = currentTime;
+      
+      // Se override ainda está ativo, card está liberado
+      if (now < expiresAt) {
+        const timeLeftMs = expiresAt - now;
+        const minutes = Math.floor(timeLeftMs / 60000);
+        return { 
+          locked: false, 
+          reason: null, 
+          timeLeft: `${minutes}min (liberado por Master)` 
+        };
+      }
+    }
+    
     // Se há entry, verificar bloqueios normais
     if (entry) {
       if (entry.timeWindowLocked && !entry.masterUnlocked) {
