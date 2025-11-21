@@ -2079,6 +2079,13 @@ export default function App() {
   
   const handleUploadCostFile = async (file, fileType) => {
     try {
+      // Se já existe arquivo, deletar o anterior primeiro
+      const oldFile = fileType === 'bill' ? costFormData.billFile : costFormData.proofFile;
+      if (oldFile) {
+        console.log(`Substituindo arquivo anterior: ${oldFile}`);
+        // O backend pode implementar lógica para deletar arquivo físico se necessário
+      }
+      
       const formData = new FormData();
       formData.append('file', file);
       formData.append('fileType', fileType); // 'bill' ou 'proof'
@@ -2104,6 +2111,16 @@ export default function App() {
       console.error('Erro ao fazer upload:', error);
       toast.error('❌ Erro ao enviar arquivo');
       return null;
+    }
+  };
+  
+  const handleDeleteCostFile = (fileType) => {
+    if (fileType === 'bill') {
+      setCostFormData({...costFormData, billFile: ''});
+      toast.success('✅ Conta/Boleto removido');
+    } else {
+      setCostFormData({...costFormData, proofFile: ''});
+      toast.success('✅ Comprovante removido');
     }
   };
   
