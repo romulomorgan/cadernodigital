@@ -4672,9 +4672,10 @@ export default function App() {
                                       
                                       {/* Botão Editar - Lógica:
                                           1. APPROVED: pode editar para registrar pagamento
-                                          2. PAID < 60min: pode editar para corrigir pagamento
-                                          3. PAID > 60min: NÃO mostra botão (apenas visualizar)
-                                          4. PENDING/REJECTED: NÃO mostra botão
+                                          2. PAID < 60min E pago pelo próprio Pastor: pode editar
+                                          3. PAID pago pelo Master: NÃO mostra botão (apenas visualizar)
+                                          4. PAID > 60min: NÃO mostra botão (apenas visualizar)
+                                          5. PENDING/REJECTED: NÃO mostra botão
                                       */}
                                       {(() => {
                                         // Se APPROVED, sempre mostra "Editar" (registrar pagamento)
@@ -4708,8 +4709,15 @@ export default function App() {
                                           );
                                         }
                                         
-                                        // Se PAID, verifica se está dentro de 60 minutos
+                                        // Se PAID, verifica quem pagou e se está dentro de 60 minutos
                                         if (cost.status === 'PAID' && cost.paidAt) {
+                                          // Se foi pago pelo Master (paidBy diferente do userId), apenas visualizar
+                                          if (cost.paidBy && cost.paidBy !== user?.userId) {
+                                            // Não mostra botão Editar - custo pago pelo Master
+                                            return null;
+                                          }
+                                          
+                                          // Se foi pago pelo próprio Pastor, verifica janela de 60 min
                                           const paidTime = new Date(cost.paidAt);
                                           const now = new Date();
                                           const diffMinutes = (now - paidTime) / (1000 * 60);
