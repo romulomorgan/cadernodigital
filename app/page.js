@@ -495,7 +495,7 @@ export default function App() {
     }
   };
   
-  const fetchUnlockRequests = async () => {
+  const fetchUnlockRequests = async (showNotification = false) => {
     try {
       const res = await fetch('/api/unlock/requests', {
         headers: {
@@ -508,8 +508,18 @@ export default function App() {
         const pending = data.requests.filter(r => r.status === 'pending');
         const history = data.requests.filter(r => r.status !== 'pending');
         
+        const newCount = pending.length;
+        
+        // Se showNotification = true e houver novas solicitações, notificar
+        if (showNotification && newCount > unlockRequestsCount) {
+          const diff = newCount - unlockRequestsCount;
+          toast.info(`🔔 ${diff} nova(s) solicitação(ões) de liberação!`, {
+            duration: 5000
+          });
+        }
+        
         setUnlockRequests(pending);
-        setUnlockRequestsCount(pending.length);
+        setUnlockRequestsCount(newCount);
         setUnlockRequestsHistory(history);
       }
     } catch (error) {
