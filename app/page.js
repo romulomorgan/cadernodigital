@@ -6576,6 +6576,7 @@ export default function App() {
                                       onClick={() => {
                                         setSelectedCost(cost);
                                         setCostFormData({
+                                          costId: cost.costId,
                                           costTypeId: cost.costTypeId,
                                           costTypeName: cost.costTypeName,
                                           dueDate: cost.dueDate,
@@ -6584,7 +6585,8 @@ export default function App() {
                                           paymentDate: cost.paymentDate || '',
                                           valuePaid: cost.valuePaid || '',
                                           proofFile: cost.proofFile || '',
-                                          status: cost.status
+                                          status: cost.status,
+                                          paidAt: cost.paidAt
                                         });
                                         setShowCostEditModalMaster(true);
                                       }}
