@@ -1469,11 +1469,11 @@ agent_communication:
 
   - task: "POST /custos/delete - Excluir tipo de custo (Master apenas)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -1482,6 +1482,211 @@ agent_communication:
           - ✅ Verifica autenticação Master
           - ✅ Exclui custo da collection
           - ✅ Registra audit log com action 'delete_custo'
+          
+          PRECISA TESTAR: Autenticação, exclusão, audit log
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Autenticação Master: Apenas usuários master podem acessar
+          - ✅ Exclusão de custo: Custo removido da collection custos
+          - ✅ Audit Log: Registro criado com action 'delete_custo'
+          - ✅ Response: Retorna success: true com mensagem
+          
+          📊 RESULTADO: EXCLUSÃO DE TIPOS DE CUSTOS FUNCIONANDO 100%
+
+  - task: "POST /upload/cost-file - Upload de arquivos de custos"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Autenticação: Usuários autenticados podem fazer upload
+          - ✅ Validação de tipo: Aceita JPG, PNG, WebP, PDF
+          - ✅ Validação de tamanho: Rejeita arquivos > 5MB
+          - ✅ Validação de fileType: Aceita 'bill' e 'proof'
+          - ✅ Diretório criado: /app/uploads/costs/ criado automaticamente
+          - ✅ Arquivo salvo: Arquivo salvo com nome único (fileType_uuid.ext)
+          - ✅ Response: Retorna filePath, fileName e mensagem de sucesso
+          - ✅ Audit Log: Registro criado com action 'upload_cost_file'
+          
+          📊 RESULTADO: UPLOAD DE ARQUIVOS DE CUSTOS FUNCIONANDO 100%
+
+  - task: "GET /api/uploads/costs/[filename] - Servir arquivos de custos"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Endpoint GET /api/uploads/costs/[filename] funcionando
+          - ✅ Content-Type correto: image/jpeg, image/png, image/webp, application/pdf
+          - ✅ Cache-Control configurado: public, max-age=31536000
+          - ✅ Status 404 para arquivos inexistentes
+          - ✅ Status 200 para arquivos existentes
+          - ✅ Arquivos servidos corretamente via browser
+          
+          📊 RESULTADO: SERVIR ARQUIVOS DE CUSTOS FUNCIONANDO 100%
+
+  - task: "POST /costs-entries/create - Criar lançamento de custo"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Autenticação: Usuários autenticados podem criar custos
+          - ✅ Validações: Campos obrigatórios (costTypeId, dueDate, value)
+          - ✅ Cálculo automático: Diferença entre valuePaid e value
+          - ✅ Dados da igreja: churchId e churchName do usuário
+          - ✅ Status inicial: PENDING para aprovação do Master
+          - ✅ Timestamps: createdAt e updatedAt preenchidos
+          - ✅ Audit Log: Registro criado com action 'create_cost_entry'
+          - ✅ Response: Retorna costEntry completo
+          
+          📊 RESULTADO: CRIAÇÃO DE LANÇAMENTOS DE CUSTOS FUNCIONANDO 100%
+
+  - task: "POST /costs-entries/list - Listar lançamentos de custos"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Autenticação: Usuários autenticados podem listar custos
+          - ✅ Filtro por permissão: Master vê tudo, Pastor vê apenas da sua igreja
+          - ✅ Filtro por status: Filtra por PENDING, APPROVED, REJECTED, ALL
+          - ✅ Ordenação: Custos ordenados por createdAt (mais recentes primeiro)
+          - ✅ Response: Retorna array de custos com success: true
+          
+          📊 RESULTADO: LISTAGEM DE CUSTOS FUNCIONANDO 100%
+
+  - task: "POST /costs-entries/approve - Aprovar lançamento de custo (Master)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Autenticação Master: Apenas usuários master podem aprovar
+          - ✅ Atualização de status: Status alterado para APPROVED
+          - ✅ Dados de aprovação: reviewedBy e reviewedAt preenchidos
+          - ✅ Timestamp: updatedAt atualizado
+          - ✅ Audit Log: Registro criado com action 'approve_cost_entry'
+          - ✅ Response: Retorna success: true com mensagem
+          
+          📊 RESULTADO: APROVAÇÃO DE CUSTOS FUNCIONANDO 100%
+
+  - task: "POST /unlock/request - Criar solicitação de liberação"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Autenticação: Usuários autenticados podem criar solicitações
+          - ✅ Validação de mês fechado: Bloqueia solicitações em mês fechado
+          - ✅ Dados da solicitação: day, month, year, timeSlot, reason
+          - ✅ Dados do solicitante: userId, name, email, role, church, region, state
+          - ✅ Status inicial: pending para aprovação do Master
+          - ✅ UUID único: requestId gerado automaticamente
+          - ✅ Audit Log: Registro criado com action 'request_unlock'
+          - ✅ Response: Retorna success: true com mensagem
+          
+          📊 RESULTADO: CRIAÇÃO DE SOLICITAÇÕES DE LIBERAÇÃO FUNCIONANDO 100%
+
+  - task: "GET /unlock/requests - Listar solicitações pendentes (Master)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Autenticação Master: Apenas usuários master podem acessar
+          - ✅ Filtro por status: Retorna apenas solicitações com status 'pending'
+          - ✅ Ordenação: Solicitações ordenadas por createdAt (mais recentes primeiro)
+          - ✅ Dados completos: Inclui todos os dados do solicitante e da solicitação
+          - ✅ Response: Retorna array de requests
+          
+          📊 RESULTADO: LISTAGEM DE SOLICITAÇÕES FUNCIONANDO 100%
+
+  - task: "POST /unlock/approve - Aprovar solicitação de liberação (Master)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TESTE COMPLETO REALIZADO - ENDPOINT FUNCIONANDO PERFEITAMENTE
+          
+          🎯 FUNCIONALIDADE TESTADA:
+          - ✅ Autenticação Master: Apenas usuários master podem aprovar
+          - ✅ Validação de mês fechado: Master pode aprovar mesmo em mês fechado
+          - ✅ Time Override: Cria override na collection time_overrides para slot vazio
+          - ✅ Entry Unlock: Atualiza entry existente com masterUnlocked se entryId fornecido
+          - ✅ Duração configurável: durationMinutes define tempo de liberação
+          - ✅ Status da solicitação: Atualiza para 'approved' com approvedBy e approvedAt
+          - ✅ Audit Log: Registro completo com detalhes da aprovação
+          - ✅ Warning: Avisa se mês está fechado
+          - ✅ Response: Retorna success: true com mensagem apropriada
+          
+          📊 RESULTADO: APROVAÇÃO DE SOLICITAÇÕES FUNCIONANDO 100%g com action 'delete_custo'
           
           PRECISA TESTAR: Autenticação, exclusão, audit log
 
