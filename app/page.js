@@ -6312,50 +6312,52 @@ export default function App() {
                         >
                           Todos
                         </Button>
-                      <Button
-                        size="sm"
-                        variant={costsFilterStatus === 'PENDING' ? 'default' : 'outline'}
-                        onClick={() => {
-                          setCostsFilterStatus('PENDING');
-                          fetchCostsList('PENDING');
-                        }}
-                        className="bg-yellow-600 hover:bg-yellow-700"
-                      >
-                        🟡 Pendentes
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant={costsFilterStatus === 'APPROVED' ? 'default' : 'outline'}
-                        onClick={() => {
-                          setCostsFilterStatus('APPROVED');
-                          fetchCostsList('APPROVED');
-                        }}
-                        className="bg-green-600 hover:bg-green-700"
-                      >
-                        🟢 Aprovados
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant={costsFilterStatus === 'PAID' ? 'default' : 'outline'}
-                        onClick={() => {
-                          setCostsFilterStatus('PAID');
-                          fetchCostsList('PAID');
-                        }}
-                        className="bg-emerald-600 hover:bg-emerald-700"
-                      >
-                        💚 Pagos
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant={costsFilterStatus === 'REJECTED' ? 'default' : 'outline'}
-                        onClick={() => {
-                          setCostsFilterStatus('REJECTED');
-                          fetchCostsList('REJECTED');
-                        }}
-                        className="bg-red-600 hover:bg-red-700"
-                      >
-                        🔴 Reprovados
-                      </Button>
+                        <Button
+                          size="sm"
+                          variant={costsFilterStatus === 'PENDING' ? 'default' : 'outline'}
+                          onClick={() => {
+                            setCostsFilterStatus('PENDING');
+                            fetchCostsList('PENDING', costsFilterChurch);
+                          }}
+                          className="bg-yellow-600 hover:bg-yellow-700"
+                        >
+                          🟡 Pendentes
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={costsFilterStatus === 'APPROVED' ? 'default' : 'outline'}
+                          onClick={() => {
+                            setCostsFilterStatus('APPROVED');
+                            fetchCostsList('APPROVED', costsFilterChurch);
+                          }}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          🟢 Aprovados
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={costsFilterStatus === 'PAID' ? 'default' : 'outline'}
+                          onClick={() => {
+                            setCostsFilterStatus('PAID');
+                            fetchCostsList('PAID', costsFilterChurch);
+                          }}
+                          className="bg-emerald-600 hover:bg-emerald-700"
+                        >
+                          💚 Pagos
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={costsFilterStatus === 'REJECTED' ? 'default' : 'outline'}
+                          onClick={() => {
+                            setCostsFilterStatus('REJECTED');
+                            fetchCostsList('REJECTED', costsFilterChurch);
+                          }}
+                          className="bg-red-600 hover:bg-red-700"
+                        >
+                          🔴 Reprovados
+                        </Button>
+                      </div>
+                    </div>
                     </div>
                   </div>
                 </CardHeader>
