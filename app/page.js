@@ -1976,6 +1976,68 @@ export default function App() {
     }
   };
   
+  const handleRejectUnlockRequest = async () => {
+    if (!selectedRequest) return;
+    
+    try {
+      const res = await fetch('/api/unlock/reject', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          requestId: selectedRequest.requestId, 
+          reason: rejectionReason || 'Rejeitado pelo Líder Máximo'
+        })
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        toast.success(`✅ ${data.message}`);
+        setShowRejectModal(false);
+        setRejectionReason('');
+        setSelectedRequest(null);
+        await fetchUnlockRequests();
+      } else {
+        toast.error(`❌ ${data.error}`);
+      }
+    } catch (error) {
+      console.error('Erro ao rejeitar solicitação:', error);
+      toast.error('❌ Erro ao rejeitar solicitação');
+    }
+  };
+  
+  const handleDeleteUnlockRequest = async () => {
+    if (!selectedRequest) return;
+    
+    try {
+      const res = await fetch('/api/unlock/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ requestId: selectedRequest.requestId })
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        toast.success(`✅ ${data.message}`);
+        setShowRequestDeleteConfirm(false);
+        setSelectedRequest(null);
+        await fetchUnlockRequests();
+      } else {
+        toast.error(`❌ ${data.error}`);
+      }
+    } catch (error) {
+      console.error('Erro ao deletar solicitação:', error);
+      toast.error('❌ Erro ao deletar solicitação');
+    }
+  };
+  
   // ========== FUNÇÕES CRUD - CUSTOS TIPOS ==========
   
   const fetchAllCustos = async () => {
