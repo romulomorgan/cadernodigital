@@ -640,6 +640,43 @@ export default function App() {
     }
   }, [isAuthenticated, activeTab, token]);
   
+  // Polling para Pastor verificar se suas solicitações foram aprovadas (atualização em tempo real)
+  useEffect(() => {
+    if (isAuthenticated && token && user?.role !== 'master') {
+      // Verificação inicial
+      const checkMyUnlockStatus = async () => {
+        try {
+          const res = await fetch('/api/unlock/my-status', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          const data = await res.json();
+          
+          // Se houver alguma aprovação nova, recarregar entries
+          if (data.activeOverrides && data.activeOverrides.length > 0) {
+            console.log('[POLLING PASTOR] Liberação detectada! Recarregando entries...');
+            await fetchEntries();
+          }
+        } catch (error) {
+          console.error('Erro ao verificar status de liberação:', error);
+        }
+      };
+      
+      checkMyUnlockStatus();
+      
+      // Verificar a cada 30 segundos
+      const interval = setInterval(() => {
+        console.log('[POLLING PASTOR] Verificando liberações aprovadas...');
+        checkMyUnlockStatus();
+      }, 30000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, token, user?.role]);
+  
   // Polling para atualizar contador de solicitações a cada 30 segundos (quando autenticado como Master)
   useEffect(() => {
     if (isAuthenticated && token && user?.role === 'master') {
