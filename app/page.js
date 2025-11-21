@@ -8915,6 +8915,98 @@ export default function App() {
                   />
                 </div>
                 
+                <div>
+                  <Label>Conta/Boleto (Upload) 📎</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="file"
+                      accept="image/*,application/pdf"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setUploadingBill(true);
+                          const filePath = await handleUploadCostFile(file, 'bill');
+                          if (filePath) {
+                            setCostFormData({...costFormData, billFile: filePath});
+                          }
+                          setUploadingBill(false);
+                          e.target.value = '';
+                        }
+                      }}
+                      disabled={uploadingBill}
+                      className="flex-1"
+                    />
+                  </div>
+                  {costFormData.billFile && (
+                    <div className="flex gap-2 mt-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => window.open(costFormData.billFile, '_blank')}
+                        className="flex-1"
+                      >
+                        <Eye className="w-3 h-3 mr-2" />
+                        Visualizar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDeleteCostFile('bill')}
+                        className="flex-1"
+                      >
+                        <Trash2 className="w-3 h-3 mr-2" />
+                        Excluir
+                      </Button>
+                    </div>
+                  )}
+                </div>
+                
+                <div>
+                  <Label>Comprovante de Pagamento 📎</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="file"
+                      accept="image/*,application/pdf"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setUploadingProof(true);
+                          const filePath = await handleUploadCostFile(file, 'proof');
+                          if (filePath) {
+                            setCostFormData({...costFormData, proofFile: filePath});
+                          }
+                          setUploadingProof(false);
+                          e.target.value = '';
+                        }
+                      }}
+                      disabled={uploadingProof}
+                      className="flex-1"
+                    />
+                  </div>
+                  {costFormData.proofFile && (
+                    <div className="flex gap-2 mt-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => window.open(costFormData.proofFile, '_blank')}
+                        className="flex-1"
+                      >
+                        <Eye className="w-3 h-3 mr-2" />
+                        Visualizar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDeleteCostFile('proof')}
+                        className="flex-1"
+                      >
+                        <Trash2 className="w-3 h-3 mr-2" />
+                        Excluir
+                      </Button>
+                    </div>
+                  )}
+                </div>
+                
                 <div className="col-span-2">
                   <Label>Status</Label>
                   <select
