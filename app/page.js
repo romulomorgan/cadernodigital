@@ -3997,6 +3997,168 @@ export default function App() {
             </Card>
           </TabsContent>
           
+          {/* CUSTOS TAB (PASTORES/BISPOS) */}
+          {user?.role !== 'master' && (
+            <TabsContent value="costs-pastor">
+              <div className="space-y-6">
+                {/* Header com Botão */}
+                <Card className="border-2 border-orange-300">
+                  <CardHeader className="bg-gradient-to-r from-orange-50 to-orange-100">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          <DollarSign className="w-6 h-6" />
+                          💰 Gestão de Custos
+                        </CardTitle>
+                        <CardDescription>Registre e acompanhe os custos da sua igreja</CardDescription>
+                      </div>
+                      <Button
+                        onClick={() => {
+                          setCostFormData({
+                            costTypeId: '',
+                            costTypeName: '',
+                            dueDate: '',
+                            value: '',
+                            billFile: '',
+                            paymentDate: '',
+                            valuePaid: '',
+                            proofFile: ''
+                          });
+                          setShowCostCreateModal(true);
+                        }}
+                        className="bg-orange-600 hover:bg-orange-700"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Lançar Custo
+                      </Button>
+                    </div>
+                  </CardHeader>
+                </Card>
+                
+                {/* Listagem de Custos */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Meus Lançamentos de Custos</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {costsList.length === 0 ? (
+                      <div className="text-center py-12 text-gray-500">
+                        <DollarSign className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                        <p className="text-lg font-semibold">Nenhum custo lançado ainda</p>
+                        <p className="text-sm mt-2">Clique em "Lançar Custo" para começar</p>
+                      </div>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="w-full">
+                          <thead className="bg-gray-100">
+                            <tr>
+                              <th className="text-left p-3 text-sm font-semibold">Tipo</th>
+                              <th className="text-left p-3 text-sm font-semibold">Vencimento</th>
+                              <th className="text-left p-3 text-sm font-semibold">Valor</th>
+                              <th className="text-left p-3 text-sm font-semibold">Pago</th>
+                              <th className="text-left p-3 text-sm font-semibold">Diferença</th>
+                              <th className="text-center p-3 text-sm font-semibold">Status</th>
+                              <th className="text-center p-3 text-sm font-semibold">Ações</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y">
+                            {costsList.map((cost) => {
+                              const statusColors = {
+                                'PENDING': 'bg-yellow-100 text-yellow-800 border-yellow-300',
+                                'APPROVED': 'bg-green-100 text-green-800 border-green-300',
+                                'REJECTED': 'bg-red-100 text-red-800 border-red-300'
+                              };
+                              const statusLabels = {
+                                'PENDING': '🟡 Pendente',
+                                'APPROVED': '🟢 Aprovado',
+                                'REJECTED': '🔴 Reprovado'
+                              };
+                              
+                              return (
+                                <tr key={cost.costId} className="hover:bg-gray-50">
+                                  <td className="p-3 text-sm font-medium">{cost.costTypeName}</td>
+                                  <td className="p-3 text-sm">{new Date(cost.dueDate).toLocaleDateString('pt-BR')}</td>
+                                  <td className="p-3 text-sm font-semibold">R$ {parseFloat(cost.value).toFixed(2)}</td>
+                                  <td className="p-3 text-sm font-semibold">{cost.valuePaid ? `R$ ${parseFloat(cost.valuePaid).toFixed(2)}` : '-'}</td>
+                                  <td className="p-3 text-sm">
+                                    {cost.difference > 0 ? (
+                                      <span className="text-red-600 font-semibold">+R$ {cost.difference.toFixed(2)}</span>
+                                    ) : cost.difference < 0 ? (
+                                      <span className="text-green-600 font-semibold">-R$ {Math.abs(cost.difference).toFixed(2)}</span>
+                                    ) : (
+                                      <span className="text-gray-500">-</span>
+                                    )}
+                                  </td>
+                                  <td className="p-3 text-center">
+                                    <Badge className={`${statusColors[cost.status]} border`}>
+                                      {statusLabels[cost.status]}
+                                    </Badge>
+                                  </td>
+                                  <td className="p-3">
+                                    <div className="flex items-center justify-center gap-1">
+                                      <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        onClick={() => {
+                                          setSelectedCost(cost);
+                                          setShowCostViewModal(true);
+                                        }}
+                                        title="Visualizar"
+                                      >
+                                        <Eye className="w-4 h-4" />
+                                      </Button>
+                                      {cost.status !== 'APPROVED' && (
+                                        <>
+                                          <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            onClick={() => {
+                                              setSelectedCost(cost);
+                                              setCostFormData({
+                                                costTypeId: cost.costTypeId,
+                                                costTypeName: cost.costTypeName,
+                                                dueDate: cost.dueDate,
+                                                value: cost.value.toString(),
+                                                billFile: cost.billFile || '',
+                                                paymentDate: cost.paymentDate || '',
+                                                valuePaid: cost.valuePaid?.toString() || '',
+                                                proofFile: cost.proofFile || ''
+                                              });
+                                              setShowCostEditModal(true);
+                                            }}
+                                            title="Editar"
+                                          >
+                                            <Edit className="w-4 h-4" />
+                                          </Button>
+                                          <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            onClick={() => {
+                                              setSelectedCost(cost);
+                                              setShowCostDeleteModal(true);
+                                            }}
+                                            title="Excluir"
+                                            className="text-red-600"
+                                          >
+                                            <Trash2 className="w-4 h-4" />
+                                          </Button>
+                                        </>
+                                      )}
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          )}
+          
           {/* FUNÇÕES TAB */}
           {user?.role === 'master' && (
             <TabsContent value="funcoes">
