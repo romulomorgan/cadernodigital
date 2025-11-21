@@ -2074,6 +2074,98 @@ export async function POST(request) {
       });
     }
     
+    // REJECT UNLOCK
+    if (endpoint === 'unlock/reject') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const { requestId, reason } = await request.json();
+      
+      // Buscar a solicitação
+      const unlockRequest = await db.collection('unlock_requests').findOne({ requestId });
+      if (!unlockRequest) {
+        return NextResponse.json({ error: 'Solicitação não encontrada' }, { status: 404 });
+      }
+      
+      // Atualizar a solicitação como rejeitada
+      await db.collection('unlock_requests').updateOne(
+        { requestId },
+        { 
+          $set: { 
+            status: 'rejected',
+            rejectedBy: user.userId,
+            rejectedAt: getBrazilTime().toISOString(),
+            rejectionReason: reason || 'Rejeitado pelo Líder Máximo'
+          } 
+        }
+      );
+      
+      // Registrar no audit log
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'reject_unlock',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { 
+          requestId, 
+          day: unlockRequest.day,
+          month: unlockRequest.month,
+          year: unlockRequest.year,
+          timeSlot: unlockRequest.timeSlot,
+          requesterId: unlockRequest.requesterId,
+          reason
+        }
+      });
+      
+      return NextResponse.json({ 
+        success: true,
+        message: 'Solicitação rejeitada'
+      });
+    }
+    
+    // DELETE UNLOCK REQUEST (Master pode deletar histórico)
+    if (endpoint === 'unlock/delete') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      const { requestId } = await request.json();
+      
+      // Buscar a solicitação antes de deletar
+      const unlockRequest = await db.collection('unlock_requests').findOne({ requestId });
+      if (!unlockRequest) {
+        return NextResponse.json({ error: 'Solicitação não encontrada' }, { status: 404 });
+      }
+      
+      // Deletar a solicitação
+      await db.collection('unlock_requests').deleteOne({ requestId });
+      
+      // Registrar no audit log
+      await db.collection('audit_logs').insertOne({
+        logId: crypto.randomUUID(),
+        action: 'delete_unlock_request',
+        userId: user.userId,
+        timestamp: getBrazilTime().toISOString(),
+        details: { 
+          requestId,
+          requesterName: unlockRequest.requesterName,
+          day: unlockRequest.day,
+          month: unlockRequest.month,
+          year: unlockRequest.year,
+          timeSlot: unlockRequest.timeSlot,
+          status: unlockRequest.status
+        }
+      });
+      
+      return NextResponse.json({ 
+        success: true,
+        message: 'Solicitação deletada do histórico'
+      });
+    }
+    
     // POST AUDIT LOG (para qualquer usuário registrar ação)
     if (endpoint === 'audit/log') {
       const user = verifyToken(request);
