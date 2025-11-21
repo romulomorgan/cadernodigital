@@ -1207,6 +1207,100 @@ export async function POST(request) {
       });
     }
     
+    // DELETE RECEIPT FROM ENTRY (Pastor/Bispo - dono da oferta)
+    if (endpoint === 'entries/delete-receipt') {
+      const user = verifyToken(request);
+      if (!user) {
+        return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      }
+      
+      try {
+        const body = await request.json();
+        const { entryId, receiptFilepath } = body;
+        
+        // Buscar entry
+        const entry = await db.collection('entries').findOne({ entryId });
+        
+        if (!entry) {
+          return NextResponse.json({ error: 'Oferta não encontrada' }, { status: 404 });
+        }
+        
+        // Verificar se é o dono da oferta (ou Master)
+        const userData = await db.collection('users').findOne({ userId: user.userId });
+        if (userData.role !== 'master' && entry.userId !== user.userId) {
+          return NextResponse.json({ error: 'Você não tem permissão para excluir este comprovante' }, { status: 403 });
+        }
+        
+        // Verificar se período está fechado
+        const currentTime = getBrazilTime();
+        const monthStatus = await db.collection('month_status').findOne({ 
+          month: entry.month, 
+          year: entry.year 
+        });
+        
+        if (monthStatus?.closed && userData.role !== 'master') {
+          return NextResponse.json({ error: 'Período fechado. Não é possível excluir comprovantes.' }, { status: 403 });
+        }
+        
+        // Verificar bloqueio de janela de tempo
+        const entryDate = dayjs.tz(`${entry.year}-${String(entry.month).padStart(2, '0')}-${String(entry.day).padStart(2, '0')}`, 'America/Sao_Paulo');
+        const [hour, minute] = entry.timeSlot.split(':');
+        const entryDateTime = entryDate.hour(parseInt(hour)).minute(parseInt(minute));
+        const lockTime = entryDateTime.add(2, 'hour');
+        
+        if (currentTime.isAfter(lockTime) && !entry.masterUnlocked && userData.role !== 'master') {
+          return NextResponse.json({ error: 'Período de edição encerrado (2 horas após o horário)' }, { status: 403 });
+        }
+        
+        // Remover comprovante da lista
+        const updatedReceipts = (entry.receipts || []).filter(r => r.filepath !== receiptFilepath);
+        
+        await db.collection('entries').updateOne(
+          { entryId },
+          { 
+            $set: { 
+              receipts: updatedReceipts,
+              updatedAt: currentTime.toISOString()
+            }
+          }
+        );
+        
+        // Tentar deletar arquivo físico (se existir)
+        try {
+          const fs = require('fs');
+          const path = require('path');
+          const filePath = path.join(process.cwd(), 'uploads', 'receipts', receiptFilepath);
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+        } catch (fileError) {
+          console.log('Arquivo não encontrado ou já deletado:', fileError.message);
+        }
+        
+        // Audit log
+        await db.collection('audit_logs').insertOne({
+          logId: crypto.randomUUID(),
+          action: 'delete_receipt',
+          userId: user.userId,
+          timestamp: currentTime.toISOString(),
+          details: {
+            entryId,
+            receiptFilepath,
+            remainingReceipts: updatedReceipts.length
+          }
+        });
+        
+        return NextResponse.json({ 
+          success: true, 
+          message: 'Comprovante excluído com sucesso!',
+          remainingReceipts: updatedReceipts 
+        });
+      } catch (error) {
+        console.error('Erro ao deletar comprovante:', error);
+        return NextResponse.json({ error: 'Erro ao deletar comprovante' }, { status: 500 });
+      }
+    }
+    
     // DELETE SPECIFIC ENTRY (Master apenas)
     if (endpoint === 'entries/delete-specific') {
       const user = verifyToken(request);
