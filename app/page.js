@@ -8362,6 +8362,7 @@ export default function App() {
                         setCostFormData({...costFormData, proofFile: filePath});
                       }
                       setUploadingProof(false);
+                      e.target.value = ''; // Limpar input
                     }
                   }}
                   disabled={uploadingProof}
@@ -8370,7 +8371,26 @@ export default function App() {
                 {uploadingProof && <span className="text-xs text-blue-600">Enviando...</span>}
               </div>
               {costFormData.proofFile && (
-                <p className="text-xs text-green-600 mt-1">✅ Arquivo anexado</p>
+                <div className="flex gap-2 mt-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => window.open(costFormData.proofFile, '_blank')}
+                    className="flex-1"
+                  >
+                    <Eye className="w-3 h-3 mr-2" />
+                    Visualizar
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => handleDeleteCostFile('proof')}
+                    className="flex-1"
+                  >
+                    <Trash2 className="w-3 h-3 mr-2" />
+                    Excluir
+                  </Button>
+                </div>
               )}
               <p className="text-xs text-gray-500 mt-1">Aceita: Imagens (JPG, PNG, WebP) e PDF (máx. 5MB)</p>
             </div>
