@@ -14,8 +14,8 @@ BASE_URL = "https://iudp-control.preview.emergentagent.com/api"
 
 # Test credentials
 MASTER_CREDENTIALS = {
-    "email": "joao.silva@iudp.org.br",
-    "password": "LiderMaximo2025!"
+    "email": "testmaster@iudp.com",
+    "password": "TestMaster2025!"
 }
 
 class FinancialCalculationTester:
