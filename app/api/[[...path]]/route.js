@@ -1465,16 +1465,17 @@ export async function POST(request) {
       
       let entries = await db.collection('entries').find(filter).toArray();
       
-      // Se for MASTER, agregar dados por horário
+      // Se for MASTER, agregar dados por horário (dia + timeSlot)
       if (userData.role === 'master') {
         const aggregatedEntries = {};
         
         entries.forEach(entry => {
-          const key = entry.entryId;
+          // Chave de agregação: dia + timeSlot (agrupa todas as igrejas do mesmo horário)
+          const key = `${entry.day}-${entry.timeSlot}`;
           
           if (!aggregatedEntries[key]) {
             aggregatedEntries[key] = {
-              entryId: entry.entryId,
+              entryId: entry.entryId, // Mantém o primeiro entryId encontrado
               month: entry.month,
               year: entry.year,
               day: entry.day,
@@ -1483,6 +1484,10 @@ export async function POST(request) {
               totalDinheiro: 0,
               totalPix: 0,
               totalMaquineta: 0,
+              value: 0, // Campo usado pelo frontend
+              dinheiro: 0,
+              pix: 0,
+              maquineta: 0,
               churchCount: 0,
               churches: [],
               timeWindowLocked: entry.timeWindowLocked,
@@ -1492,21 +1497,33 @@ export async function POST(request) {
             };
           }
           
-          // Agregar valores
-          aggregatedEntries[key].totalValue += (entry.value || 0);
-          aggregatedEntries[key].totalDinheiro += (entry.dinheiro || 0);
-          aggregatedEntries[key].totalPix += (entry.pix || 0);
-          aggregatedEntries[key].totalMaquineta += (entry.maquineta || 0);
+          // Agregar valores de todas as igrejas
+          const entryValue = entry.value || 0;
+          const entryDinheiro = entry.dinheiro || 0;
+          const entryPix = entry.pix || 0;
+          const entryMaquineta = entry.maquineta || 0;
+          
+          aggregatedEntries[key].totalValue += entryValue;
+          aggregatedEntries[key].totalDinheiro += entryDinheiro;
+          aggregatedEntries[key].totalPix += entryPix;
+          aggregatedEntries[key].totalMaquineta += entryMaquineta;
+          
+          // Atualizar campo 'value' também (usado pelo frontend)
+          aggregatedEntries[key].value = aggregatedEntries[key].totalValue;
+          aggregatedEntries[key].dinheiro = aggregatedEntries[key].totalDinheiro;
+          aggregatedEntries[key].pix = aggregatedEntries[key].totalPix;
+          aggregatedEntries[key].maquineta = aggregatedEntries[key].totalMaquineta;
+          
           aggregatedEntries[key].churchCount++;
           
           // Adicionar detalhes da igreja
           aggregatedEntries[key].churches.push({
             churchId: entry.churchId,
             churchName: entry.church,
-            value: entry.value || 0,
-            dinheiro: entry.dinheiro || 0,
-            pix: entry.pix || 0,
-            maquineta: entry.maquineta || 0,
+            value: entryValue,
+            dinheiro: entryDinheiro,
+            pix: entryPix,
+            maquineta: entryMaquineta,
             notes: entry.notes || '',
             userName: entry.userName,
             userId: entry.userId,
