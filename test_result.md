@@ -1441,3 +1441,54 @@ agent_communication:
           - ✅ Registra audit log com action 'delete_custo'
           
           PRECISA TESTAR: Autenticação, exclusão, audit log
+
+  - task: "Corrigir cálculos financeiros no calendário do Master"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js e /app/app/page.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          🔧 CORREÇÕES CRÍTICAS IMPLEMENTADAS - NOV 20, 2025
+          
+          PROBLEMAS IDENTIFICADOS:
+          1. ❌ Total mensal não refletia a soma de todas as ofertas
+          2. ❌ Subtotais diários não somavam os valores dos cartões de horário
+          3. ❌ Filtro por igreja não atualizava os totais
+          
+          CAUSA RAIZ:
+          - Backend usava entry.entryId como chave de agregação
+          - Cada igreja tinha entryId único, então não agregava nada
+          - Entries agregadas tinham campo 'totalValue' mas frontend esperava 'value'
+          - Frontend fazia filtro duplicado em cima de dados já filtrados
+          
+          CORREÇÕES APLICADAS:
+          
+          Backend (/app/app/api/[[...path]]/route.js linhas 1468-1530):
+          ✅ Alterada chave de agregação de entry.entryId para ${day}-${timeSlot}
+          ✅ Agora agrega corretamente todas as igrejas do mesmo horário
+          ✅ Adicionado campo 'value' nas entries agregadas (= totalValue)
+          ✅ Adicionados campos dinheiro, pix, maquineta nas entries agregadas
+          ✅ Cálculo correto dos totais somando todos os valores
+          
+          Frontend (/app/app/page.js):
+          ✅ Removida lógica duplicada de entriesFiltradas (linha 273)
+          ✅ Simplificada função getEntry - usa entries direto (linha 972)
+          ✅ Adicionado useEffect para recarregar ao mudar filtro (linha 597)
+          ✅ Removida chamada duplicada de fetchEntries no dropdown (linha 3053)
+          
+          RESULTADO ESPERADO:
+          - ✅ Total mensal = soma de todos os dias do mês
+          - ✅ Subtotal diário = soma de todos os horários do dia
+          - ✅ Filtro por igreja atualiza totais automaticamente
+          - ✅ Backend faz agregação e filtro, frontend apenas exibe
+          
+          PRECISA TESTAR:
+          1. Total do mês reflete todas as ofertas corretamente
+          2. Subtotal de cada dia soma todos os horários
+          3. Filtrar por igreja específica atualiza todos os totais
+          4. Limpar filtro volta a mostrar todas as igrejas agregadas
