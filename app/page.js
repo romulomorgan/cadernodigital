@@ -2229,10 +2229,13 @@ export default function App() {
       
       if (res.ok) {
         const data = await res.json();
+        console.log('[DEBUG] Tipos de custos carregados:', data.custos);
         setAllCustos(data.custos || []);
+      } else {
+        console.error('[DEBUG] Erro ao buscar custos - Status:', res.status);
       }
     } catch (error) {
-      console.error('Erro ao buscar custos:', error);
+      console.error('[DEBUG] Erro ao buscar custos:', error);
     }
   };
   
