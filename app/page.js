@@ -7363,11 +7363,11 @@ export default function App() {
                           </div>
                         </div>
                         
-                        {/* Observações */}
+                        {/* Observação do Dia */}
                         {church.notes && (
                           <div className="bg-amber-50 border border-amber-200 rounded p-3">
-                            <p className="text-xs text-amber-700 font-semibold mb-1">📝 Observações:</p>
-                            <p className="text-sm text-amber-900">{church.notes}</p>
+                            <p className="text-xs text-amber-700 font-semibold mb-1">📝 Observação do Dia:</p>
+                            <p className="text-sm text-amber-900 whitespace-pre-wrap">{church.notes}</p>
                           </div>
                         )}
                         
