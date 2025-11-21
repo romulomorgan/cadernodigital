@@ -4072,6 +4072,7 @@ export default function App() {
                                     setSelectedRequest(req);
                                     setShowRequestViewModal(true);
                                   }}
+                                  title="Visualizar detalhes"
                                 >
                                   <Eye className="w-4 h-4" />
                                 </Button>
@@ -4082,6 +4083,7 @@ export default function App() {
                                     setSelectedRequest(req);
                                     setShowRequestDeleteConfirm(true);
                                   }}
+                                  title="Excluir registro"
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </Button>
