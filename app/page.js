@@ -5033,12 +5033,22 @@ export default function App() {
                       
                       <div className="md:col-span-2">
                         <Label>Nova Senha (deixe em branco para não alterar)</Label>
-                        <Input
-                          type="password"
-                          value={newPasswordUsuario}
-                          onChange={(e) => setNewPasswordUsuario(e.target.value)}
-                          placeholder="Nova senha (opcional)"
-                        />
+                        <div className="relative">
+                          <Input
+                            type={showEditUserPassword ? "text" : "password"}
+                            value={newPasswordUsuario}
+                            onChange={(e) => setNewPasswordUsuario(e.target.value)}
+                            placeholder="Nova senha (opcional)"
+                            className="pr-10"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowEditUserPassword(!showEditUserPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                          >
+                            {showEditUserPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
                       </div>
                       
                       <div>
