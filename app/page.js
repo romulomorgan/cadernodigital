@@ -593,6 +593,13 @@ export default function App() {
     }
   }, [isAuthenticated, activeTab, token]);
   
+  // Recarregar entries quando o filtro de igreja do Master mudar
+  useEffect(() => {
+    if (isAuthenticated && token && user?.role === 'master' && activeTab === 'calendar') {
+      fetchEntries();
+    }
+  }, [selectedChurchFilter]);
+
   // Buscar igrejas e roles públicas para o formulário de registro (sem autenticação)
   useEffect(() => {
     const fetchPublicData = async () => {
