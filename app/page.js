@@ -6307,6 +6307,43 @@ export default function App() {
                                       <Eye className="w-4 h-4" />
                                     </Button>
                                     
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => {
+                                        setSelectedCost(cost);
+                                        setCostFormData({
+                                          costTypeId: cost.costTypeId,
+                                          costTypeName: cost.costTypeName,
+                                          dueDate: cost.dueDate,
+                                          value: cost.value,
+                                          billFile: cost.billFile || '',
+                                          paymentDate: cost.paymentDate || '',
+                                          valuePaid: cost.valuePaid || '',
+                                          proofFile: cost.proofFile || '',
+                                          status: cost.status
+                                        });
+                                        setShowCostEditModalMaster(true);
+                                      }}
+                                      title="Editar"
+                                      className="text-blue-600 hover:text-blue-700"
+                                    >
+                                      <Edit className="w-4 h-4" />
+                                    </Button>
+                                    
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => {
+                                        setSelectedCost(cost);
+                                        setShowCostDeleteConfirm(true);
+                                      }}
+                                      title="Excluir"
+                                      className="text-red-600 hover:text-red-700"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                    
                                     {cost.status === 'PENDING' && (
                                       <>
                                         <Button
