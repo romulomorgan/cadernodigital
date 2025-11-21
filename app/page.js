@@ -115,6 +115,7 @@ export default function App() {
     proofFile: ''
   });
   const [costsFilterStatus, setCostsFilterStatus] = useState('ALL');
+  const [costsFilterChurch, setCostsFilterChurch] = useState('ALL');
   
   // Estados para Solicitações de Liberação (Master)
   const [unlockRequestsCount, setUnlockRequestsCount] = useState(0);
