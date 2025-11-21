@@ -6282,7 +6282,26 @@ export default function App() {
                     </div>
                     
                     {/* Filtros */}
-                    <div className="flex gap-2">
+                    <div className="flex gap-3 items-center">
+                      {/* Filtro por Igreja */}
+                      <select
+                        className="border rounded p-2 text-sm"
+                        value={costsFilterChurch}
+                        onChange={(e) => {
+                          setCostsFilterChurch(e.target.value);
+                          fetchCostsList(costsFilterStatus, e.target.value);
+                        }}
+                      >
+                        <option value="ALL">🏛️ Todas as Igrejas</option>
+                        {churches.map(church => (
+                          <option key={church.churchId} value={church.churchId}>
+                            {church.name}
+                          </option>
+                        ))}
+                      </select>
+                      
+                      {/* Filtros de Status */}
+                      <div className="flex gap-2">
                       <Button
                         size="sm"
                         variant={costsFilterStatus === 'ALL' ? 'default' : 'outline'}
