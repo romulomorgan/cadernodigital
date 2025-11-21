@@ -619,13 +619,16 @@ export async function POST(request) {
       try {
         const userData = await db.collection('users').findOne({ userId: user.userId });
         const body = await request.json();
-        const { status: filterStatus } = body;
+        const { status: filterStatus, churchId: filterChurch } = body;
         
         let filter = {};
         
         // Se for Master, vê tudo; se for Pastor, vê apenas da sua igreja
         if (userData.role !== 'master') {
           filter.churchId = userData.churchId;
+        } else if (filterChurch) {
+          // Master pode filtrar por igreja específica
+          filter.churchId = filterChurch;
         }
         
         // Filtro por status (se fornecido)
