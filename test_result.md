@@ -828,6 +828,41 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
+      🔧 CORREÇÃO CRÍTICA DOS CÁLCULOS FINANCEIROS - NOV 20, 2025
+      
+      PROBLEMA REPORTADO PELO USUÁRIO:
+      1. Total do mês não refletia a soma correta das ofertas
+      2. Subtotais diários não somavam os cartões de horário
+      3. Filtro por igreja não atualizava os totais
+      
+      ANÁLISE REALIZADA:
+      - Backend usava entry.entryId como chave de agregação (cada igreja tinha entryId único)
+      - Resultado: Nenhuma agregação ocorria, cada entrada ficava separada
+      - Entries agregadas tinham campo 'totalValue' mas frontend esperava 'value'
+      - Frontend fazia filtro duplicado em cima de dados já filtrados pelo backend
+      
+      CORREÇÕES IMPLEMENTADAS:
+      
+      Backend (route.js linhas 1468-1530):
+      ✅ Chave de agregação: entry.entryId → ${day}-${timeSlot}
+      ✅ Agrupa todas as igrejas do mesmo dia e horário
+      ✅ Adiciona campo 'value' nas entries agregadas (= totalValue)
+      ✅ Cálculo correto de dinheiro, pix, maquineta agregados
+      
+      Frontend (page.js):
+      ✅ Remove filtro duplicado de entriesFiltradas
+      ✅ Simplifica getEntry para usar entries direto
+      ✅ Adiciona useEffect que reage a mudanças no filtro de igreja
+      ✅ Remove chamada duplicada de fetchEntries
+      
+      PRÓXIMOS PASSOS:
+      - Testar backend: Agregação correta por dia+horário
+      - Testar frontend: Totais mensais e diários corretos
+      - Testar filtro: Mudança de igreja atualiza totais
+      
+      Aguardando testes para confirmar que os 3 problemas foram resolvidos.
+  - agent: "main"
+    message: |
       ✅ CORREÇÕES CRÍTICAS IMPLEMENTADAS - NOV 4, 2025 13:42
       
       1. DASHBOARD AUTO-LOAD E FILTROS:
