@@ -8893,8 +8893,12 @@ export default function App() {
                   >
                     <option value="PENDING">🟡 Pendente</option>
                     <option value="APPROVED">🟢 Aprovado</option>
+                    <option value="PAID">💚 Pago</option>
                     <option value="REJECTED">🔴 Reprovado</option>
                   </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    "Pago" = Pagamento confirmado e comprovante anexado
+                  </p>
                 </div>
               </div>
               
