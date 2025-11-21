@@ -2005,6 +2005,74 @@ export default function App() {
     }
   };
   
+  const handleUpdateCostEntryMaster = async () => {
+    if (!selectedCost) return;
+    
+    try {
+      const res = await fetch('/api/costs-entries/update-master', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          costId: selectedCost.costId,
+          ...costFormData
+        })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        setShowCostEditModalMaster(false);
+        setSelectedCost(null);
+        setCostFormData({
+          costTypeId: '',
+          costTypeName: '',
+          dueDate: '',
+          value: '',
+          billFile: '',
+          paymentDate: '',
+          valuePaid: '',
+          proofFile: '',
+          status: 'PENDING'
+        });
+        fetchCostsList(costsFilterStatus);
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao atualizar custo');
+    }
+  };
+  
+  const handleDeleteCostEntry = async () => {
+    if (!selectedCost) return;
+    
+    try {
+      const res = await fetch('/api/costs-entries/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ costId: selectedCost.costId })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        setShowCostDeleteConfirm(false);
+        setSelectedCost(null);
+        fetchCostsList(costsFilterStatus);
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao excluir custo');
+    }
+  };
+  
   // ========== FUNÇÕES - UPLOAD DE ARQUIVOS DE CUSTOS ==========
   
   const handleUploadCostFile = async (file, fileType) => {
