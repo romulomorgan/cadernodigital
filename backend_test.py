@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 """
-Backend Test Suite - Financial Calculations Validation
-Testing critical financial calculation fixes in Master calendar
+Backend Test Suite - Sistema de Solicitações e Upload de Custos
+Testa os endpoints críticos implementados recentemente
 """
 
 import requests
 import json
-import sys
-from datetime import datetime
+import base64
+import os
+import tempfile
+from datetime import datetime, timedelta
 
-# Get base URL from environment
+# Configuração da API
 BASE_URL = "https://iudp-control.preview.emergentagent.com/api"
 
-# Test credentials
-MASTER_CREDENTIALS = {
-    "email": "testmaster@iudp.com",
-    "password": "TestMaster2025!"
-}
+# Credenciais de teste
+MASTER_EMAIL = "joao.silva@iudp.org.br"
+MASTER_PASSWORD = "LiderMaximo2025!"
 
 class FinancialCalculationTester:
     def __init__(self):
