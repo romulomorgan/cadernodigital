@@ -924,6 +924,8 @@ export async function POST(request) {
         const body = await request.json();
         const { costId, costTypeId, costTypeName, dueDate, value, billFile, paymentDate, valuePaid, proofFile, status } = body;
         
+        const existingCost = await db.collection('costs_entries').findOne({ costId });
+        
         const updateData = {
           costTypeId,
           costTypeName,
@@ -931,7 +933,7 @@ export async function POST(request) {
           value: parseFloat(value),
           billFile,
           paymentDate,
-          valuePaid: valuePaid ? parseFloat(valuePaid) : null,
+          valuePaid: valuePaid ? parseFloat(valuePaid) : 0,
           proofFile,
           status,
           updatedAt: getBrazilTime().toISOString(),
@@ -942,6 +944,14 @@ export async function POST(request) {
         if (valuePaid) {
           const diff = parseFloat(valuePaid) - parseFloat(value);
           updateData.difference = diff;
+        } else {
+          updateData.difference = 0;
+        }
+        
+        // Se Master está mudando status para PAID e ainda não tem paidAt, adicionar
+        if (status === 'PAID' && (!existingCost.paidAt || !existingCost.paidBy)) {
+          updateData.paidAt = getBrazilTime().toISOString();
+          updateData.paidBy = user.userId;
         }
         
         await db.collection('costs_entries').updateOne(
