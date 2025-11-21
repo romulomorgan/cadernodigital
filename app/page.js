@@ -4553,6 +4553,7 @@ export default function App() {
                       <Button
                         onClick={() => {
                           setCostFormData({
+                            costId: '',
                             costTypeId: '',
                             costTypeName: '',
                             dueDate: '',
@@ -4560,7 +4561,9 @@ export default function App() {
                             billFile: '',
                             paymentDate: '',
                             valuePaid: '',
-                            proofFile: ''
+                            proofFile: '',
+                            status: '',
+                            paidAt: null
                           });
                           setShowCostCreateModal(true);
                         }}
