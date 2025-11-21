@@ -8768,6 +8768,130 @@ export default function App() {
         </DialogContent>
       </Dialog>
       
+      {/* Modal Editar Custo (Master) */}
+      <Dialog open={showCostEditModalMaster} onOpenChange={setShowCostEditModalMaster}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Editar Custo - Master</DialogTitle>
+            <DialogDescription>Edite qualquer campo, incluindo o status</DialogDescription>
+          </DialogHeader>
+          
+          {selectedCost && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <Label>Tipo de Custo</Label>
+                  <Input
+                    value={costFormData.costTypeName}
+                    onChange={(e) => setCostFormData({...costFormData, costTypeName: e.target.value})}
+                  />
+                </div>
+                
+                <div>
+                  <Label>Data de Vencimento</Label>
+                  <Input
+                    type="date"
+                    value={costFormData.dueDate}
+                    onChange={(e) => setCostFormData({...costFormData, dueDate: e.target.value})}
+                  />
+                </div>
+                
+                <div>
+                  <Label>Valor (R$)</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={costFormData.value}
+                    onChange={(e) => setCostFormData({...costFormData, value: e.target.value})}
+                  />
+                </div>
+                
+                <div>
+                  <Label>Data de Pagamento</Label>
+                  <Input
+                    type="date"
+                    value={costFormData.paymentDate}
+                    onChange={(e) => setCostFormData({...costFormData, paymentDate: e.target.value})}
+                  />
+                </div>
+                
+                <div>
+                  <Label>Valor Pago (R$)</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={costFormData.valuePaid}
+                    onChange={(e) => setCostFormData({...costFormData, valuePaid: e.target.value})}
+                  />
+                </div>
+                
+                <div className="col-span-2">
+                  <Label>Status</Label>
+                  <select
+                    className="w-full border rounded p-2"
+                    value={costFormData.status}
+                    onChange={(e) => setCostFormData({...costFormData, status: e.target.value})}
+                  >
+                    <option value="PENDING">🟡 Pendente</option>
+                    <option value="APPROVED">🟢 Aprovado</option>
+                    <option value="REJECTED">🔴 Reprovado</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div className="flex gap-3 justify-end">
+                <Button variant="outline" onClick={() => setShowCostEditModalMaster(false)}>
+                  Cancelar
+                </Button>
+                <Button onClick={handleUpdateCostEntryMaster}>
+                  <Save className="w-4 h-4 mr-2" />
+                  Salvar Alterações
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Modal Confirmar Deletar Custo */}
+      <Dialog open={showCostDeleteConfirm} onOpenChange={setShowCostDeleteConfirm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertCircle className="w-5 h-5" />
+              Confirmar Exclusão
+            </DialogTitle>
+            <DialogDescription>
+              Esta ação é permanente e não pode ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedCost && (
+            <div className="space-y-4">
+              <div className="bg-red-50 rounded p-3 border border-red-200">
+                <p className="text-sm font-semibold text-red-900">Tem certeza que deseja excluir este custo?</p>
+                <p className="text-sm text-gray-700 mt-2"><strong>Tipo:</strong> {selectedCost.costTypeName}</p>
+                <p className="text-sm text-gray-700"><strong>Igreja:</strong> {selectedCost.churchName}</p>
+                <p className="text-sm text-gray-700"><strong>Valor:</strong> R$ {parseFloat(selectedCost.value).toFixed(2)}</p>
+              </div>
+              
+              <div className="flex gap-3 justify-end">
+                <Button variant="outline" onClick={() => {
+                  setShowCostDeleteConfirm(false);
+                  setSelectedCost(null);
+                }}>
+                  Cancelar
+                </Button>
+                <Button variant="destructive" onClick={handleDeleteCostEntry}>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Excluir
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      
     </div>
   );
 }
