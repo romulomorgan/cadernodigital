@@ -6362,8 +6362,8 @@ export default function App() {
                 </div>
               </CardHeader>
               <CardContent className="pt-6">
-                  {costsList.length === 0 ? (
-                    <div className="text-center py-12 text-gray-400">
+                {costsList.length === 0 ? (
+                  <div className="text-center py-12 text-gray-400">
                       <DollarSign className="w-16 h-16 mx-auto mb-4" />
                       <p className="text-lg font-semibold">Nenhum custo lançado ainda</p>
                       <p className="text-sm mt-2">
