@@ -4645,43 +4645,86 @@ export default function App() {
                                       >
                                         <Eye className="w-4 h-4" />
                                       </Button>
-                                      {cost.status !== 'APPROVED' && (
-                                        <>
-                                          <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={() => {
-                                              setSelectedCost(cost);
-                                              setCostFormData({
-                                                costTypeId: cost.costTypeId,
-                                                costTypeName: cost.costTypeName,
-                                                dueDate: cost.dueDate,
-                                                value: cost.value.toString(),
-                                                billFile: cost.billFile || '',
-                                                paymentDate: cost.paymentDate || '',
-                                                valuePaid: cost.valuePaid?.toString() || '',
-                                                proofFile: cost.proofFile || ''
-                                              });
-                                              setShowCostEditModal(true);
-                                            }}
-                                            title="Editar"
-                                          >
-                                            <Edit className="w-4 h-4" />
-                                          </Button>
-                                          <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={() => {
-                                              setSelectedCost(cost);
-                                              setShowCostDeleteModal(true);
-                                            }}
-                                            title="Excluir"
-                                            className="text-red-600"
-                                          >
-                                            <Trash2 className="w-4 h-4" />
-                                          </Button>
-                                        </>
+                                      
+                                      {/* Botão Pagar - Apenas se APPROVED */}
+                                      {cost.status === 'APPROVED' && (
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          onClick={() => {
+                                            setSelectedCost(cost);
+                                            setCostFormData({
+                                              costId: cost.costId,
+                                              costTypeId: cost.costTypeId,
+                                              costTypeName: cost.costTypeName,
+                                              dueDate: cost.dueDate,
+                                              value: cost.value.toString(),
+                                              billFile: cost.billFile || '',
+                                              paymentDate: cost.paymentDate || '',
+                                              valuePaid: cost.valuePaid?.toString() || '',
+                                              proofFile: cost.proofFile || '',
+                                              status: cost.status,
+                                              paidAt: cost.paidAt
+                                            });
+                                            setShowCostEditModal(true);
+                                          }}
+                                          title="Registrar Pagamento"
+                                          className="text-green-600 hover:text-green-700"
+                                        >
+                                          💳 Pagar
+                                        </Button>
                                       )}
+                                      
+                                      {/* Botão Editar - Apenas se PAID e dentro de 60 min */}
+                                      {cost.status === 'PAID' && (() => {
+                                        if (!cost.paidAt) return false;
+                                        const paidTime = new Date(cost.paidAt);
+                                        const now = new Date();
+                                        const diffMinutes = (now - paidTime) / (1000 * 60);
+                                        return diffMinutes <= 60;
+                                      })() && (
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          onClick={() => {
+                                            setSelectedCost(cost);
+                                            setCostFormData({
+                                              costId: cost.costId,
+                                              costTypeId: cost.costTypeId,
+                                              costTypeName: cost.costTypeName,
+                                              dueDate: cost.dueDate,
+                                              value: cost.value.toString(),
+                                              billFile: cost.billFile || '',
+                                              paymentDate: cost.paymentDate || '',
+                                              valuePaid: cost.valuePaid?.toString() || '',
+                                              proofFile: cost.proofFile || '',
+                                              status: cost.status,
+                                              paidAt: cost.paidAt
+                                            });
+                                            setShowCostEditModal(true);
+                                          }}
+                                          title="Editar Pagamento (60 min)"
+                                          className="text-blue-600 hover:text-blue-700"
+                                        >
+                                          <Edit className="w-4 h-4" />
+                                        </Button>
+                                      )}
+                                      
+                                      {/* Mostrar tempo restante se PAID */}
+                                      {cost.status === 'PAID' && cost.paidAt && (() => {
+                                        const paidTime = new Date(cost.paidAt);
+                                        const now = new Date();
+                                        const diffMinutes = (now - paidTime) / (1000 * 60);
+                                        const remaining = 60 - Math.floor(diffMinutes);
+                                        if (remaining > 0 && remaining <= 60) {
+                                          return (
+                                            <span className="text-xs text-gray-500 px-2">
+                                              ⏱️ {remaining}min
+                                            </span>
+                                          );
+                                        }
+                                        return null;
+                                      })()}
                                     </div>
                                   </td>
                                 </tr>
