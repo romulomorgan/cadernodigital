@@ -1986,17 +1986,6 @@ export async function POST(request) {
         })
         .toArray();
       
-      // Buscar time_overrides ativos do usuário
-      const now = getBrazilTime().toISOString();
-      const activeOverrides = await db.collection('time_overrides')
-        .find({ 
-          userId: user.userId,
-          month: parseInt(month),
-          year: parseInt(year),
-          expiresAt: { $gt: now }
-        })
-        .toArray();
-      
       return NextResponse.json({ 
         pendingRequests,
         activeOverrides
