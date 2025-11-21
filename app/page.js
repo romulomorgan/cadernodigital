@@ -6784,6 +6784,65 @@ export default function App() {
                     Download
                   </Button>
                   
+                  {/* Botão Excluir Comprovante (apenas para pastores - donos da oferta) */}
+                  {user?.role !== 'master' && (
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={async () => {
+                        if (!confirm('⚠️ ATENÇÃO!\n\nTem certeza que deseja EXCLUIR este comprovante?\n\nEsta ação não pode ser desfeita!')) {
+                          return;
+                        }
+                        
+                        try {
+                          const receipt = viewingReceipts.receipts[viewingReceipts.currentIndex];
+                          
+                          const res = await fetch('/api/entries/delete-receipt', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                              'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                              entryId: viewingReceipts.entryId,
+                              receiptFilepath: receipt.filepath
+                            })
+                          });
+                          
+                          const data = await res.json();
+                          if (res.ok) {
+                            toast.success('✅ ' + data.message);
+                            
+                            // Atualizar lista de comprovantes
+                            if (data.remainingReceipts.length === 0) {
+                              // Se não há mais comprovantes, fechar modal
+                              setViewingReceipts(null);
+                            } else {
+                              // Atualizar visualização com comprovantes restantes
+                              setViewingReceipts({
+                                ...viewingReceipts,
+                                receipts: data.remainingReceipts,
+                                currentIndex: Math.min(viewingReceipts.currentIndex, data.remainingReceipts.length - 1)
+                              });
+                            }
+                            
+                            // Recarregar entries para atualizar lista geral
+                            fetchEntries();
+                          } else {
+                            toast.error('❌ ' + data.error);
+                          }
+                        } catch (error) {
+                          console.error('Erro ao excluir comprovante:', error);
+                          toast.error('❌ Erro ao excluir comprovante');
+                        }
+                      }}
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Excluir
+                    </Button>
+                  )}
+                  
                   <Button
                     size="sm"
                     variant="outline"
