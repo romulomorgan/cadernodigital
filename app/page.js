@@ -643,8 +643,10 @@ export default function App() {
   // Polling para Pastor verificar se suas solicitações foram aprovadas (atualização em tempo real)
   useEffect(() => {
     if (isAuthenticated && token && user?.role !== 'master') {
+      let lastActiveOverridesCount = 0;
+      
       // Verificação inicial
-      const checkMyUnlockStatus = async () => {
+      const checkMyUnlockStatus = async (showNotification = false) => {
         try {
           const res = await fetch('/api/unlock/my-status', {
             method: 'POST',
@@ -658,19 +660,30 @@ export default function App() {
           // Se houver alguma aprovação nova, recarregar entries
           if (data.activeOverrides && data.activeOverrides.length > 0) {
             console.log('[POLLING PASTOR] Liberação detectada! Recarregando entries...');
+            
+            // Se é verificação periódica e há novas liberações
+            if (showNotification && data.activeOverrides.length > lastActiveOverridesCount) {
+              toast.success('✅ Sua solicitação foi APROVADA! Card liberado para edição.', {
+                duration: 7000
+              });
+            }
+            
+            lastActiveOverridesCount = data.activeOverrides.length;
             await fetchEntries();
+          } else {
+            lastActiveOverridesCount = 0;
           }
         } catch (error) {
           console.error('Erro ao verificar status de liberação:', error);
         }
       };
       
-      checkMyUnlockStatus();
+      checkMyUnlockStatus(false);
       
       // Verificar a cada 30 segundos
       const interval = setInterval(() => {
         console.log('[POLLING PASTOR] Verificando liberações aprovadas...');
-        checkMyUnlockStatus();
+        checkMyUnlockStatus(true);
       }, 30000);
       
       return () => clearInterval(interval);
