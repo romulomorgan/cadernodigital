@@ -119,6 +119,7 @@ export default function App() {
   // Estados para Solicitações de Liberação (Master)
   const [unlockRequestsCount, setUnlockRequestsCount] = useState(0);
   const [unlockRequestsHistory, setUnlockRequestsHistory] = useState([]);
+  const [previousRequestsCount, setPreviousRequestsCount] = useState(0);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [rejectionReason, setRejectionReason] = useState('');
