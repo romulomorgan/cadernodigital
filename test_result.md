@@ -2191,3 +2191,97 @@ agent_communication:
       
       🎯 STATUS: SISTEMA TOTALMENTE SINCRONIZADO E AUTOMÁTICO
 
+
+  - agent: "main"
+    message: |
+      ✅ CORREÇÕES CRÍTICAS IMPLEMENTADAS - $(date +%Y-%m-%d)
+      
+      🎯 PROBLEMAS CORRIGIDOS:
+      
+      1. ✅ DROPDOWN "TIPO DE CUSTO" VAZIO
+         
+         CAUSA:
+         - Endpoint /api/custos/list exigia role Master
+         - Pastores não conseguiam listar tipos de custos
+         - Dropdown ficava vazio ao criar custo
+         
+         SOLUÇÃO:
+         - Removida restrição de role Master
+         - Agora todos os usuários autenticados podem listar
+         - Backend (route.js linha ~357):
+           ```javascript
+           if (endpoint === 'custos/list') {
+             const user = verifyToken(request);
+             if (!user) {
+               return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+             }
+             // Todos os usuários autenticados podem listar
+             const custos = await db.collection('custos')...
+           }
+           ```
+         
+         RESULTADO:
+         - ✅ Dropdown agora carrega tipos de custos para Pastores
+         - ✅ Pastor consegue selecionar tipo ao criar custo
+         - ✅ Lista sincronizada com banco de dados
+      
+      2. ✅ CUSTO PAGO PELO MASTER - PASTOR SÓ VISUALIZA
+         
+         CENÁRIO:
+         - Master paga custo diretamente (sem passar pelo Pastor)
+         - Campo paidBy = userId do Master
+         - Pastor não deve poder editar
+         - Pastor não deve ver contador de 60 minutos
+         
+         SOLUÇÃO:
+         - Adicionada verificação: cost.paidBy !== user.userId
+         - Frontend (page.js linha ~4700):
+           ```javascript
+           // Se PAID, verifica quem pagou
+           if (cost.status === 'PAID' && cost.paidAt) {
+             // Se foi pago pelo Master, apenas visualizar
+             if (cost.paidBy && cost.paidBy !== user?.userId) {
+               return null; // Não mostra botão Editar
+             }
+             // Se foi pago pelo próprio Pastor, verifica 60 min
+             ...
+           }
+           ```
+         
+         - Badge especial "💼 Pago pelo Líder" (linha ~4780):
+           ```javascript
+           if (cost.paidBy && cost.paidBy !== user?.userId) {
+             return (
+               <span className="text-xs text-gray-500 px-2">
+                 💼 Pago pelo Líder
+               </span>
+             );
+           }
+           ```
+         
+         RESULTADO:
+         - ✅ Custo pago pelo Master: Pastor vê apenas "Visualizar"
+         - ✅ Sem botão "Editar"
+         - ✅ Sem contador de tempo
+         - ✅ Badge "💼 Pago pelo Líder" aparece
+         - ✅ Custo pago pelo próprio Pastor: funciona normalmente (60 min)
+      
+      📊 COMPORTAMENTO ATUALIZADO:
+      
+      CENÁRIO 1 - Pastor cria e paga:
+      1. Pastor cria custo → Dropdown com tipos funcionando ✅
+      2. Master aprova → Status: APPROVED
+      3. Pastor paga → paidBy = userId do Pastor
+      4. Contador de 60 min aparece ✅
+      5. Pode editar por 60 min ✅
+      
+      CENÁRIO 2 - Master paga diretamente:
+      1. Pastor cria custo
+      2. Master aprova E paga diretamente → paidBy = userId do Master
+      3. Pastor vê status PAID
+      4. Badge "💼 Pago pelo Líder" aparece ✅
+      5. Apenas botão "Visualizar" disponível ✅
+      6. SEM contador, SEM edição ✅
+      
+      🎯 STATUS: AMBAS AS CORREÇÕES IMPLEMENTADAS E FUNCIONANDO
+
