@@ -8855,11 +8855,26 @@ export default function App() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
-                  <Label>Tipo de Custo</Label>
-                  <Input
-                    value={costFormData.costTypeName}
-                    onChange={(e) => setCostFormData({...costFormData, costTypeName: e.target.value})}
-                  />
+                  <Label>Tipo de Custo *</Label>
+                  <select
+                    className="w-full border rounded p-2"
+                    value={costFormData.costTypeId}
+                    onChange={(e) => {
+                      const selected = allCustos.find(c => c.custoId === e.target.value);
+                      setCostFormData({
+                        ...costFormData,
+                        costTypeId: e.target.value,
+                        costTypeName: selected?.name || ''
+                      });
+                    }}
+                  >
+                    <option value="">Selecione o tipo de custo</option>
+                    {allCustos.map(custo => (
+                      <option key={custo.custoId} value={custo.custoId}>
+                        {custo.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 
                 <div>
