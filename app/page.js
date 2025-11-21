@@ -114,7 +114,6 @@ export default function App() {
   const [costsFilterStatus, setCostsFilterStatus] = useState('ALL');
   
   // Estados para Solicitações de Liberação (Master)
-  const [unlockRequests, setUnlockRequests] = useState([]);
   const [unlockRequestsCount, setUnlockRequestsCount] = useState(0);
   
   // Estados para upload de arquivos de custos
