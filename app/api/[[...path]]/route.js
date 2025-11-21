@@ -819,6 +819,82 @@ export async function POST(request) {
       }
     }
     
+    // UPLOAD COST FILE (Bill or Proof)
+    if (endpoint === 'upload/cost-file') {
+      const user = verifyToken(request);
+      if (!user) {
+        return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+      }
+      
+      try {
+        const formData = await request.formData();
+        const file = formData.get('file');
+        const fileType = formData.get('fileType'); // 'bill' ou 'proof'
+        
+        if (!file) {
+          return NextResponse.json({ error: 'Arquivo não enviado' }, { status: 400 });
+        }
+        
+        if (!fileType || !['bill', 'proof'].includes(fileType)) {
+          return NextResponse.json({ error: 'Tipo de arquivo inválido' }, { status: 400 });
+        }
+        
+        // Validar tipo e tamanho
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+        if (!allowedTypes.includes(file.type)) {
+          return NextResponse.json({ 
+            error: '❌ Formato não suportado',
+            details: 'Use: JPEG, PNG, WEBP ou PDF'
+          }, { status: 400 });
+        }
+        
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+          return NextResponse.json({ 
+            error: '❌ Arquivo muito grande',
+            details: `Tamanho: ${(file.size / 1024 / 1024).toFixed(2)}MB. Máximo: 5MB`
+          }, { status: 400 });
+        }
+        
+        const COST_UPLOAD_DIR = '/app/uploads/costs';
+        if (!existsSync(COST_UPLOAD_DIR)) {
+          mkdirSync(COST_UPLOAD_DIR, { recursive: true });
+        }
+        
+        const bytes = await file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        
+        const fileId = crypto.randomUUID();
+        const extension = file.name.split('.').pop();
+        const filename = `${fileType}_${fileId}.${extension}`;
+        const filepath = path.join(COST_UPLOAD_DIR, filename);
+        
+        writeFileSync(filepath, buffer);
+        console.log('[UPLOAD COST] Arquivo salvo:', filepath);
+        
+        // Retornar caminho relativo para salvar no banco
+        const relativePath = `/api/uploads/costs/${filename}`;
+        
+        await db.collection('audit_logs').insertOne({
+          logId: crypto.randomUUID(),
+          action: 'upload_cost_file',
+          userId: user.userId,
+          timestamp: getBrazilTime().toISOString(),
+          details: { filename: file.name, fileType, fileId }
+        });
+        
+        return NextResponse.json({ 
+          success: true, 
+          filePath: relativePath,
+          fileName: file.name,
+          message: 'Arquivo enviado com sucesso'
+        });
+      } catch (error) {
+        console.error('Erro ao fazer upload de arquivo de custo:', error);
+        return NextResponse.json({ error: 'Erro ao fazer upload' }, { status: 500 });
+      }
+    }
+    
     // PUBLIC: GET ALL ROLES (para cadastro público)
     if (endpoint === 'public/roles') {
       try {
