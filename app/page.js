@@ -3846,6 +3846,108 @@ export default function App() {
             </div>
           </TabsContent>
           
+          {/* REQUESTS TAB - Solicitações de Liberação (Master apenas) */}
+          <TabsContent value="requests">
+            <Card className="border-2 border-yellow-300">
+              <CardHeader className="bg-gradient-to-r from-yellow-50 to-yellow-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Bell className="w-6 h-6 text-yellow-600" />
+                      🔔 Solicitações de Liberação
+                    </CardTitle>
+                    <CardDescription>Aprove ou rejeite solicitações de pastores para editar lançamentos</CardDescription>
+                  </div>
+                  <Badge className="text-lg font-bold bg-yellow-500 text-white">
+                    {unlockRequestsCount} Pendentes
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                {unlockRequests.length === 0 ? (
+                  <div className="text-center py-12 text-gray-500">
+                    <Bell className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                    <p className="text-lg font-semibold">Nenhuma solicitação pendente</p>
+                    <p className="text-sm mt-2">Quando pastores solicitarem liberação, aparecerão aqui</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {unlockRequests.map((req) => (
+                      <Card key={req.requestId} className="border-2 border-yellow-200 hover:border-yellow-400 transition-colors">
+                        <CardContent className="p-4">
+                          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            {/* Informações da Solicitação */}
+                            <div className="md:col-span-3 space-y-2">
+                              <div className="flex items-start gap-3">
+                                <div className="bg-yellow-100 rounded-full p-2">
+                                  <User className="w-5 h-5 text-yellow-600" />
+                                </div>
+                                <div className="flex-1">
+                                  <p className="font-bold text-lg">{req.requesterName}</p>
+                                  <p className="text-sm text-gray-600">{req.requesterEmail}</p>
+                                  <Badge className="mt-1 bg-blue-100 text-blue-800">{req.requesterRole}</Badge>
+                                </div>
+                              </div>
+                              
+                              <div className="grid grid-cols-2 gap-3 mt-3 text-sm">
+                                <div className="flex items-center gap-2">
+                                  <Church className="w-4 h-4 text-gray-500" />
+                                  <span className="font-semibold">Igreja:</span>
+                                  <span>{req.requesterChurch || 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Calendar className="w-4 h-4 text-gray-500" />
+                                  <span className="font-semibold">Data:</span>
+                                  <span>{req.day}/{req.month}/{req.year}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Clock className="w-4 h-4 text-gray-500" />
+                                  <span className="font-semibold">Horário:</span>
+                                  <span>{req.timeSlot}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <AlertCircle className="w-4 h-4 text-gray-500" />
+                                  <span className="font-semibold">Solicitado em:</span>
+                                  <span>{new Date(req.createdAt).toLocaleString('pt-BR')}</span>
+                                </div>
+                              </div>
+                              
+                              {req.reason && (
+                                <div className="mt-3 bg-gray-50 rounded p-3 border border-gray-200">
+                                  <p className="text-xs font-semibold text-gray-600 mb-1">Motivo:</p>
+                                  <p className="text-sm">{req.reason}</p>
+                                </div>
+                              )}
+                            </div>
+                            
+                            {/* Ações */}
+                            <div className="flex md:flex-col gap-2 justify-end">
+                              <Button
+                                onClick={() => handleApproveUnlockRequest(req.requestId, req.entryId, 60)}
+                                className="flex-1 bg-green-600 hover:bg-green-700"
+                              >
+                                <CheckCircle className="w-4 h-4 mr-2" />
+                                Aprovar
+                                <span className="text-xs ml-1">(60min)</span>
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                className="flex-1"
+                                disabled
+                              >
+                                <XCircle className="w-4 h-4 mr-2" />
+                                Rejeitar
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
           
           {/* DASHBOARD TAB */}
           <TabsContent value="dashboard">
