@@ -115,6 +115,12 @@ export default function App() {
   
   // Estados para Solicitações de Liberação (Master)
   const [unlockRequestsCount, setUnlockRequestsCount] = useState(0);
+  const [unlockRequestsHistory, setUnlockRequestsHistory] = useState([]);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [showRequestViewModal, setShowRequestViewModal] = useState(false);
+  const [showRequestDeleteConfirm, setShowRequestDeleteConfirm] = useState(false);
   
   // Estados para upload de arquivos de custos
   const [uploadingBill, setUploadingBill] = useState(false);
