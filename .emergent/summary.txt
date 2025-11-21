@@ -1,90 +1,70 @@
 <analysis>
-The trajectory details an intensive, feature-rich development process for a church management application, Caderno de Controle Online — IUDP. The process is characterized by rapid, iterative cycles driven by highly specific user feedback delivered in Portuguese. The core of the application was built progressively, starting with User, Church, and Role management (CRUD), and then expanding significantly into a sophisticated Financial Calendar for offerings and a comprehensive Cost Management system with a hierarchical approval workflow.
+The trajectory documents the iterative development of a church management application, Caderno de Controle Online — IUDP, driven by specific user feedback in Portuguese. The project started with basic CRUD for Users, Churches, and Roles and expanded into a complex Financial Calendar and a multi-step Cost Management system.
 
-The architecture is a clear monolith within a Next.js framework, with nearly all backend logic consolidated in  and frontend logic in . This has led to extremely large and complex files.
+The architecture is a Next.js monolith, with backend logic heavily concentrated in  and frontend logic in . This has resulted in very large and complex files. Development followed a pattern of implementing new features (e.g., cost approval, real-time unlock requests) and then immediately addressing bugs or user-requested refinements (e.g., fixing financial calculations, correcting JSX syntax errors, implementing a strict server restart policy).
 
-Key development patterns include:
-1.  **Backend First:** New features typically start with creating or modifying Mongoose schemas and API endpoints in .
-2.  **Frontend State:** Corresponding state variables () and data-fetching functions are added to .
-3.  **UI Implementation:** JSX for new tabs, modals, and lists is then implemented in , often reusing patterns from existing modules like Funções (Roles).
+The most recent work involves a major overhaul of the Custos (Costs) module workflow. The user provided a highly detailed specification for how costs should be created, approved, paid, and edited, defining distinct states and permissions for Pastors and the Master Leader. The previous engineer had just begun implementing these changes by refactoring the Create Cost modal. The established development process mandates a strict check for issues, clear cache, and restart server policy after every code change to combat rendering and caching problems.
 
-The work history shows a constant cycle of feature implementation (e.g., 3-field offering entry, PDF viewing, cost approval system) followed by immediate bug-fixing based on user reports (e.g., infinite loops from  dependencies, syntax errors, data persistence/caching issues). The most recent user request concerns critical bugs in the financial calculation logic on the Master Leader's calendar, which is the immediate task at hand.
-
-The user's primary language is Portuguese. The next agent must respond in **Portuguese only**.
+The user's primary language is **Portuguese**, and all future communications must be in Portuguese only.
 </analysis>
-
 <product_requirements>
-The Caderno de Controle Online — IUDP is a comprehensive management application for a church organization, designed for two primary roles: a Líder Máximo (Master Leader) with full administrative oversight, and Pastors/Bishops who manage their individual churches.
+The Caderno de Controle Online — IUDP is a web application for managing church finances and operations, designed for a Líder Máximo (Master Leader) with full oversight and Pastores (Pastors) who manage individual churches.
 
-**Implemented Core Modules:**
-*   **Financial Calendar (Offerings):** A calendar interface where Pastors can log daily offerings, categorized into Cash, PIX, and Card Machine, and upload receipts (images/PDFs). The Master Leader has a read-only, aggregated view showing totals from all churches, with a drill-down modal to see details per church. The calendar has a filtering system by church.
-*   **Cost Management System:** A full-featured module where Pastors submit church expenses (rent, utilities, etc.) with attached bills and payment proofs. These submissions enter a Pending state.
-*   **Approval Workflow:** The Master Leader has a dashboard to review all submitted costs, with the ability to Approve or Reject them, updating the status for the Pastor.
-*   **User/Church/Role Management:** Full CRUD interfaces for managing users, churches, and user roles.
-*   **Statistics:** A dashboard for the Master Leader displaying key metrics on user growth and financial data, including cost summaries.
+**Key Implemented Features:**
+*   **Financial Calendar:** Pastors log daily offerings (Cash, PIX, Card) and upload receipts. The Master Leader has an aggregated, filterable view.
+*   **Unlock Request System:** Pastors can request to unlock closed calendar days. The Master Leader reviews these in a dedicated Solicitações tab with a full history and real-time polling for updates.
+*   **Cost Management:** Pastors submit expense requests with attached bills. The Master Leader has a dashboard to approve, reject, edit, or pay these costs. The list is filterable and grouped by church.
+*   **User/Role/Church Management:** Full CRUD interfaces for core administrative data.
+*   **Password Visibility:** Show/hide password toggles have been implemented across all password fields in the application.
 
-The system is built to enforce data consistency, with frequent requests from the user to purge all data to ensure a clean start for testing new logic.
+The most recent requirement, currently in progress, is a detailed, multi-step workflow for the Cost Management module, defining a strict lifecycle from creation (by Pastor), approval (by Master), payment (by either Pastor or Master), and a time-limited editing window.
 </product_requirements>
-
 <key_technical_concepts>
 - **Framework:** Next.js (App Router)
-- **Architecture:** Monolithic Full-Stack. Backend logic is centralized in a single dynamic route file, and the entire frontend is in a single page component.
+- **Architecture:** Monolithic Full-Stack. Backend logic is in a single dynamic route () and the entire authenticated frontend is in one component ().
 - **Database:** MongoDB with Mongoose.
-- **Backend:** API endpoints handled via a single  file.
-- **Frontend:** Client-side rendered app using  with React Hooks (, ) for state management.
-- **Styling:** TailwindCSS and shadcn/ui.
-- **Authentication:** JWT-based, with role-based access control ( vs. other roles) implemented through conditional rendering.
+- **State Management:** React Hooks (, ) for all client-side state.
+- **Styling:** TailwindCSS with shadcn/ui components.
+- **Authentication:** JWT-based, with role-based access control ( vs. others) handled via conditional rendering.
+- **Real-time Updates:** Implemented via client-side polling ().
 </key_technical_concepts>
-
 <code_architecture>
-The application follows a monolithic structure where frontend and backend logic are heavily concentrated in two files.
+The application architecture is a monolithic structure within the Next.js App Router framework. Frontend and backend logic are almost entirely contained within two key files.
 
 **Directory Structure:**
 
 
 -   ****
-    -   **Importance:** This is the single backend for the entire application. It uses Next.js dynamic routing () to handle all API requests.
-    -   **Summary of Changes:** This file has been modified extensively. It contains endpoints for:
-        -   Full CRUD on , , .
-        -   Creating, reading, and updating financial  (offerings), including a complex aggregation pipeline for the Master Leader's view that groups by time slot and filters by church.
-        -   Deleting specific offerings or receipts.
-        -   A complete CRUD and approval workflow for  (, , , ).
-        -   Utility endpoints for data cleanup (, ).
+    -   **Importance:** This is the single, centralized backend for the entire application. It handles all API requests for every feature using Next.js dynamic routing.
+    -   **Summary of Changes:** This file contains numerous endpoints for full CRUD operations on , , ,  (offerings), and . It includes complex logic for financial data aggregation, a complete cost approval workflow (create, list, approve, reject, update, delete), file uploads, and a full system for managing unlock requests (request, approve, reject, list, delete). Recent changes include adding  and  endpoints and modifying the  endpoint to support filtering by church.
 
 -   ****
-    -   **Importance:** This is the single frontend file for the entire logged-in experience. It manages all application state, API calls, and renders all UI components conditionally based on the active tab and user role.
-    -   **Summary of Changes:** This file is extremely large and complex. Key changes include:
-        -   State management for over six modules (Calendar, Users, Churches, Roles, Costs, Statistics) using dozens of  hooks.
-        -   Implementation of the Calendário view with two distinct UIs: one for Pastors (data entry) and one for the Master Leader (aggregated, read-only view).
-        -   Implementation of the Custos tab for both Pastors (data entry form and list) and the Master Leader (approval dashboard with filters).
-        -   Numerous modals for all CRUD operations, viewing receipts, and viewing detailed reports.
-        -   Conditional rendering logic based on  is used pervasively to control access to features.
-        -   Functions for fetching data from all backend endpoints and handling UI logic like opening/closing modals and updating state.
+    -   **Importance:** This is the single, centralized frontend component for the authenticated application. It manages all UI, state, and API interactions for every module.
+    -   **Summary of Changes:** This file is exceptionally large and complex. It manages state with dozens of  hooks for modules like Calendar, Costs, Users, Roles, and the new Requests tab. It contains all modals for creating, viewing, and editing data. Recent work involved extensive refactoring of the Custos tab to add filtering, grouping by church, and new action buttons (Edit, Delete). The most recent edits were made to the Create/Edit Cost modal to implement a more complex, state-dependent workflow where certain fields are disabled based on the cost's status. It also includes the  logic for polling updates.
 
 -   ****
-    -   **Importance:** Serves as a manual log for development progress, feature lists, and communication between agents.
-    -   **Summary of Changes:** This file was frequently updated throughout the trajectory to document newly implemented features and confirm the completion of user requests.
+    -   **Importance:** This file acts as a development log, tracking user requests, testing results, and communication between agents.
+    -   **Summary of Changes:** The file has been updated frequently to document new features, bug fixes, and to define testing plans for the  agent.
 </code_architecture>
-
 <pending_tasks>
-- **Fix Financial Calculations:** The primary task is to debug and correct the logic for calculating and displaying totals on the Master Leader's calendar. The monthly total, daily subtotals, and their response to the church filter are all reported as incorrect.
+- **Implement the full Cost Management workflow** as specified by the user in their most recent request. This includes:
+    1.  Disabling payment fields on initial cost creation.
+    2.  Enabling payment fields for the Pastor only after the Master has set the status to APPROVED.
+    3.  Implementing a 60-minute edit window for the Pastor after they submit payment details.
+    4.  Ensuring the Master Leader can pay a cost directly and set the status to PAID.
 </pending_tasks>
-
 <current_work>
-Immediately before this summary request, the user reported a critical bug regarding the financial summaries on the Master Leader's calendar.
+The last task was to begin implementing the highly-detailed cost management workflow requested by the user. The user wants a strict, multi-stage process for creating and paying for costs, with different permissions and field visibilities for Pastors and the Master Leader depending on the cost's status (, , ).
 
-**The specific problems are:**
-1.  **Incorrect Monthly Total:** The main total do mês at the top of the calendar does not accurately reflect the sum of all offerings within the month.
-2.  **Incorrect Daily Subtotals:** The subtotal displayed for each day does not correctly sum up the values from all time-slot cards within that day.
-3.  **Filter Ineffectiveness:** When the Master Leader uses the dropdown to filter by a specific church, the totals and subtotals do not update correctly to reflect only that church's data.
+The immediate work focused on the first step of this workflow: **refactoring the Create Cost modal for Pastors**. The goal is to disable fields related to payment (, , ) during the initial creation of a cost request. These fields should only become editable after a Master Leader has approved the cost.
 
-The previous engineer had just acknowledged the user's detailed report and was at the very beginning of the analysis phase to identify the root cause of these calculation errors. No code has been modified yet to address this specific issue. The work involves investigating the data aggregation pipeline in  and the state management/rendering logic for totals in .
+The last action taken was an edit to **** (Message 656) to begin this refactoring. The code was modified to conditionally render or disable these fields within the modal, which is used for both creating and editing costs.
+
+**File:** 
+**Action:** The  tool was used to modify the JSX for the cost creation/editing modal, adding logic to disable payment-related fields.
+
+
 </current_work>
-
 <optional_next_step>
-Analyze and debug the financial calculation logic. Start by examining the  backend endpoint in  to verify the aggregation query, and then check the frontend logic in  that sums these values for display.
+Continue refactoring the Create/Edit Cost modal in  to fully implement the disabled state for all payment-related fields during initial creation.
 </optional_next_step>
-
-<direct_quotes>
-**User's Last Request (Chat Message 484):** Por que no painel do líder máximo, o valor total lá no calendário, ele não tá correspondendo exatamente ao somatório de todos os subtotais? [...] verifica se o subtotal de cada dia está somando todas as horas das ofertas [...] e se todos os subtotais estão sendo somados para aparecer no total do mês, lá em cima. E que isso também deve justamente funcionar mediante filtros. Os filtros, quando forem escolhidos uma única igreja, o total representará o total arrecadado nesse mês por esta igreja selecionada. [...] Faça um planejamento, entenda qual é esse objetivo, pra que que serve essa ferramenta e faça funcionar. Faça teste e me entregue.
-</direct_quotes>

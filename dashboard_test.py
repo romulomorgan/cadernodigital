@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Configuração da API
-BASE_URL = "https://iudp-control.preview.emergentagent.com/api"
+BASE_URL = "https://church-admin-13.preview.emergentagent.com/api"
 
 def log_test(message, success=None):
     """Log de teste com formatação"""

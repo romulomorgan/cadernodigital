@@ -12,7 +12,7 @@ import tempfile
 import time
 
 # Configuração da API
-BASE_URL = "https://iudp-control.preview.emergentagent.com/api"
+BASE_URL = "https://church-admin-13.preview.emergentagent.com/api"
 
 def create_test_image():
     """Cria uma imagem PNG simples para testes"""
