@@ -3058,8 +3058,7 @@ export default function App() {
                         value={selectedChurchFilter} 
                         onValueChange={(value) => {
                           setSelectedChurchFilter(value);
-                          // Recarregar dados com novo filtro
-                          fetchEntries();
+                          // O useEffect vai recarregar automaticamente
                         }}
                       >
                         <SelectTrigger className="w-[300px] bg-white border-blue-300">
