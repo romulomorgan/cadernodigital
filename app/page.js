@@ -92,7 +92,26 @@ export default function App() {
   // Receipt viewer - FASE 4
   const [viewingReceipts, setViewingReceipts] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [detailsData, setDetailsData] = useState(null); // { entryId, receipts: [], currentIndex: 0 }
+  const [detailsData, setDetailsData] = useState(null);
+  
+  // Estados para Custos (Pastores e Master)
+  const [costsList, setCostsList] = useState([]);
+  const [showCostCreateModal, setShowCostCreateModal] = useState(false);
+  const [showCostEditModal, setShowCostEditModal] = useState(false);
+  const [showCostViewModal, setShowCostViewModal] = useState(false);
+  const [showCostDeleteModal, setShowCostDeleteModal] = useState(false);
+  const [selectedCost, setSelectedCost] = useState(null);
+  const [costFormData, setCostFormData] = useState({
+    costTypeId: '',
+    costTypeName: '',
+    dueDate: '',
+    value: '',
+    billFile: '',
+    paymentDate: '',
+    valuePaid: '',
+    proofFile: ''
+  });
+  const [costsFilterStatus, setCostsFilterStatus] = useState('ALL'); // { entryId, receipts: [], currentIndex: 0 }
   
   // Confirmation dialogs
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
