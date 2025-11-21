@@ -7340,6 +7340,312 @@ export default function App() {
           )}
         </DialogContent>
       </Dialog>
+      
+      {/* ========== MODAIS DE CUSTOS ========== */}
+      
+      {/* Modal Criar Custo */}
+      <Dialog open={showCostCreateModal} onOpenChange={setShowCostCreateModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>💰 Lançar Novo Custo</DialogTitle>
+            <DialogDescription>Preencha as informações do custo a ser registrado</DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Tipo de Custo *</Label>
+                <Select 
+                  value={costFormData.costTypeId}
+                  onValueChange={(value) => {
+                    const tipo = allCustos.find(c => c.custoId === value);
+                    setCostFormData({
+                      ...costFormData,
+                      costTypeId: value,
+                      costTypeName: tipo?.name || ''
+                    });
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {allCustos.map(custo => (
+                      <SelectItem key={custo.custoId} value={custo.custoId}>
+                        {custo.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label>Data de Vencimento *</Label>
+                <Input
+                  type="date"
+                  value={costFormData.dueDate}
+                  onChange={(e) => setCostFormData({...costFormData, dueDate: e.target.value})}
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Valor do Custo *</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={costFormData.value}
+                  onChange={(e) => setCostFormData({...costFormData, value: e.target.value})}
+                />
+              </div>
+              
+              <div>
+                <Label>Data do Pagamento</Label>
+                <Input
+                  type="date"
+                  value={costFormData.paymentDate}
+                  onChange={(e) => setCostFormData({...costFormData, paymentDate: e.target.value})}
+                />
+              </div>
+            </div>
+            
+            <div>
+              <Label>Valor Pago</Label>
+              <Input
+                type="number"
+                step="0.01"
+                placeholder="0.00"
+                value={costFormData.valuePaid}
+                onChange={(e) => setCostFormData({...costFormData, valuePaid: e.target.value})}
+              />
+              <p className="text-xs text-gray-500 mt-1">Informe o valor efetivamente pago (pode incluir juros se houver atraso)</p>
+            </div>
+            
+            <div>
+              <Label>Conta/Boleto (Upload)</Label>
+              <Input
+                type="text"
+                placeholder="Nome do arquivo ou URL"
+                value={costFormData.billFile}
+                onChange={(e) => setCostFormData({...costFormData, billFile: e.target.value})}
+              />
+              <p className="text-xs text-gray-500 mt-1">Em breve: upload de arquivos PDF/Imagem</p>
+            </div>
+            
+            <div>
+              <Label>Comprovante de Pagamento (Upload)</Label>
+              <Input
+                type="text"
+                placeholder="Nome do arquivo ou URL"
+                value={costFormData.proofFile}
+                onChange={(e) => setCostFormData({...costFormData, proofFile: e.target.value})}
+              />
+              <p className="text-xs text-gray-500 mt-1">Em breve: upload de arquivos PDF/Imagem</p>
+            </div>
+            
+            <div className="flex gap-3 justify-end pt-4">
+              <Button variant="outline" onClick={() => setShowCostCreateModal(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleCreateCost} className="bg-orange-600 hover:bg-orange-700">
+                💾 Salvar Custo
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Modal Visualizar Custo */}
+      <Dialog open={showCostViewModal} onOpenChange={setShowCostViewModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>👁️ Detalhes do Custo</DialogTitle>
+          </DialogHeader>
+          
+          {selectedCost && (
+            <div className="space-y-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-500">Tipo</Label>
+                  <p className="font-semibold">{selectedCost.costTypeName}</p>
+                </div>
+                <div>
+                  <Label className="text-gray-500">Status</Label>
+                  <p>
+                    {selectedCost.status === 'PENDING' && '🟡 Pendente'}
+                    {selectedCost.status === 'APPROVED' && '🟢 Aprovado'}
+                    {selectedCost.status === 'REJECTED' && '🔴 Reprovado'}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-gray-500">Vencimento</Label>
+                  <p className="font-semibold">{new Date(selectedCost.dueDate).toLocaleDateString('pt-BR')}</p>
+                </div>
+                <div>
+                  <Label className="text-gray-500">Data Pagamento</Label>
+                  <p className="font-semibold">
+                    {selectedCost.paymentDate ? new Date(selectedCost.paymentDate).toLocaleDateString('pt-BR') : '-'}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-blue-50 border border-blue-200 rounded p-3">
+                  <Label className="text-xs text-blue-700">Valor do Custo</Label>
+                  <p className="text-lg font-bold text-blue-900">R$ {parseFloat(selectedCost.value).toFixed(2)}</p>
+                </div>
+                <div className="bg-green-50 border border-green-200 rounded p-3">
+                  <Label className="text-xs text-green-700">Valor Pago</Label>
+                  <p className="text-lg font-bold text-green-900">
+                    {selectedCost.valuePaid ? `R$ ${parseFloat(selectedCost.valuePaid).toFixed(2)}` : '-'}
+                  </p>
+                </div>
+                <div className={`${selectedCost.difference > 0 ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-200'} border rounded p-3`}>
+                  <Label className="text-xs text-gray-700">Diferença</Label>
+                  <p className={`text-lg font-bold ${selectedCost.difference > 0 ? 'text-red-900' : 'text-gray-700'}`}>
+                    {selectedCost.difference > 0 ? `+R$ ${selectedCost.difference.toFixed(2)}` : '-'}
+                  </p>
+                </div>
+              </div>
+              
+              {selectedCost.rejectionReason && (
+                <div className="bg-red-50 border border-red-200 rounded p-3">
+                  <Label className="text-sm text-red-700 font-semibold">Motivo da Reprovação:</Label>
+                  <p className="text-sm text-red-900 mt-1">{selectedCost.rejectionReason}</p>
+                </div>
+              )}
+              
+              <div className="flex gap-3 justify-end pt-4">
+                <Button variant="outline" onClick={() => setShowCostViewModal(false)}>
+                  Fechar
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Modal Editar Custo */}
+      <Dialog open={showCostEditModal} onOpenChange={setShowCostEditModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>✏️ Editar Custo</DialogTitle>
+            <DialogDescription>Altere as informações e salve novamente</DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Tipo de Custo *</Label>
+                <Select 
+                  value={costFormData.costTypeId}
+                  onValueChange={(value) => {
+                    const tipo = allCustos.find(c => c.custoId === value);
+                    setCostFormData({
+                      ...costFormData,
+                      costTypeId: value,
+                      costTypeName: tipo?.name || ''
+                    });
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {allCustos.map(custo => (
+                      <SelectItem key={custo.custoId} value={custo.custoId}>
+                        {custo.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label>Data de Vencimento *</Label>
+                <Input
+                  type="date"
+                  value={costFormData.dueDate}
+                  onChange={(e) => setCostFormData({...costFormData, dueDate: e.target.value})}
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Valor do Custo *</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={costFormData.value}
+                  onChange={(e) => setCostFormData({...costFormData, value: e.target.value})}
+                />
+              </div>
+              
+              <div>
+                <Label>Data do Pagamento</Label>
+                <Input
+                  type="date"
+                  value={costFormData.paymentDate}
+                  onChange={(e) => setCostFormData({...costFormData, paymentDate: e.target.value})}
+                />
+              </div>
+            </div>
+            
+            <div>
+              <Label>Valor Pago</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={costFormData.valuePaid}
+                onChange={(e) => setCostFormData({...costFormData, valuePaid: e.target.value})}
+              />
+            </div>
+            
+            <div className="flex gap-3 justify-end pt-4">
+              <Button variant="outline" onClick={() => setShowCostEditModal(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleUpdateCost} className="bg-blue-600 hover:bg-blue-700">
+                💾 Salvar Alterações
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Modal Confirmar Exclusão de Custo */}
+      <Dialog open={showCostDeleteModal} onOpenChange={setShowCostDeleteModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertCircle className="w-5 h-5" />
+              Confirmar Exclusão
+            </DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir este custo?
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex gap-3 justify-end pt-4">
+            <Button variant="outline" onClick={() => setShowCostDeleteModal(false)}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={() => handleDeleteCost(selectedCost?.costId)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Sim, Excluir
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
     </div>
   );
 }
