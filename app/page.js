@@ -640,15 +640,15 @@ export default function App() {
     }
   }, [isAuthenticated, activeTab, token]);
   
-  // Polling para atualizar contador de solicitações a cada 1 minuto (quando autenticado como Master)
+  // Polling para atualizar contador de solicitações a cada 30 segundos (quando autenticado como Master)
   useEffect(() => {
     if (isAuthenticated && token && user?.role === 'master') {
       fetchUnlockRequests(false); // Carregamento inicial sem notificação
       
       const interval = setInterval(() => {
-        console.log('[POLLING] Verificando novas solicitações...');
+        console.log('[POLLING MASTER] Verificando novas solicitações...');
         fetchUnlockRequests(true); // Verificações periódicas COM notificação
-      }, 60000); // 60 segundos = 1 minuto
+      }, 30000); // 30 segundos para resposta mais rápida
       
       return () => clearInterval(interval);
     }
