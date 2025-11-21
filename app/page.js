@@ -1699,7 +1699,172 @@ export default function App() {
     }
   };
   
-  // ========== FUNÇÕES CRUD - CUSTOS ==========
+  // ========== FUNÇÕES CRUD - CUSTOS ENTRIES (LANÇAMENTOS) ==========
+  
+  const fetchCostsList = async (filterStatus = 'ALL') => {
+    try {
+      const res = await fetch('/api/costs-entries/list', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: filterStatus })
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setCostsList(data.costs || []);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar custos:', error);
+    }
+  };
+  
+  const handleCreateCost = async () => {
+    if (!costFormData.costTypeId || !costFormData.dueDate || !costFormData.value) {
+      toast.error('❌ Preencha os campos obrigatórios: tipo, vencimento e valor');
+      return;
+    }
+    
+    try {
+      const res = await fetch('/api/costs-entries/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(costFormData)
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        setShowCostCreateModal(false);
+        setCostFormData({
+          costTypeId: '',
+          costTypeName: '',
+          dueDate: '',
+          value: '',
+          billFile: '',
+          paymentDate: '',
+          valuePaid: '',
+          proofFile: ''
+        });
+        fetchCostsList(costsFilterStatus);
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao criar custo');
+    }
+  };
+  
+  const handleUpdateCost = async () => {
+    if (!costFormData.costTypeId || !costFormData.dueDate || !costFormData.value) {
+      toast.error('❌ Preencha os campos obrigatórios');
+      return;
+    }
+    
+    try {
+      const res = await fetch('/api/costs-entries/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          costId: selectedCost.costId,
+          costData: costFormData
+        })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        setShowCostEditModal(false);
+        setSelectedCost(null);
+        fetchCostsList(costsFilterStatus);
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao atualizar custo');
+    }
+  };
+  
+  const handleDeleteCost = async (costId) => {
+    try {
+      const res = await fetch('/api/costs-entries/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ costId })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        setShowCostDeleteModal(false);
+        setSelectedCost(null);
+        fetchCostsList(costsFilterStatus);
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao excluir custo');
+    }
+  };
+  
+  const handleApproveCost = async (costId) => {
+    try {
+      const res = await fetch('/api/costs-entries/approve', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ costId })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        fetchCostsList(costsFilterStatus);
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao aprovar custo');
+    }
+  };
+  
+  const handleRejectCost = async (costId, reason) => {
+    try {
+      const res = await fetch('/api/costs-entries/reject', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ costId, reason })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        fetchCostsList(costsFilterStatus);
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao reprovar custo');
+    }
+  };
+  
+  // ========== FUNÇÕES CRUD - CUSTOS TIPOS ==========
   
   const fetchAllCustos = async () => {
     try {
