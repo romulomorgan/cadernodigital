@@ -8342,38 +8342,46 @@ export default function App() {
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Valor do Custo *</Label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  placeholder="0.00"
-                  value={costFormData.value}
-                  onChange={(e) => setCostFormData({...costFormData, value: e.target.value})}
-                />
-              </div>
-              
-              <div>
-                <Label>Data do Pagamento</Label>
-                <Input
-                  type="date"
-                  value={costFormData.paymentDate}
-                  onChange={(e) => setCostFormData({...costFormData, paymentDate: e.target.value})}
-                />
-              </div>
-            </div>
-            
             <div>
-              <Label>Valor Pago</Label>
+              <Label>Valor do Custo (R$) *</Label>
               <Input
                 type="number"
                 step="0.01"
                 placeholder="0.00"
-                value={costFormData.valuePaid}
-                onChange={(e) => setCostFormData({...costFormData, valuePaid: e.target.value})}
+                value={costFormData.value}
+                onChange={(e) => setCostFormData({...costFormData, value: e.target.value})}
               />
-              <p className="text-xs text-gray-500 mt-1">Informe o valor efetivamente pago (pode incluir juros se houver atraso)</p>
+            </div>
+            
+            {/* Campos de Pagamento - DESABILITADOS ao criar */}
+            <div className="border-t-2 border-gray-300 pt-4 mt-4">
+              <p className="text-sm font-semibold text-gray-600 mb-3">
+                📝 Informações de Pagamento (habilitado após aprovação do Master)
+              </p>
+              
+              <div className="grid grid-cols-2 gap-4 opacity-50">
+                <div>
+                  <Label>Data do Pagamento</Label>
+                  <Input
+                    type="date"
+                    disabled
+                    className="bg-gray-100"
+                    title="Este campo será liberado após aprovação do Master"
+                  />
+                </div>
+                
+                <div>
+                  <Label>Valor Pago (R$)</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    disabled
+                    className="bg-gray-100"
+                    title="Este campo será liberado após aprovação do Master"
+                  />
+                </div>
+              </div>
             </div>
             
             <div>
