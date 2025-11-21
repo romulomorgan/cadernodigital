@@ -569,10 +569,18 @@ export default function App() {
     }
   }, [isAuthenticated, activeTab, token]);
   
-  // Carregar custos quando entrar na aba custos
+  // Carregar custos tipos quando entrar na aba custos (Master)
   useEffect(() => {
     if (isAuthenticated && activeTab === 'custos' && token && user?.role === 'master') {
       fetchAllCustos();
+    }
+  }, [isAuthenticated, activeTab, token]);
+  
+  // Carregar custos entries quando entrar na aba costs-pastor (Pastores/Bispos)
+  useEffect(() => {
+    if (isAuthenticated && activeTab === 'costs-pastor' && token && user?.role !== 'master') {
+      fetchCostsList(costsFilterStatus);
+      fetchAllCustos(); // Para popular o dropdown
     }
   }, [isAuthenticated, activeTab, token]);
   
