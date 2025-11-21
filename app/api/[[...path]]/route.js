@@ -1970,7 +1970,17 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
       }
       
-      const { month, year } = await request.json();
+      let month, year;
+      try {
+        const body = await request.json();
+        month = body.month;
+        year = body.year;
+      } catch (e) {
+        // Se não houver body, usar mês/ano atual
+        const now = getBrazilTime();
+        month = now.month() + 1;
+        year = now.year();
+      }
       
       // Buscar solicitações pendentes do usuário
       const pendingRequests = await db.collection('unlock_requests')
