@@ -3905,7 +3905,10 @@ export default function App() {
                               <Button
                                 variant="destructive"
                                 className="flex-1"
-                                disabled
+                                onClick={() => {
+                                  setSelectedRequest(req);
+                                  setShowRejectModal(true);
+                                }}
                               >
                                 <XCircle className="w-4 h-4 mr-2" />
                                 Rejeitar
