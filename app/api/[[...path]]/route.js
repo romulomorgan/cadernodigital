@@ -819,6 +819,100 @@ export async function POST(request) {
       }
     }
     
+    // UPDATE COST ENTRY (Master pode editar qualquer campo, incluindo status)
+    if (endpoint === 'costs-entries/update-master') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      try {
+        const body = await request.json();
+        const { costId, costTypeId, costTypeName, dueDate, value, billFile, paymentDate, valuePaid, proofFile, status } = body;
+        
+        const updateData = {
+          costTypeId,
+          costTypeName,
+          dueDate,
+          value: parseFloat(value),
+          billFile,
+          paymentDate,
+          valuePaid: valuePaid ? parseFloat(valuePaid) : null,
+          proofFile,
+          status,
+          updatedAt: getBrazilTime().toISOString(),
+          updatedBy: user.userId
+        };
+        
+        // Calcular diferença
+        if (valuePaid) {
+          const diff = parseFloat(valuePaid) - parseFloat(value);
+          updateData.difference = diff;
+        }
+        
+        await db.collection('costs_entries').updateOne(
+          { costId },
+          { $set: updateData }
+        );
+        
+        // Audit log
+        await db.collection('audit_logs').insertOne({
+          logId: crypto.randomUUID(),
+          action: 'update_cost_entry_master',
+          userId: user.userId,
+          timestamp: getBrazilTime().toISOString(),
+          details: { costId, changes: updateData }
+        });
+        
+        return NextResponse.json({ success: true, message: 'Custo atualizado com sucesso!' });
+      } catch (error) {
+        console.error('Erro ao atualizar custo:', error);
+        return NextResponse.json({ error: 'Erro ao atualizar custo' }, { status: 500 });
+      }
+    }
+    
+    // DELETE COST ENTRY (Master apenas)
+    if (endpoint === 'costs-entries/delete') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      try {
+        const body = await request.json();
+        const { costId } = body;
+        
+        // Buscar dados do custo antes de deletar
+        const cost = await db.collection('costs_entries').findOne({ costId });
+        
+        if (!cost) {
+          return NextResponse.json({ error: 'Custo não encontrado' }, { status: 404 });
+        }
+        
+        // Deletar
+        await db.collection('costs_entries').deleteOne({ costId });
+        
+        // Audit log
+        await db.collection('audit_logs').insertOne({
+          logId: crypto.randomUUID(),
+          action: 'delete_cost_entry',
+          userId: user.userId,
+          timestamp: getBrazilTime().toISOString(),
+          details: { 
+            costId,
+            costTypeName: cost.costTypeName,
+            value: cost.value,
+            churchName: cost.churchName
+          }
+        });
+        
+        return NextResponse.json({ success: true, message: 'Custo excluído com sucesso!' });
+      } catch (error) {
+        console.error('Erro ao excluir custo:', error);
+        return NextResponse.json({ error: 'Erro ao excluir custo' }, { status: 500 });
+      }
+    }
+    
     // UPLOAD COST FILE (Bill or Proof)
     if (endpoint === 'upload/cost-file') {
       const user = verifyToken(request);
