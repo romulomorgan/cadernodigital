@@ -356,10 +356,11 @@ export async function POST(request) {
     // LIST CUSTOS
     if (endpoint === 'custos/list') {
       const user = verifyToken(request);
-      if (!user || user.role !== 'master') {
-        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!user) {
+        return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
       }
       
+      // Todos os usuários autenticados podem listar tipos de custos
       const custos = await db.collection('custos')
         .find({})
         .sort({ name: 1 })
