@@ -6358,7 +6358,6 @@ export default function App() {
                         </Button>
                       </div>
                     </div>
-                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-6">
