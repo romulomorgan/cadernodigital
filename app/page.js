@@ -643,25 +643,16 @@ export default function App() {
   // Polling para atualizar contador de solicitações a cada 1 minuto (quando autenticado como Master)
   useEffect(() => {
     if (isAuthenticated && token && user?.role === 'master') {
-      fetchUnlockRequests();
+      fetchUnlockRequests(false); // Carregamento inicial sem notificação
+      
       const interval = setInterval(() => {
-        const previousCount = unlockRequestsCount;
-        fetchUnlockRequests();
-        
-        // Se houver novas solicitações, mostrar notificação
-        setTimeout(() => {
-          if (unlockRequestsCount > previousCount) {
-            toast.info(`🔔 ${unlockRequestsCount - previousCount} nova(s) solicitação(ões) de liberação!`, {
-              duration: 5000,
-              position: 'top-right'
-            });
-          }
-        }, 500);
+        console.log('[POLLING] Verificando novas solicitações...');
+        fetchUnlockRequests(true); // Verificações periódicas COM notificação
       }, 60000); // 60 segundos = 1 minuto
       
       return () => clearInterval(interval);
     }
-  }, [isAuthenticated, token, user?.role, unlockRequestsCount]);
+  }, [isAuthenticated, token, user?.role]);
 
   // Buscar igrejas e roles públicas para o formulário de registro (sem autenticação)
   useEffect(() => {
