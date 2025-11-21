@@ -814,16 +814,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "POST /custos/create - Criar tipo de custo"
-    - "POST /custos/list - Listar tipos de custos"
-    - "POST /custos/update - Atualizar tipo de custo"
-    - "POST /custos/delete - Excluir tipo de custo"
-    - "Aba Custos - UI completa com CRUD"
-    - "Aba Estatística - Dashboard com métricas"
-    - "Reorganização da ordem das abas Master"
+    - "Corrigir cálculos financeiros no calendário do Master"
   stuck_tasks: []
   test_all: false
-  test_priority: "high_first"
+  test_priority: "critical_first"
 
 agent_communication:
   - agent: "main"
