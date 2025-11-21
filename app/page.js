@@ -1886,6 +1886,85 @@ export default function App() {
     }
   };
   
+  // ========== FUNÇÕES - UPLOAD DE ARQUIVOS DE CUSTOS ==========
+  
+  const handleUploadCostFile = async (file, fileType) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('fileType', fileType); // 'bill' ou 'proof'
+      
+      const res = await fetch('/api/upload/cost-file', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        toast.success(`✅ ${data.message}`);
+        return data.filePath;
+      } else {
+        toast.error(`❌ ${data.error}`);
+        return null;
+      }
+    } catch (error) {
+      console.error('Erro ao fazer upload:', error);
+      toast.error('❌ Erro ao enviar arquivo');
+      return null;
+    }
+  };
+  
+  // ========== FUNÇÕES - SOLICITAÇÕES DE LIBERAÇÃO ==========
+  
+  const fetchUnlockRequests = async () => {
+    try {
+      const res = await fetch('/api/unlock/requests', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setUnlockRequests(data.requests || []);
+        setUnlockRequestsCount(data.requests?.length || 0);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar solicitações:', error);
+    }
+  };
+  
+  const handleApproveUnlockRequest = async (requestId, entryId, durationMinutes = 60) => {
+    try {
+      const res = await fetch('/api/unlock/approve', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ requestId, entryId, durationMinutes })
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        toast.success(`✅ ${data.message}`);
+        await fetchUnlockRequests(); // Recarregar lista
+        await fetchEntries(); // Atualizar calendário
+      } else {
+        toast.error(`❌ ${data.error}`);
+      }
+    } catch (error) {
+      console.error('Erro ao aprovar solicitação:', error);
+      toast.error('❌ Erro ao aprovar solicitação');
+    }
+  };
+  
   // ========== FUNÇÕES CRUD - CUSTOS TIPOS ==========
   
   const fetchAllCustos = async () => {
