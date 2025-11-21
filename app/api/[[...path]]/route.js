@@ -546,6 +546,279 @@ export async function POST(request) {
       }
     }
     
+    // ========== ENDPOINTS DE CUSTOS (COSTS ENTRIES) ==========
+    
+    // CREATE COST ENTRY (Pastor/Bispo)
+    if (endpoint === 'costs-entries/create') {
+      const user = verifyToken(request);
+      if (!user) {
+        return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      }
+      
+      try {
+        const userData = await db.collection('users').findOne({ userId: user.userId });
+        const body = await request.json();
+        const { costTypeId, costTypeName, dueDate, value, billFile, paymentDate, valuePaid, proofFile } = body;
+        
+        // Validações
+        if (!costTypeId || !dueDate || !value) {
+          return NextResponse.json({ error: 'Campos obrigatórios: tipo de custo, vencimento e valor' }, { status: 400 });
+        }
+        
+        // Calcular diferença (juros/multa)
+        const difference = (parseFloat(valuePaid) || 0) - parseFloat(value);
+        
+        const costEntry = {
+          costId: crypto.randomUUID(),
+          churchId: userData.churchId,
+          churchName: userData.church,
+          userId: user.userId,
+          userName: userData.name,
+          costTypeId,
+          costTypeName,
+          dueDate,
+          value: parseFloat(value),
+          billFile: billFile || null,
+          paymentDate: paymentDate || null,
+          valuePaid: parseFloat(valuePaid) || 0,
+          difference: difference,
+          proofFile: proofFile || null,
+          status: 'PENDING',
+          reviewedBy: null,
+          reviewedAt: null,
+          rejectionReason: null,
+          createdAt: getBrazilTime().toISOString(),
+          updatedAt: getBrazilTime().toISOString()
+        };
+        
+        await db.collection('costs_entries').insertOne(costEntry);
+        
+        // Audit log
+        await db.collection('audit_logs').insertOne({
+          logId: crypto.randomUUID(),
+          action: 'create_cost_entry',
+          userId: user.userId,
+          timestamp: getBrazilTime().toISOString(),
+          details: { costId: costEntry.costId, costTypeName, value }
+        });
+        
+        return NextResponse.json({ success: true, message: 'Custo registrado com sucesso!', costEntry });
+      } catch (error) {
+        console.error('Erro ao criar custo:', error);
+        return NextResponse.json({ error: 'Erro ao criar custo' }, { status: 500 });
+      }
+    }
+    
+    // LIST COST ENTRIES
+    if (endpoint === 'costs-entries/list') {
+      const user = verifyToken(request);
+      if (!user) {
+        return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      }
+      
+      try {
+        const userData = await db.collection('users').findOne({ userId: user.userId });
+        const body = await request.json();
+        const { status: filterStatus } = body;
+        
+        let filter = {};
+        
+        // Se for Master, vê tudo; se for Pastor, vê apenas da sua igreja
+        if (userData.role !== 'master') {
+          filter.churchId = userData.churchId;
+        }
+        
+        // Filtro por status (se fornecido)
+        if (filterStatus && filterStatus !== 'ALL') {
+          filter.status = filterStatus;
+        }
+        
+        const costs = await db.collection('costs_entries').find(filter).sort({ createdAt: -1 }).toArray();
+        
+        return NextResponse.json({ success: true, costs });
+      } catch (error) {
+        console.error('Erro ao listar custos:', error);
+        return NextResponse.json({ error: 'Erro ao listar custos' }, { status: 500 });
+      }
+    }
+    
+    // UPDATE COST ENTRY
+    if (endpoint === 'costs-entries/update') {
+      const user = verifyToken(request);
+      if (!user) {
+        return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      }
+      
+      try {
+        const body = await request.json();
+        const { costId, costData } = body;
+        
+        const existingCost = await db.collection('costs_entries').findOne({ costId });
+        if (!existingCost) {
+          return NextResponse.json({ error: 'Custo não encontrado' }, { status: 404 });
+        }
+        
+        // Verificar permissão
+        const userData = await db.collection('users').findOne({ userId: user.userId });
+        if (userData.role !== 'master' && existingCost.userId !== user.userId) {
+          return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
+        }
+        
+        // Calcular diferença se valuePaid ou value mudaram
+        let difference = existingCost.difference;
+        if (costData.valuePaid !== undefined || costData.value !== undefined) {
+          const newValuePaid = costData.valuePaid !== undefined ? parseFloat(costData.valuePaid) : existingCost.valuePaid;
+          const newValue = costData.value !== undefined ? parseFloat(costData.value) : existingCost.value;
+          difference = newValuePaid - newValue;
+        }
+        
+        const updateData = {
+          ...costData,
+          difference,
+          status: 'PENDING', // Volta para pendente ao editar
+          updatedAt: getBrazilTime().toISOString()
+        };
+        
+        await db.collection('costs_entries').updateOne(
+          { costId },
+          { $set: updateData }
+        );
+        
+        // Audit log
+        await db.collection('audit_logs').insertOne({
+          logId: crypto.randomUUID(),
+          action: 'update_cost_entry',
+          userId: user.userId,
+          timestamp: getBrazilTime().toISOString(),
+          details: { costId, changes: costData }
+        });
+        
+        return NextResponse.json({ success: true, message: 'Custo atualizado com sucesso!' });
+      } catch (error) {
+        console.error('Erro ao atualizar custo:', error);
+        return NextResponse.json({ error: 'Erro ao atualizar custo' }, { status: 500 });
+      }
+    }
+    
+    // DELETE COST ENTRY
+    if (endpoint === 'costs-entries/delete') {
+      const user = verifyToken(request);
+      if (!user) {
+        return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      }
+      
+      try {
+        const body = await request.json();
+        const { costId } = body;
+        
+        const existingCost = await db.collection('costs_entries').findOne({ costId });
+        if (!existingCost) {
+          return NextResponse.json({ error: 'Custo não encontrado' }, { status: 404 });
+        }
+        
+        // Verificar permissão
+        const userData = await db.collection('users').findOne({ userId: user.userId });
+        if (userData.role !== 'master' && existingCost.userId !== user.userId) {
+          return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
+        }
+        
+        await db.collection('costs_entries').deleteOne({ costId });
+        
+        // Audit log
+        await db.collection('audit_logs').insertOne({
+          logId: crypto.randomUUID(),
+          action: 'delete_cost_entry',
+          userId: user.userId,
+          timestamp: getBrazilTime().toISOString(),
+          details: { costId, costTypeName: existingCost.costTypeName }
+        });
+        
+        return NextResponse.json({ success: true, message: 'Custo excluído com sucesso!' });
+      } catch (error) {
+        console.error('Erro ao deletar custo:', error);
+        return NextResponse.json({ error: 'Erro ao deletar custo' }, { status: 500 });
+      }
+    }
+    
+    // APPROVE COST ENTRY (Master apenas)
+    if (endpoint === 'costs-entries/approve') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      try {
+        const body = await request.json();
+        const { costId } = body;
+        
+        await db.collection('costs_entries').updateOne(
+          { costId },
+          { 
+            $set: { 
+              status: 'APPROVED',
+              reviewedBy: user.userId,
+              reviewedAt: getBrazilTime().toISOString(),
+              updatedAt: getBrazilTime().toISOString()
+            }
+          }
+        );
+        
+        // Audit log
+        await db.collection('audit_logs').insertOne({
+          logId: crypto.randomUUID(),
+          action: 'approve_cost_entry',
+          userId: user.userId,
+          timestamp: getBrazilTime().toISOString(),
+          details: { costId }
+        });
+        
+        return NextResponse.json({ success: true, message: 'Custo aprovado com sucesso!' });
+      } catch (error) {
+        console.error('Erro ao aprovar custo:', error);
+        return NextResponse.json({ error: 'Erro ao aprovar custo' }, { status: 500 });
+      }
+    }
+    
+    // REJECT COST ENTRY (Master apenas)
+    if (endpoint === 'costs-entries/reject') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      try {
+        const body = await request.json();
+        const { costId, reason } = body;
+        
+        await db.collection('costs_entries').updateOne(
+          { costId },
+          { 
+            $set: { 
+              status: 'REJECTED',
+              reviewedBy: user.userId,
+              reviewedAt: getBrazilTime().toISOString(),
+              rejectionReason: reason || 'Sem motivo especificado',
+              updatedAt: getBrazilTime().toISOString()
+            }
+          }
+        );
+        
+        // Audit log
+        await db.collection('audit_logs').insertOne({
+          logId: crypto.randomUUID(),
+          action: 'reject_cost_entry',
+          userId: user.userId,
+          timestamp: getBrazilTime().toISOString(),
+          details: { costId, reason }
+        });
+        
+        return NextResponse.json({ success: true, message: 'Custo reprovado!' });
+      } catch (error) {
+        console.error('Erro ao reprovar custo:', error);
+        return NextResponse.json({ error: 'Erro ao reprovar custo' }, { status: 500 });
+      }
+    }
+    
     // PUBLIC: GET ALL ROLES (para cadastro público)
     if (endpoint === 'public/roles') {
       try {
