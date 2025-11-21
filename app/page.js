@@ -8004,25 +8004,59 @@ export default function App() {
             </div>
             
             <div>
-              <Label>Conta/Boleto (Upload)</Label>
-              <Input
-                type="text"
-                placeholder="Nome do arquivo ou URL"
-                value={costFormData.billFile}
-                onChange={(e) => setCostFormData({...costFormData, billFile: e.target.value})}
-              />
-              <p className="text-xs text-gray-500 mt-1">Em breve: upload de arquivos PDF/Imagem</p>
+              <Label>Conta/Boleto (Upload) 📎</Label>
+              <div className="flex gap-2">
+                <Input
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setUploadingBill(true);
+                      const filePath = await handleUploadCostFile(file, 'bill');
+                      if (filePath) {
+                        setCostFormData({...costFormData, billFile: filePath});
+                      }
+                      setUploadingBill(false);
+                    }
+                  }}
+                  disabled={uploadingBill}
+                  className="flex-1"
+                />
+                {uploadingBill && <span className="text-xs text-blue-600">Enviando...</span>}
+              </div>
+              {costFormData.billFile && (
+                <p className="text-xs text-green-600 mt-1">✅ Arquivo anexado</p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">Aceita: Imagens (JPG, PNG, WebP) e PDF (máx. 5MB)</p>
             </div>
             
             <div>
-              <Label>Comprovante de Pagamento (Upload)</Label>
-              <Input
-                type="text"
-                placeholder="Nome do arquivo ou URL"
-                value={costFormData.proofFile}
-                onChange={(e) => setCostFormData({...costFormData, proofFile: e.target.value})}
-              />
-              <p className="text-xs text-gray-500 mt-1">Em breve: upload de arquivos PDF/Imagem</p>
+              <Label>Comprovante de Pagamento (Upload) 📎</Label>
+              <div className="flex gap-2">
+                <Input
+                  type="file"
+                  accept="image/*,application/pdf"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setUploadingProof(true);
+                      const filePath = await handleUploadCostFile(file, 'proof');
+                      if (filePath) {
+                        setCostFormData({...costFormData, proofFile: filePath});
+                      }
+                      setUploadingProof(false);
+                    }
+                  }}
+                  disabled={uploadingProof}
+                  className="flex-1"
+                />
+                {uploadingProof && <span className="text-xs text-blue-600">Enviando...</span>}
+              </div>
+              {costFormData.proofFile && (
+                <p className="text-xs text-green-600 mt-1">✅ Arquivo anexado</p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">Aceita: Imagens (JPG, PNG, WebP) e PDF (máx. 5MB)</p>
             </div>
             
             <div className="flex gap-3 justify-end pt-4">
