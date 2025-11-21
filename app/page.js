@@ -6374,7 +6374,35 @@ export default function App() {
                       </p>
                     </div>
                   ) : (
-                    <div className="overflow-x-auto">
+                    <div className="space-y-6">
+                      {/* Agrupar por Igreja */}
+                      {(() => {
+                        // Agrupar custos por igreja
+                        const groupedByChurch = costsList.reduce((acc, cost) => {
+                          const key = cost.churchName || 'Sem Igreja';
+                          if (!acc[key]) acc[key] = [];
+                          acc[key].push(cost);
+                          return acc;
+                        }, {});
+                        
+                        // Ordenar igrejas alfabeticamente
+                        const sortedChurches = Object.keys(groupedByChurch).sort();
+                        
+                        return sortedChurches.map(churchName => (
+                          <div key={churchName} className="border-2 border-purple-200 rounded-lg">
+                            {/* Cabeçalho da Igreja */}
+                            <div className="bg-purple-100 p-4 border-b-2 border-purple-200">
+                              <h3 className="font-bold text-lg flex items-center gap-2">
+                                <Church className="w-5 h-5" />
+                                {churchName}
+                                <Badge className="ml-2 bg-purple-600">
+                                  {groupedByChurch[churchName].length} custos
+                                </Badge>
+                              </h3>
+                            </div>
+                            
+                            {/* Tabela de Custos da Igreja */}
+                            <div className="overflow-x-auto">
                       <table className="w-full">
                         <thead className="bg-gray-100">
                           <tr>
