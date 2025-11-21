@@ -1324,7 +1324,18 @@ export async function POST(request) {
         const entryDateTime = entryDate.hour(parseInt(hour)).minute(parseInt(minute));
         const lockTime = entryDateTime.add(2, 'hour');
         
-        if (currentTime.isAfter(lockTime) && !entry.masterUnlocked && userData.role !== 'master') {
+        // Verificar se há um time_override ativo (liberação do Master)
+        const activeOverride = await db.collection('time_overrides').findOne({
+          userId: user.userId,
+          month: entry.month,
+          year: entry.year,
+          day: entry.day,
+          timeSlot: entry.timeSlot,
+          expiresAt: { $gt: currentTime.toISOString() }
+        });
+        
+        // Se NÃO há override ativo E o tempo passou E não é Master → BLOQUEAR
+        if (currentTime.isAfter(lockTime) && !activeOverride && !entry.masterUnlocked && userData.role !== 'master') {
           return NextResponse.json({ error: 'Período de edição encerrado (2 horas após o horário)' }, { status: 403 });
         }
         
