@@ -2030,7 +2030,8 @@ export default function App() {
       const data = await res.json();
       
       if (res.ok) {
-        toast.success(`✅ ${data.message}`);
+        toast.success(`✅ ${data.message} - Pastor será notificado automaticamente.`);
+        console.log('[MASTER] Solicitação aprovada. Pastor receberá notificação em até 30 segundos.');
         await fetchUnlockRequests(); // Recarregar lista
         await fetchEntries(); // Atualizar calendário
       } else {
