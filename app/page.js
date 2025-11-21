@@ -4759,8 +4759,18 @@ export default function App() {
                                         return null;
                                       })()}
                                       
-                                      {/* Contador de tempo restante - apenas se PAID e dentro de 60 min */}
+                                      {/* Contador de tempo restante - apenas se PAID, pago pelo próprio Pastor e dentro de 60 min */}
                                       {cost.status === 'PAID' && cost.paidAt && (() => {
+                                        // Se foi pago pelo Master, não mostra contador
+                                        if (cost.paidBy && cost.paidBy !== user?.userId) {
+                                          return (
+                                            <span className="text-xs text-gray-500 px-2">
+                                              💼 Pago pelo Líder
+                                            </span>
+                                          );
+                                        }
+                                        
+                                        // Se foi pago pelo próprio Pastor, mostra contador
                                         const paidTime = new Date(cost.paidAt);
                                         const now = new Date();
                                         const diffMinutes = (now - paidTime) / (1000 * 60);
