@@ -8380,6 +8380,168 @@ export default function App() {
         </DialogContent>
       </Dialog>
       
+      {/* Modal Rejeitar Solicitação */}
+      <Dialog open={showRejectModal} onOpenChange={setShowRejectModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <XCircle className="w-5 h-5 text-red-600" />
+              Rejeitar Solicitação
+            </DialogTitle>
+            <DialogDescription>
+              Informe o motivo da rejeição (opcional)
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedRequest && (
+            <div className="space-y-4">
+              <div className="bg-gray-50 rounded p-3 border">
+                <p className="text-sm"><strong>Pastor:</strong> {selectedRequest.requesterName}</p>
+                <p className="text-sm"><strong>Igreja:</strong> {selectedRequest.requesterChurch}</p>
+                <p className="text-sm"><strong>Data:</strong> {selectedRequest.day}/{selectedRequest.month}/{selectedRequest.year} - {selectedRequest.timeSlot}</p>
+              </div>
+              
+              <div>
+                <Label>Motivo da Rejeição</Label>
+                <textarea
+                  className="w-full border rounded p-2 mt-1"
+                  rows={4}
+                  placeholder="Ex: Data incorreta, informações incompletas..."
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                />
+              </div>
+              
+              <div className="flex gap-3 justify-end">
+                <Button variant="outline" onClick={() => {
+                  setShowRejectModal(false);
+                  setRejectionReason('');
+                  setSelectedRequest(null);
+                }}>
+                  Cancelar
+                </Button>
+                <Button variant="destructive" onClick={handleRejectUnlockRequest}>
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Rejeitar
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Modal Visualizar Solicitação */}
+      <Dialog open={showRequestViewModal} onOpenChange={setShowRequestViewModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Bell className="w-5 h-5 text-blue-600" />
+              Detalhes da Solicitação
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedRequest && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-xs text-gray-500">Pastor</Label>
+                  <p className="font-semibold">{selectedRequest.requesterName}</p>
+                  <p className="text-sm text-gray-600">{selectedRequest.requesterEmail}</p>
+                </div>
+                <div>
+                  <Label className="text-xs text-gray-500">Igreja</Label>
+                  <p className="font-semibold">{selectedRequest.requesterChurch || 'N/A'}</p>
+                </div>
+                <div>
+                  <Label className="text-xs text-gray-500">Data do Lançamento</Label>
+                  <p className="font-semibold">{selectedRequest.day}/{selectedRequest.month}/{selectedRequest.year}</p>
+                </div>
+                <div>
+                  <Label className="text-xs text-gray-500">Horário</Label>
+                  <p className="font-semibold">{selectedRequest.timeSlot}</p>
+                </div>
+                <div>
+                  <Label className="text-xs text-gray-500">Solicitado em</Label>
+                  <p className="text-sm">{new Date(selectedRequest.createdAt).toLocaleString('pt-BR')}</p>
+                </div>
+                <div>
+                  <Label className="text-xs text-gray-500">Status</Label>
+                  <Badge className={selectedRequest.status === 'approved' ? 'bg-green-600' : selectedRequest.status === 'rejected' ? 'bg-red-600' : 'bg-yellow-600'}>
+                    {selectedRequest.status === 'approved' ? '✅ Aprovado' : selectedRequest.status === 'rejected' ? '❌ Rejeitado' : '⏳ Pendente'}
+                  </Badge>
+                </div>
+              </div>
+              
+              {selectedRequest.reason && (
+                <div className="bg-gray-50 rounded p-3 border">
+                  <Label className="text-xs text-gray-600">Motivo da Solicitação:</Label>
+                  <p className="text-sm mt-1">{selectedRequest.reason}</p>
+                </div>
+              )}
+              
+              {selectedRequest.status === 'approved' && (
+                <div className="bg-green-50 rounded p-3 border border-green-200">
+                  <Label className="text-xs text-green-700">✅ Aprovado em:</Label>
+                  <p className="text-sm mt-1">{new Date(selectedRequest.approvedAt).toLocaleString('pt-BR')}</p>
+                </div>
+              )}
+              
+              {selectedRequest.status === 'rejected' && selectedRequest.rejectionReason && (
+                <div className="bg-red-50 rounded p-3 border border-red-200">
+                  <Label className="text-xs text-red-700">❌ Motivo da Rejeição:</Label>
+                  <p className="text-sm mt-1">{selectedRequest.rejectionReason}</p>
+                  <p className="text-xs text-gray-500 mt-2">Rejeitado em: {new Date(selectedRequest.rejectedAt).toLocaleString('pt-BR')}</p>
+                </div>
+              )}
+              
+              <div className="flex justify-end">
+                <Button variant="outline" onClick={() => setShowRequestViewModal(false)}>
+                  Fechar
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Modal Confirmar Deletar Solicitação */}
+      <Dialog open={showRequestDeleteConfirm} onOpenChange={setShowRequestDeleteConfirm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertCircle className="w-5 h-5" />
+              Confirmar Exclusão
+            </DialogTitle>
+            <DialogDescription>
+              Esta ação é permanente e não pode ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedRequest && (
+            <div className="space-y-4">
+              <div className="bg-red-50 rounded p-3 border border-red-200">
+                <p className="text-sm font-semibold text-red-900">Tem certeza que deseja deletar esta solicitação?</p>
+                <p className="text-sm text-gray-700 mt-2"><strong>Pastor:</strong> {selectedRequest.requesterName}</p>
+                <p className="text-sm text-gray-700"><strong>Data:</strong> {selectedRequest.day}/{selectedRequest.month}/{selectedRequest.year} - {selectedRequest.timeSlot}</p>
+              </div>
+              
+              <div className="flex gap-3 justify-end">
+                <Button variant="outline" onClick={() => {
+                  setShowRequestDeleteConfirm(false);
+                  setSelectedRequest(null);
+                }}>
+                  Cancelar
+                </Button>
+                <Button variant="destructive" onClick={handleDeleteUnlockRequest}>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Deletar
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      
     </div>
   );
 }
