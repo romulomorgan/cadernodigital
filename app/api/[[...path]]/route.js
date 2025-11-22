@@ -559,7 +559,7 @@ export async function POST(request) {
       try {
         const userData = await db.collection('users').findOne({ userId: user.userId });
         const body = await request.json();
-        const { costTypeId, costTypeName, dueDate, value, billFile, paymentDate, valuePaid, proofFile } = body;
+        const { costTypeId, costTypeName, dueDate, value, billFile, paymentDate, valuePaid, proofFile, description } = body;
         
         // Validações
         if (!costTypeId || !dueDate || !value) {
