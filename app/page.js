@@ -2477,6 +2477,7 @@ export default function App() {
   // ========== FUNÇÕES - PRIVACIDADE ==========
   
   const fetchPrivacyConfig = async (roleId) => {
+    console.log('[PRIVACY/FETCH] Fetching config for roleId:', roleId);
     try {
       const res = await fetch('/api/privacy/get', {
         method: 'POST',
@@ -2489,13 +2490,16 @@ export default function App() {
       
       if (res.ok) {
         const data = await res.json();
-        console.log('[PRIVACY] Config loaded:', data.config);
+        console.log('[PRIVACY/FETCH] ✅ Config loaded:', data.config);
+        console.log('[PRIVACY/FETCH] Setting allowedTabs to:', data.config.allowedTabs);
         setAllowedTabs(data.config.allowedTabs || []);
       } else {
-        console.error('[PRIVACY] Error loading config');
+        console.error('[PRIVACY/FETCH] ❌ Error loading config - Status:', res.status);
+        setAllowedTabs([]);
       }
     } catch (error) {
-      console.error('[PRIVACY] Error:', error);
+      console.error('[PRIVACY/FETCH] ❌ Error:', error);
+      setAllowedTabs([]);
     }
   };
   
