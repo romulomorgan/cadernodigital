@@ -6311,6 +6311,7 @@ export default function App() {
                       onClick={() => {
                         setShowCustoViewModal(false);
                         setNewCustoName(selectedCusto.name);
+                        setCustoDocumentOptional(selectedCusto.documentOptional || false);
                         setShowCustoEditModal(true);
                       }}
                       className="flex-1"
