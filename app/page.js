@@ -1988,7 +1988,7 @@ export default function App() {
         body: JSON.stringify({
           costId: costFormData.costId,
           paymentDate: costFormData.paymentDate,
-          valuePaid: costFormData.valuePaid,
+          valuePaid: parseCurrency(costFormData.valuePaid),
           proofFile: costFormData.proofFile
         })
       });
