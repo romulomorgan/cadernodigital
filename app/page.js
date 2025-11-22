@@ -8843,12 +8843,6 @@ export default function App() {
                   </div>
                 )}
               </div>
-              
-              <div className="flex gap-3 justify-end pt-4">
-                <Button variant="outline" onClick={() => setShowCostViewModal(false)}>
-                  Fechar
-                </Button>
-              </div>
             </div>
           )}
         </DialogContent>
