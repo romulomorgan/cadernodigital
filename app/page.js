@@ -6374,6 +6374,7 @@ export default function App() {
                     onClick={() => {
                       setShowCustoCreateModal(false);
                       setNewCustoName('');
+                      setCustoDocumentOptional(false);
                     }}
                   >
                     Cancelar
