@@ -401,6 +401,20 @@ export default function App() {
       return () => clearInterval(interval);
     }
   }, [isAuthenticated, currentDate, filterState, filterRegion, filterChurch]);
+
+  // Carregar dados do usuário ao autenticar
+  useEffect(() => {
+    if (isAuthenticated && token && user) {
+      fetchAllRoles();
+      fetchChurches();
+      fetchAllCustos();
+      
+      // Buscar permissões se não for Master, Pastor ou Bispo
+      if (user.role !== 'master' && user.role !== 'pastor' && user.role !== 'bispo') {
+        fetchUserPermissions(user.roleId);
+      }
+    }
+  }, [isAuthenticated, token, user]);
   
   // Relógio Digital - atualiza a cada segundo com America/Sao_Paulo
   useEffect(() => {
