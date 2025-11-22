@@ -9127,11 +9127,13 @@ export default function App() {
               <div className="mt-3">
                 <Label>Valor do Custo (R$) *</Label>
                 <Input
-                  type="number"
-                  step="0.01"
+                  type="text"
                   disabled={costFormData.status === 'APPROVED'}
                   value={costFormData.value}
-                  onChange={(e) => setCostFormData({...costFormData, value: e.target.value})}
+                  onChange={(e) => {
+                    const formatted = formatCurrency(e.target.value);
+                    setCostFormData({...costFormData, value: formatted});
+                  }}
                 />
               </div>
               
