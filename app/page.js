@@ -642,7 +642,7 @@ export default function App() {
     
     // Atualizar lista a cada 10 segundos
     const intervalId = setInterval(() => {
-      fetchCostsList(costsFilterStatus, costsFilterChurch);
+      fetchCostsList(costsFilterStatus, costsFilterChurch, costsFilterMonth, costsFilterYear);
     }, 10000);
     
     return () => clearInterval(intervalId);
