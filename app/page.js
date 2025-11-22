@@ -1927,7 +1927,8 @@ export default function App() {
           costTypeName: costFormData.costTypeName,
           dueDate: costFormData.dueDate,
           value: costFormData.value,
-          billFile: costFormData.billFile
+          billFile: costFormData.billFile,
+          description: costFormData.description || null
         })
       });
       
