@@ -7971,14 +7971,22 @@ export default function App() {
                               ? 'border-green-500 bg-green-50'
                               : 'border-gray-300 bg-white hover:border-gray-400'
                           }`}
-                          onClick={() => toggleTab(tab.value)}
+                          onClick={(e) => {
+                            // Só toggle se não clicar no checkbox diretamente
+                            if (e.target.type !== 'checkbox') {
+                              toggleTab(tab.value);
+                            }
+                          }}
                         >
                           <div className="flex items-start gap-3">
                             <input
                               type="checkbox"
                               checked={allowedTabs.includes(tab.value)}
-                              onChange={() => toggleTab(tab.value)}
-                              className="mt-1 w-5 h-5 rounded"
+                              onChange={(e) => {
+                                e.stopPropagation();
+                                toggleTab(tab.value);
+                              }}
+                              className="mt-1 w-5 h-5 rounded cursor-pointer"
                             />
                             <div className="flex-1">
                               <p className="font-semibold">{tab.label}</p>
