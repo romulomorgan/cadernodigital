@@ -2531,12 +2531,16 @@ export default function App() {
   };
   
   const toggleTab = (tabValue) => {
+    console.log('[PRIVACY/TOGGLE] Toggling tab:', tabValue);
+    console.log('[PRIVACY/TOGGLE] Current allowedTabs:', allowedTabs);
+    
     setAllowedTabs(prev => {
-      if (prev.includes(tabValue)) {
-        return prev.filter(t => t !== tabValue);
-      } else {
-        return [...prev, tabValue];
-      }
+      const newTabs = prev.includes(tabValue)
+        ? prev.filter(t => t !== tabValue)
+        : [...prev, tabValue];
+      
+      console.log('[PRIVACY/TOGGLE] New allowedTabs:', newTabs);
+      return newTabs;
     });
   };
   
