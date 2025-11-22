@@ -3756,7 +3756,7 @@ export default function App() {
             <div className="space-y-4">
               {/* Botão de Toggle para dias anteriores */}
               {(() => {
-                const today = getBrazilTime().getDate();
+                const today = currentDate.getDate();
                 const allDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
                 const pastDays = allDays.filter(d => d < today);
                 const hasPastDays = pastDays.length > 0;
