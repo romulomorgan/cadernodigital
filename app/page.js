@@ -2563,10 +2563,12 @@ export default function App() {
   };
 
   const savePrivacyConfig = async () => {
-    if (!selectedRoleForPrivacy) {
+    if (!selectedRoleForPrivacy && !editingPrivacyRole) {
       toast.error('❌ Selecione uma função primeiro');
       return;
     }
+    
+    const roleToSave = editingPrivacyRole || selectedRoleForPrivacy;
     
     try {
       const res = await fetch('/api/privacy/save', {
@@ -2576,8 +2578,8 @@ export default function App() {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          roleId: selectedRoleForPrivacy.roleId,
-          roleName: selectedRoleForPrivacy.name,
+          roleId: roleToSave.roleId,
+          roleName: roleToSave.name || roleToSave.roleName,
           allowedTabs
         })
       });
@@ -2585,12 +2587,64 @@ export default function App() {
       const data = await res.json();
       if (res.ok) {
         toast.success('✅ ' + data.message);
+        
+        // Recarregar lista de configurações
+        await fetchAllPrivacyConfigs();
+        
+        // Fechar modal se estiver editando
+        if (showPrivacyEditModal) {
+          setShowPrivacyEditModal(false);
+          setEditingPrivacyRole(null);
+          setAllowedTabs([]);
+        }
+        
+        // Limpar seleção
+        setSelectedRoleForPrivacy(null);
+        setAllowedTabs([]);
       } else {
         toast.error('❌ ' + data.error);
       }
     } catch (error) {
       toast.error('❌ Erro ao salvar configuração');
     }
+  };
+  
+  // Excluir configuração de privacidade
+  const deletePrivacyConfig = async (roleId, roleName) => {
+    if (!confirm(`Tem certeza que deseja excluir a configuração de privacidade para "${roleName}"?`)) {
+      return;
+    }
+    
+    try {
+      const res = await fetch('/api/privacy/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ roleId })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+        await fetchAllPrivacyConfigs();
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao excluir configuração');
+    }
+  };
+  
+  // Abrir modal para editar configuração
+  const openEditPrivacyModal = (config) => {
+    setEditingPrivacyRole({
+      roleId: config.roleId,
+      roleName: config.roleName
+    });
+    setAllowedTabs(config.allowedTabs || []);
+    setShowPrivacyEditModal(true);
   };
   
   const toggleTab = (tabValue) => {
