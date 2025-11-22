@@ -406,7 +406,7 @@ export default function App() {
   useEffect(() => {
     if (isAuthenticated && token && user) {
       fetchAllRoles();
-      fetchChurches();
+      fetchAllChurches();
       fetchAllCustos();
       
       // Buscar permissões se não for Master, Pastor ou Bispo
