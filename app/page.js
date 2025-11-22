@@ -1940,7 +1940,7 @@ export default function App() {
           costTypeId: costFormData.costTypeId,
           costTypeName: costFormData.costTypeName,
           dueDate: costFormData.dueDate,
-          value: costFormData.value,
+          value: parseCurrency(costFormData.value),
           billFile: costFormData.billFile,
           description: costFormData.description || null
         })
