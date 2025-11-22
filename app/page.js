@@ -8783,7 +8783,7 @@ export default function App() {
                     <div className="mt-2">
                       {selectedCost.billFile.endsWith('.pdf') ? (
                         <iframe 
-                          src={selectedCost.billFile} 
+                          src={`${selectedCost.billFile}#toolbar=0`}
                           className="w-full h-32 border rounded"
                           title="Conta/Boleto"
                         />
