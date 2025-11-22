@@ -1993,7 +1993,7 @@ export default function App() {
         'Deseja usar automaticamente:\n' +
         '• Data de pagamento = Data de vencimento\n' +
         '• Valor pago = Valor do custo\n\n' +
-        'Clique em "OK" para usar valores padrão ou "Cancelar" para editar manualmente.'
+        'Clique em "OK" para preencher automaticamente ou "Cancelar" para editar manualmente.'
       );
       
       if (!useDefaults) {
@@ -2001,41 +2001,25 @@ export default function App() {
         return;
       }
       
-      // Preencher automaticamente os valores padrão
-      const paymentDate = paymentDateEmpty ? costFormData.dueDate : costFormData.paymentDate;
-      const valuePaid = valuePaidEmpty ? costFormData.value : costFormData.valuePaid;
+      // Preencher automaticamente os valores padrão MAS NÃO SALVAR
+      setCostFormData({
+        ...costFormData,
+        paymentDate: paymentDateEmpty ? costFormData.dueDate : costFormData.paymentDate,
+        valuePaid: valuePaidEmpty ? costFormData.value : costFormData.valuePaid
+      });
       
-      try {
-        const res = await fetch('/api/costs-entries/pay', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            costId: costFormData.costId,
-            paymentDate: paymentDate,
-            valuePaid: parseCurrency(valuePaid),
-            proofFile: costFormData.proofFile
-          })
-        });
-        
-        const data = await res.json();
-        if (res.ok) {
-          toast.success('✅ ' + data.message);
-          setShowCostEditModal(false);
-          setSelectedCost(null);
-          fetchCostsList(costsFilterStatus, costsFilterChurch, costsFilterMonth, costsFilterYear);
-        } else {
-          toast.error('❌ ' + data.error);
-        }
-      } catch (error) {
-        toast.error('❌ Erro ao registrar pagamento');
-      }
+      // Avisar que precisa adicionar comprovante
+      toast.info('ℹ️ Valores preenchidos! Agora adicione o comprovante de pagamento antes de salvar.');
       return;
     }
     
-    // Se ambos os campos estão preenchidos, prosseguir normalmente
+    // Validar se o comprovante foi anexado
+    if (!costFormData.proofFile || costFormData.proofFile === '') {
+      toast.error('❌ O comprovante de pagamento é obrigatório! Por favor, faça o upload do comprovante.');
+      return;
+    }
+    
+    // Se todos os campos estão preenchidos, prosseguir com o salvamento
     try {
       const res = await fetch('/api/costs-entries/pay', {
         method: 'POST',
