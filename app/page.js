@@ -2580,24 +2580,32 @@ export default function App() {
       return false;
     }
     
-    // Pastor e Bispo têm permissões padrão (não usam sistema de privacidade)
+    // Pastor e Bispo têm permissões padrão fixas (não usam sistema de privacidade)
+    // Eles veem seu próprio painel de usuário
     if (user?.role === 'pastor' || user?.role === 'bispo') {
       return ['calendar', 'dashboard', 'compare', 'costs-pastor'].includes(tabValue);
     }
     
-    // Para outros roles, verificar sistema de privacidade
+    // Para outros roles (Secretária, Tesoureiro, etc.), usar sistema de privacidade
+    // IMPORTANTE: Eles se logam no painel do Master, mas com permissões restritas
+    
     // Se userAllowedTabs é null, ainda está carregando - não mostrar nada
     if (userAllowedTabs === null) {
+      console.log('[canViewTab] Permissões ainda carregando, ocultando abas');
       return false;
     }
     
-    // Se é array vazio, nenhuma aba permitida
-    if (Array.isArray(userAllowedTabs) && userAllowedTabs.length === 0) {
+    // Se é array vazio ou não configurado, NENHUMA aba permitida
+    // Usuário vê apenas o painel vazio (layout sem abas)
+    if (!Array.isArray(userAllowedTabs) || userAllowedTabs.length === 0) {
+      console.log('[canViewTab] Nenhuma aba configurada para este role, ocultando:', tabValue);
       return false;
     }
     
     // Verificar se está na lista de abas permitidas
-    return userAllowedTabs.includes(tabValue);
+    const hasPermission = userAllowedTabs.includes(tabValue);
+    console.log('[canViewTab] Verificando permissão para:', tabValue, '-> Resultado:', hasPermission);
+    return hasPermission;
   };
   
   // Buscar abas permitidas para o usuário logado
