@@ -8713,7 +8713,7 @@ export default function App() {
       
       {/* Modal Visualizar Custo */}
       <Dialog open={showCostViewModal} onOpenChange={setShowCostViewModal}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>👁️ Detalhes do Custo</DialogTitle>
           </DialogHeader>
