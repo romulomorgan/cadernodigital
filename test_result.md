@@ -813,10 +813,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "Corrigir persistência do checkbox 'Conta/Boleto/Orçamento (Opcional)'"
-    - "Verificar dropdown 'Tipo de Custo' vazio para Pastores"
-    - "Corrigir exibição de status vazio no modal de visualização"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
