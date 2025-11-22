@@ -2555,6 +2555,7 @@ export default function App() {
   
   const fetchAllCustos = async () => {
     try {
+      console.log('[FETCH_CUSTOS] Iniciando busca de tipos de custos...');
       const res = await fetch('/api/custos/list', {
         method: 'POST',
         headers: {
@@ -2565,13 +2566,14 @@ export default function App() {
       
       if (res.ok) {
         const data = await res.json();
-        console.log('[DEBUG] Tipos de custos carregados:', data.custos);
+        console.log('[FETCH_CUSTOS] ✅ Tipos de custos carregados:', data.custos?.length || 0, 'itens');
+        console.log('[FETCH_CUSTOS] Detalhes:', data.custos);
         setAllCustos(data.custos || []);
       } else {
-        console.error('[DEBUG] Erro ao buscar custos - Status:', res.status);
+        console.error('[FETCH_CUSTOS] ❌ Erro ao buscar custos - Status:', res.status);
       }
     } catch (error) {
-      console.error('[DEBUG] Erro ao buscar custos:', error);
+      console.error('[FETCH_CUSTOS] ❌ Erro de rede:', error);
     }
   };
   
