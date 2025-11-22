@@ -3449,7 +3449,7 @@ export default function App() {
                 <span className="flex items-center gap-2">
                   💰 Custos
                   {(() => {
-                    const statusChangedCount = costsEntriesList.filter(c => 
+                    const statusChangedCount = costsList.filter(c => 
                       c.status === 'APPROVED' || c.status === 'PAID' || c.status === 'REJECTED'
                     ).length;
                     return statusChangedCount > 0 ? (
@@ -3468,7 +3468,7 @@ export default function App() {
                   <span className="flex items-center gap-2">
                     💰 Custos
                     {(() => {
-                      const pendingCount = costsEntriesList.filter(c => c.status === 'PENDING').length;
+                      const pendingCount = costsList.filter(c => c.status === 'PENDING').length;
                       return pendingCount > 0 ? (
                         <Badge className="ml-1 bg-yellow-500 text-white">{pendingCount}</Badge>
                       ) : null;
