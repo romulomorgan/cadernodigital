@@ -2132,6 +2132,37 @@ export default function App() {
   const handleUpdateCostEntryMaster = async () => {
     if (!selectedCost) return;
     
+    // Se o status for PAID, validar data de pagamento e valor pago
+    if (costFormData.status === 'PAID') {
+      // Verificar se os campos estão vazios
+      const paymentDateEmpty = !costFormData.paymentDate;
+      const valuePaidEmpty = !costFormData.valuePaid || costFormData.valuePaid === '' || costFormData.valuePaid === '0' || costFormData.valuePaid === '0,00';
+      
+      if (paymentDateEmpty || valuePaidEmpty) {
+        // Perguntar se quer usar os valores padrão
+        const useDefaults = window.confirm(
+          '⚠️ Data de pagamento e/ou valor pago não foram preenchidos.\n\n' +
+          'Deseja usar automaticamente:\n' +
+          '• Data de pagamento = Data de vencimento\n' +
+          '• Valor pago = Valor do custo\n\n' +
+          'Clique em "OK" para usar valores padrão ou "Cancelar" para editar manualmente.'
+        );
+        
+        if (!useDefaults) {
+          // Usuário quer editar manualmente
+          return;
+        }
+        
+        // Preencher automaticamente
+        if (paymentDateEmpty) {
+          costFormData.paymentDate = costFormData.dueDate;
+        }
+        if (valuePaidEmpty) {
+          costFormData.valuePaid = costFormData.value;
+        }
+      }
+    }
+    
     try {
       const res = await fetch('/api/costs-entries/update-master', {
         method: 'POST',
@@ -2141,7 +2172,15 @@ export default function App() {
         },
         body: JSON.stringify({
           costId: selectedCost.costId,
-          ...costFormData
+          costTypeId: costFormData.costTypeId,
+          costTypeName: costFormData.costTypeName,
+          dueDate: costFormData.dueDate,
+          value: parseCurrency(costFormData.value),
+          billFile: costFormData.billFile,
+          paymentDate: costFormData.paymentDate,
+          valuePaid: parseCurrency(costFormData.valuePaid),
+          proofFile: costFormData.proofFile,
+          status: costFormData.status
         })
       });
       
@@ -2151,6 +2190,7 @@ export default function App() {
         setShowCostEditModalMaster(false);
         setSelectedCost(null);
         setCostFormData({
+          costId: '',
           costTypeId: '',
           costTypeName: '',
           dueDate: '',
@@ -2159,7 +2199,9 @@ export default function App() {
           paymentDate: '',
           valuePaid: '',
           proofFile: '',
-          status: 'PENDING'
+          status: 'PENDING',
+          paidAt: null,
+          description: ''
         });
         fetchCostsList(costsFilterStatus, costsFilterChurch, costsFilterMonth, costsFilterYear);
       } else {
