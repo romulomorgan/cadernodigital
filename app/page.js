@@ -1947,7 +1947,7 @@ export default function App() {
           status: '',
           paidAt: null
         });
-        fetchCostsList(costsFilterStatus);
+        fetchCostsList(costsFilterStatus, costsFilterChurch, costsFilterMonth, costsFilterYear);
       } else {
         toast.error('❌ ' + data.error);
       }
@@ -1982,7 +1982,7 @@ export default function App() {
         toast.success('✅ ' + data.message);
         setShowCostEditModal(false);
         setSelectedCost(null);
-        fetchCostsList(costsFilterStatus);
+        fetchCostsList(costsFilterStatus, costsFilterChurch, costsFilterMonth, costsFilterYear);
       } else {
         toast.error('❌ ' + data.error);
       }
@@ -2024,7 +2024,7 @@ export default function App() {
         toast.success('✅ ' + data.message);
         setShowCostEditModal(false);
         setSelectedCost(null);
-        fetchCostsList(costsFilterStatus);
+        fetchCostsList(costsFilterStatus, costsFilterChurch, costsFilterMonth, costsFilterYear);
       } else {
         toast.error('❌ ' + data.error);
       }
@@ -2049,7 +2049,7 @@ export default function App() {
         toast.success('✅ ' + data.message);
         setShowCostDeleteModal(false);
         setSelectedCost(null);
-        fetchCostsList(costsFilterStatus);
+        fetchCostsList(costsFilterStatus, costsFilterChurch, costsFilterMonth, costsFilterYear);
       } else {
         toast.error('❌ ' + data.error);
       }
@@ -2072,7 +2072,7 @@ export default function App() {
       const data = await res.json();
       if (res.ok) {
         toast.success('✅ ' + data.message);
-        fetchCostsList(costsFilterStatus);
+        fetchCostsList(costsFilterStatus, costsFilterChurch, costsFilterMonth, costsFilterYear);
       } else {
         toast.error('❌ ' + data.error);
       }
@@ -2095,7 +2095,7 @@ export default function App() {
       const data = await res.json();
       if (res.ok) {
         toast.success('✅ ' + data.message);
-        fetchCostsList(costsFilterStatus);
+        fetchCostsList(costsFilterStatus, costsFilterChurch, costsFilterMonth, costsFilterYear);
       } else {
         toast.error('❌ ' + data.error);
       }
@@ -2136,7 +2136,7 @@ export default function App() {
           proofFile: '',
           status: 'PENDING'
         });
-        fetchCostsList(costsFilterStatus);
+        fetchCostsList(costsFilterStatus, costsFilterChurch, costsFilterMonth, costsFilterYear);
       } else {
         toast.error('❌ ' + data.error);
       }
@@ -2163,7 +2163,7 @@ export default function App() {
         toast.success('✅ ' + data.message);
         setShowCostDeleteConfirm(false);
         setSelectedCost(null);
-        fetchCostsList(costsFilterStatus);
+        fetchCostsList(costsFilterStatus, costsFilterChurch, costsFilterMonth, costsFilterYear);
       } else {
         toast.error('❌ ' + data.error);
       }
