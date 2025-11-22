@@ -1871,7 +1871,7 @@ export default function App() {
   
   // ========== FUNÇÕES CRUD - CUSTOS ENTRIES (LANÇAMENTOS) ==========
   
-  const fetchCostsList = async (filterStatus = 'ALL', filterChurch = 'ALL') => {
+  const fetchCostsList = async (filterStatus = 'ALL', filterChurch = 'ALL', filterMonth = null, filterYear = null) => {
     try {
       const res = await fetch('/api/costs-entries/list', {
         method: 'POST',
@@ -1889,8 +1889,17 @@ export default function App() {
         const data = await res.json();
         let costs = data.costs || [];
         
-        // Ordenar por data (mais recentes primeiro)
-        costs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        // Filtrar por mês/ano se especificado
+        if (filterMonth && filterMonth !== 'ALL' && filterYear) {
+          costs = costs.filter(cost => {
+            const dueDate = new Date(cost.dueDate);
+            return dueDate.getMonth() + 1 === parseInt(filterMonth) && 
+                   dueDate.getFullYear() === parseInt(filterYear);
+          });
+        }
+        
+        // Ordenar por data de vencimento (mais próximos primeiro)
+        costs.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
         
         setCostsList(costs);
       }
