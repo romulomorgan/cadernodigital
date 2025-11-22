@@ -1949,7 +1949,11 @@ export default function App() {
     }
     
     // Validar se o documento (conta/boleto ou orçamento) foi anexado
-    if (!costFormData.billFile || costFormData.billFile === '') {
+    // Verificar se o tipo de custo selecionado tem documentOptional = true
+    const selectedCustoType = allCustos.find(c => c.custoId === costFormData.costTypeId);
+    const isDocumentOptional = selectedCustoType?.documentOptional || false;
+    
+    if (!isDocumentOptional && (!costFormData.billFile || costFormData.billFile === '')) {
       const docName = costFormData.costTypeName && costFormData.costTypeName.toUpperCase() === 'ESPECIAL' 
         ? 'orçamento' 
         : 'conta/boleto';
