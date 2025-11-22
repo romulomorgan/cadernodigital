@@ -7836,7 +7836,134 @@ export default function App() {
                 </CardContent>
               </Card>
             </TabsContent>
-          )}
+          
+          {/* ========== ABA PRIVACIDADE ========== */}
+          <TabsContent value="privacy">
+            <Card className="border-2 border-purple-200">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100">
+                <CardTitle className="text-2xl flex items-center gap-2">
+                  🔒 Controle de Privacidade por Função
+                </CardTitle>
+                <p className="text-sm text-gray-600 mt-2">
+                  Configure quais abas cada função pode visualizar no painel do Líder Máximo
+                </p>
+              </CardHeader>
+              <CardContent className="p-6">
+                {/* Seleção de Função */}
+                <div className="mb-6">
+                  <Label className="text-base font-semibold mb-2 block">Selecione a Função:</Label>
+                  <Select 
+                    value={selectedRoleForPrivacy?.roleId || ''}
+                    onValueChange={(roleId) => {
+                      const role = allRoles.find(r => r.roleId === roleId);
+                      if (role && role.name.toLowerCase() !== 'pastor' && role.name.toLowerCase() !== 'bispo') {
+                        setSelectedRoleForPrivacy(role);
+                        fetchPrivacyConfig(roleId);
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="w-full max-w-md">
+                      <SelectValue placeholder="Escolha uma função..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {allRoles
+                        .filter(role => role.name.toLowerCase() !== 'pastor' && role.name.toLowerCase() !== 'bispo')
+                        .map(role => (
+                          <SelectItem key={role.roleId} value={role.roleId}>
+                            {role.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {/* Lista de Abas */}
+                {selectedRoleForPrivacy && (
+                  <div>
+                    <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded">
+                      <p className="text-sm text-blue-800">
+                        <strong>Configurando:</strong> {selectedRoleForPrivacy.name}
+                      </p>
+                      <p className="text-xs text-blue-600 mt-1">
+                        Usuários com esta função verão apenas as abas marcadas abaixo
+                      </p>
+                    </div>
+                    
+                    <Label className="text-base font-semibold mb-3 block">Abas Permitidas:</Label>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {[
+                        { value: 'dashboard', label: '📊 Dashboard', description: 'Visão geral do sistema' },
+                        { value: 'compare', label: '📈 Comparações', description: 'Comparar dados entre igrejas' },
+                        { value: 'calendar', label: '📅 Calendário', description: 'Calendário financeiro completo' },
+                        { value: 'funcoes', label: '📋 Funções', description: 'Gerenciar funções do sistema' },
+                        { value: 'usuarios', label: '👤 Usuários', description: 'Gerenciar usuários' },
+                        { value: 'igrejas', label: '🏛️ Igrejas', description: 'Gerenciar igrejas' },
+                        { value: 'custos', label: '💰 Custos', description: 'Gerenciar tipos e lançamentos de custos' },
+                        { value: 'estatistica', label: '📊 Estatística', description: 'Relatórios e estatísticas' },
+                        { value: 'audit', label: '🔍 Auditoria', description: 'Logs de auditoria do sistema' }
+                      ].map(tab => (
+                        <div 
+                          key={tab.value}
+                          className={`border-2 rounded-lg p-3 cursor-pointer transition-all ${
+                            allowedTabs.includes(tab.value)
+                              ? 'border-green-500 bg-green-50'
+                              : 'border-gray-300 bg-white hover:border-gray-400'
+                          }`}
+                          onClick={() => toggleTab(tab.value)}
+                        >
+                          <div className="flex items-start gap-3">
+                            <input
+                              type="checkbox"
+                              checked={allowedTabs.includes(tab.value)}
+                              onChange={() => toggleTab(tab.value)}
+                              className="mt-1 w-5 h-5 rounded"
+                            />
+                            <div className="flex-1">
+                              <p className="font-semibold">{tab.label}</p>
+                              <p className="text-xs text-gray-600">{tab.description}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="mt-6 flex gap-3">
+                      <Button 
+                        onClick={savePrivacyConfig}
+                        className="bg-purple-600 hover:bg-purple-700"
+                      >
+                        💾 Salvar Configuração
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedRoleForPrivacy(null);
+                          setAllowedTabs([]);
+                        }}
+                      >
+                        Cancelar
+                      </Button>
+                    </div>
+                    
+                    <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                      <p className="text-sm text-yellow-800">
+                        ⚠️ <strong>Atenção:</strong> As alterações entram em vigor no próximo login do usuário.
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
+                {!selectedRoleForPrivacy && (
+                  <div className="text-center py-12">
+                    <div className="text-6xl mb-4">🔒</div>
+                    <p className="text-gray-600">Selecione uma função acima para configurar as permissões</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
         </Tabs>
       </div>
       
