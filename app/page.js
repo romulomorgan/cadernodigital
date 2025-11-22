@@ -2582,40 +2582,42 @@ export default function App() {
   
   // Verificar se usuário tem permissão para ver uma aba
   const canViewTab = (tabValue) => {
-    // Master sempre pode ver tudo (abas administrativas)
-    if (user?.role === 'master') return true;
+    // Master sempre pode ver tudo
+    if (user?.role === 'master') {
+      return true;
+    }
     
-    // Abas exclusivas do Master nunca são visíveis para outros
+    // Abas exclusivas do Master - NUNCA visíveis para não-Master
     const masterOnlyTabs = ['funcoes', 'usuarios', 'igrejas', 'custos', 'estatistica', 'audit', 'privacy', 'requests'];
-    if (masterOnlyTabs.includes(tabValue) && user?.role !== 'master') {
-      return false;
+    if (masterOnlyTabs.includes(tabValue)) {
+      return false; // Só master vê essas abas
     }
     
-    // Pastor e Bispo têm permissões padrão fixas (não usam sistema de privacidade)
-    // Eles veem seu próprio painel de usuário
+    // APENAS Pastor e Bispo têm permissões fixas e painel próprio
     if (user?.role === 'pastor' || user?.role === 'bispo') {
-      return ['calendar', 'dashboard', 'compare', 'costs-pastor'].includes(tabValue);
+      const isPastorTab = ['calendar', 'dashboard', 'compare', 'costs-pastor'].includes(tabValue);
+      console.log('[canViewTab] Pastor/Bispo verificando:', tabValue, '→', isPastorTab);
+      return isPastorTab;
     }
     
-    // Para outros roles (Secretária, Tesoureiro, etc.), usar sistema de privacidade
-    // IMPORTANTE: Eles se logam no painel do Master, mas com permissões restritas
+    // TODOS os outros roles (secretaria, tesoureiro, contador, gerente, obreiro, etc.)
+    // usam SISTEMA DE PRIVACIDADE e veem abas do MASTER (não do pastor!)
     
-    // Se userAllowedTabs é null, ainda está carregando - não mostrar nada
+    // Se ainda está carregando permissões, não mostrar nada
     if (userAllowedTabs === null) {
-      console.log('[canViewTab] Permissões ainda carregando, ocultando abas');
+      console.log('[canViewTab] ⏳ Permissões carregando para', user?.role, '- ocultando:', tabValue);
       return false;
     }
     
-    // Se é array vazio ou não configurado, NENHUMA aba permitida
-    // Usuário vê apenas o painel vazio (layout sem abas)
+    // Se não tem configuração ou array vazio, não mostrar nenhuma aba
     if (!Array.isArray(userAllowedTabs) || userAllowedTabs.length === 0) {
-      console.log('[canViewTab] Nenhuma aba configurada para este role, ocultando:', tabValue);
+      console.log('[canViewTab] ❌ Sem configuração para', user?.role, '- ocultando:', tabValue);
       return false;
     }
     
-    // Verificar se está na lista de abas permitidas
+    // Verificar se a aba está na lista de permitidas
     const hasPermission = userAllowedTabs.includes(tabValue);
-    console.log('[canViewTab] Verificando permissão para:', tabValue, '-> Resultado:', hasPermission);
+    console.log('[canViewTab] 🔐', user?.role, 'verificando:', tabValue, '→', hasPermission ? '✅ PERMITIDO' : '❌ NEGADO');
     return hasPermission;
   };
   
