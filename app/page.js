@@ -8731,6 +8731,7 @@ export default function App() {
                   <p>
                     {selectedCost.status === 'PENDING' && '🟡 Pendente'}
                     {selectedCost.status === 'APPROVED' && '🟢 Aprovado'}
+                    {selectedCost.status === 'PAID' && '💚 Pago'}
                     {selectedCost.status === 'REJECTED' && '🔴 Reprovado'}
                   </p>
                 </div>
