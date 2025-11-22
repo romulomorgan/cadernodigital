@@ -1,22 +1,33 @@
 #!/usr/bin/env python3
 """
-Backend Test Suite - Sistema de Solicitações e Upload de Custos
-Testa os endpoints críticos implementados recentemente
+Backend Testing Script for Bug Fixes and Privacy System
+Testing the following endpoints:
+1. GET /api/custos/list - Test if returns cost types for authenticated users (not just Master)
+2. GET /api/costs-entries/list - Test if all costs have status field filled
+3. POST /api/privacy/get and POST /api/privacy/save - Test new privacy system (Master only)
 """
 
 import requests
 import json
-import base64
-import os
-import tempfile
-from datetime import datetime, timedelta
+import sys
+from datetime import datetime
 
-# Configuração da API
+# Base URL from .env
 BASE_URL = "https://caderno-online.preview.emergentagent.com/api"
 
-# Credenciais de teste
-MASTER_EMAIL = "joao.silva@iudp.org.br"
-MASTER_PASSWORD = "LiderMaximo2025!"
+# Test credentials
+MASTER_CREDENTIALS = {
+    "email": "joao.silva@iudp.org.br",
+    "password": "LiderMaximo2025!"
+}
+
+# We'll create a Pastor user for testing
+PASTOR_CREDENTIALS = {
+    "email": "pastor.teste@iudp.org.br", 
+    "password": "Pastor123!",
+    "name": "Pastor Teste",
+    "role": "pastor"
+}
 
 class BackendTester:
     def __init__(self):
