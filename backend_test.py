@@ -12,7 +12,7 @@ import tempfile
 from datetime import datetime, timedelta
 
 # Configuração da API
-BASE_URL = "https://church-admin-13.preview.emergentagent.com/api"
+BASE_URL = "https://caderno-online.preview.emergentagent.com/api"
 
 # Credenciais de teste
 MASTER_EMAIL = "joao.silva@iudp.org.br"
