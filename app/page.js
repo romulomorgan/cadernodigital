@@ -2538,6 +2538,30 @@ export default function App() {
     }
   };
   
+  // Buscar todas as configurações de privacidade
+  const fetchAllPrivacyConfigs = async () => {
+    try {
+      console.log('[PRIVACY/FETCH_ALL] Buscando todas as configurações...');
+      const res = await fetch('/api/privacy/list', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        console.log('[PRIVACY/FETCH_ALL] ✅ Configurações carregadas:', data.configs?.length || 0);
+        setPrivacyConfigs(data.configs || []);
+      } else {
+        console.error('[PRIVACY/FETCH_ALL] ❌ Erro - Status:', res.status);
+      }
+    } catch (error) {
+      console.error('[PRIVACY/FETCH_ALL] ❌ Error:', error);
+    }
+  };
+
   const savePrivacyConfig = async () => {
     if (!selectedRoleForPrivacy) {
       toast.error('❌ Selecione uma função primeiro');
