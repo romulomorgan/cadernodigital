@@ -3211,13 +3211,15 @@ export async function POST(request) {
     // GET - Buscar configuração de privacidade de uma função
     if (endpoint === 'privacy/get') {
       const user = verifyToken(request);
-      if (!user || user.role !== 'master') {
-        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      if (!user) {
+        return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
       }
       
       try {
         const { roleId } = await request.json();
         
+        // Qualquer usuário autenticado pode buscar configurações de privacidade
+        // Isso é necessário para que o sistema aplique as permissões no login
         const config = await db.collection('privacy_config').findOne({ roleId });
         
         return NextResponse.json({ 
