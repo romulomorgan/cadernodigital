@@ -4977,13 +4977,14 @@ export default function App() {
                                                     costTypeId: cost.costTypeId,
                                                     costTypeName: cost.costTypeName,
                                                     dueDate: cost.dueDate,
-                                                    value: cost.value.toString(),
+                                                    value: formatCurrencyFromNumber(cost.value),
                                                     billFile: cost.billFile || '',
                                                     paymentDate: cost.paymentDate || '',
-                                                    valuePaid: cost.valuePaid?.toString() || '',
+                                                    valuePaid: formatCurrencyFromNumber(cost.valuePaid),
                                                     proofFile: cost.proofFile || '',
                                                     status: cost.status,
-                                                    paidAt: cost.paidAt
+                                                    paidAt: cost.paidAt,
+                                                    description: cost.description || ''
                                                   });
                                                   setShowCostEditModal(true);
                                                 }}
