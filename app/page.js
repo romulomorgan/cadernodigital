@@ -8788,11 +8788,13 @@ export default function App() {
             <div>
               <Label>Valor do Custo (R$) *</Label>
               <Input
-                type="number"
-                step="0.01"
-                placeholder="0.00"
+                type="text"
+                placeholder="0,00"
                 value={costFormData.value}
-                onChange={(e) => setCostFormData({...costFormData, value: e.target.value})}
+                onChange={(e) => {
+                  const formatted = formatCurrency(e.target.value);
+                  setCostFormData({...costFormData, value: formatted});
+                }}
               />
             </div>
             
