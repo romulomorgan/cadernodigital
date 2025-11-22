@@ -236,6 +236,10 @@ export default function App() {
   const [selectedCusto, setSelectedCusto] = useState(null);
   const [newCustoName, setNewCustoName] = useState('');
   const [custoDocumentOptional, setCustoDocumentOptional] = useState(false);
+  
+  // Privacy states
+  const [selectedRoleForPrivacy, setSelectedRoleForPrivacy] = useState(null);
+  const [allowedTabs, setAllowedTabs] = useState([]);
   const [showCustoCreateModal, setShowCustoCreateModal] = useState(false);
   const [showCustoViewModal, setShowCustoViewModal] = useState(false);
   const [showCustoEditModal, setShowCustoEditModal] = useState(false);
