@@ -3231,6 +3231,65 @@ export async function POST(request) {
       }
     }
     
+    // LIST - Listar todas as configurações de privacidade
+    if (endpoint === 'privacy/list') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      try {
+        const configs = await db.collection('privacy_config')
+          .find({})
+          .sort({ roleName: 1 })
+          .toArray();
+        
+        return NextResponse.json({ 
+          configs: configs.map(c => ({
+            roleId: c.roleId,
+            roleName: c.roleName,
+            allowedTabs: c.allowedTabs || [],
+            updatedAt: c.updatedAt
+          }))
+        });
+      } catch (error) {
+        console.error('Erro ao listar configurações de privacidade:', error);
+        return NextResponse.json({ error: 'Erro ao listar configurações' }, { status: 500 });
+      }
+    }
+    
+    // DELETE - Excluir configuração de privacidade
+    if (endpoint === 'privacy/delete') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      try {
+        const { roleId } = await request.json();
+        
+        await db.collection('privacy_config').deleteOne({ roleId });
+        
+        // Registrar log de auditoria
+        await db.collection('audit_logs').insertOne({
+          logId: crypto.randomUUID(),
+          action: 'PRIVACY_DELETE',
+          userId: user.userId,
+          userName: user.name,
+          timestamp: new Date().toISOString(),
+          details: { roleId }
+        });
+        
+        return NextResponse.json({ 
+          success: true,
+          message: 'Configuração removida com sucesso!' 
+        });
+      } catch (error) {
+        console.error('Erro ao excluir configuração de privacidade:', error);
+        return NextResponse.json({ error: 'Erro ao excluir configuração' }, { status: 500 });
+      }
+    }
+    
     // SAVE - Salvar configuração de privacidade
     if (endpoint === 'privacy/save') {
       const user = verifyToken(request);
