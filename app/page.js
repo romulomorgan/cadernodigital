@@ -8776,70 +8776,70 @@ export default function App() {
               )}
               
               {/* Arquivos Anexados */}
-              <div className="grid grid-cols-2 gap-4 mt-4">
+              <div className="grid grid-cols-2 gap-3 mt-4">
                 {selectedCost.billFile && (
-                  <div className="border border-gray-300 rounded p-3">
+                  <div className="border border-gray-300 rounded p-2">
                     <Label className="text-xs text-gray-600 font-semibold">📎 Conta/Boleto:</Label>
                     <div className="mt-2">
                       {selectedCost.billFile.endsWith('.pdf') ? (
                         <iframe 
                           src={selectedCost.billFile} 
-                          className="w-full h-64 border rounded"
+                          className="w-full h-32 border rounded"
                           title="Conta/Boleto"
                         />
                       ) : (
                         <img 
                           src={selectedCost.billFile} 
                           alt="Conta/Boleto" 
-                          className="w-full h-64 object-cover rounded border"
+                          className="w-full h-32 object-contain rounded border bg-gray-50"
                         />
                       )}
                     </div>
                     <Button
                       size="sm"
                       variant="outline"
-                      className="w-full mt-2"
+                      className="w-full mt-2 text-xs"
                       onClick={() => window.open(selectedCost.billFile, '_blank')}
                     >
-                      <Download className="w-3 h-3 mr-2" />
+                      <Download className="w-3 h-3 mr-1" />
                       Abrir/Baixar
                     </Button>
                   </div>
                 )}
                 
                 {selectedCost.proofFile && (
-                  <div className="border border-gray-300 rounded p-3">
+                  <div className="border border-gray-300 rounded p-2">
                     <Label className="text-xs text-gray-600 font-semibold">📎 Comprovante:</Label>
                     <div className="mt-2">
                       {selectedCost.proofFile.endsWith('.pdf') ? (
                         <iframe 
                           src={selectedCost.proofFile} 
-                          className="w-full h-64 border rounded"
+                          className="w-full h-32 border rounded"
                           title="Comprovante"
                         />
                       ) : (
                         <img 
                           src={selectedCost.proofFile} 
                           alt="Comprovante" 
-                          className="w-full h-64 object-cover rounded border"
+                          className="w-full h-32 object-contain rounded border bg-gray-50"
                         />
                       )}
                     </div>
                     <Button
                       size="sm"
                       variant="outline"
-                      className="w-full mt-2"
+                      className="w-full mt-2 text-xs"
                       onClick={() => window.open(selectedCost.proofFile, '_blank')}
                     >
-                      <Download className="w-3 h-3 mr-2" />
+                      <Download className="w-3 h-3 mr-1" />
                       Abrir/Baixar
                     </Button>
                   </div>
                 )}
                 
                 {!selectedCost.billFile && !selectedCost.proofFile && (
-                  <div className="col-span-2 text-center text-gray-500 py-4">
-                    <p className="text-sm">Nenhum arquivo anexado</p>
+                  <div className="col-span-2 text-center text-gray-500 py-3">
+                    <p className="text-xs">Nenhum arquivo anexado</p>
                   </div>
                 )}
               </div>
