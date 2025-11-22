@@ -958,6 +958,37 @@ test_plan:
           
           📊 RESULTADO: BUG CORRIGIDO - STATUS APARECE CORRETAMENTE NOS CUSTOS
 
+  - task: "Sistema de Privacidade - Endpoints POST /api/privacy/get e POST /api/privacy/save"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ SISTEMA DE PRIVACIDADE TESTADO COMPLETAMENTE - FUNCIONANDO 100%
+          
+          🎯 ENDPOINTS TESTADOS:
+          - ✅ POST /api/privacy/save: Salva configuração de privacidade (Master only)
+          - ✅ POST /api/privacy/get: Busca configuração por roleId (Master only)
+          - ✅ POST /api/privacy/list-all: Lista todas as configurações (Master only)
+          
+          🔐 AUTENTICAÇÃO E AUTORIZAÇÃO:
+          - ✅ Master pode acessar todos os endpoints de privacidade
+          - ✅ Pastor é corretamente negado (403) em todos os endpoints
+          - ✅ Apenas usuários Master podem gerenciar configurações de privacidade
+          
+          🧪 FUNCIONALIDADES TESTADAS:
+          - ✅ Salvar configuração: roleId, roleName, allowedTabs salvos corretamente
+          - ✅ Buscar configuração: Dados recuperados corretamente
+          - ✅ Verificação de integridade: Configuração salva = configuração recuperada
+          - ✅ Listar todas: 1 configuração encontrada no sistema
+          
+          📊 RESULTADO: SISTEMA DE PRIVACIDADE FUNCIONANDO PERFEITAMENTE
+
 agent_communication:
   - agent: "main"
     message: |
