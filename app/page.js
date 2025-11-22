@@ -9224,13 +9224,15 @@ export default function App() {
                 <div>
                   <Label>Valor Pago (R$) {costFormData.status === 'APPROVED' && '*'}</Label>
                   <Input
-                    type="number"
-                    step="0.01"
-                    placeholder="0.00"
+                    type="text"
+                    placeholder="0,00"
                     disabled={costFormData.status === 'PENDING'}
                     className={costFormData.status === 'PENDING' ? 'bg-gray-100' : ''}
                     value={costFormData.valuePaid}
-                    onChange={(e) => setCostFormData({...costFormData, valuePaid: e.target.value})}
+                    onChange={(e) => {
+                      const formatted = formatCurrency(e.target.value);
+                      setCostFormData({...costFormData, valuePaid: formatted});
+                    }}
                     title={costFormData.status === 'PENDING' ? 'Este campo será liberado após aprovação do Master' : ''}
                   />
                 </div>
