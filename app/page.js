@@ -241,6 +241,9 @@ export default function App() {
   const [selectedRoleForPrivacy, setSelectedRoleForPrivacy] = useState(null);
   const [allowedTabs, setAllowedTabs] = useState([]);
   const [userAllowedTabs, setUserAllowedTabs] = useState(null); // Abas permitidas para o usuário logado
+  const [privacyConfigs, setPrivacyConfigs] = useState([]); // Lista de todas as configurações
+  const [showPrivacyEditModal, setShowPrivacyEditModal] = useState(false); // Modal de edição
+  const [editingPrivacyRole, setEditingPrivacyRole] = useState(null); // Função sendo editada
   const [showCustoCreateModal, setShowCustoCreateModal] = useState(false);
   const [showCustoViewModal, setShowCustoViewModal] = useState(false);
   const [showCustoEditModal, setShowCustoEditModal] = useState(false);
