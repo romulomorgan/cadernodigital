@@ -472,7 +472,7 @@ class BackendTester:
                 "custoId": custos[0]['custoId'],
                 "description": "Custo para teste de workflow",
                 "value": 250.00,
-                "date": "2025-01-15"
+                "dueDate": "2025-01-15"  # Changed from 'date' to 'dueDate'
             }
             
             create_response = requests.post(f"{BASE_URL}/costs-entries/create", json=cost_entry_data, headers=headers_pastor)
