@@ -584,6 +584,7 @@ export async function POST(request) {
           valuePaid: 0, // Será preenchido após aprovação
           difference: 0,
           proofFile: null, // Será preenchido após aprovação
+          description: description || null, // Para custos especiais
           status: 'PENDING',
           reviewedBy: null,
           reviewedAt: null,
