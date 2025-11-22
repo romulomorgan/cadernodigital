@@ -235,6 +235,7 @@ export default function App() {
   const [allCustos, setAllCustos] = useState([]);
   const [selectedCusto, setSelectedCusto] = useState(null);
   const [newCustoName, setNewCustoName] = useState('');
+  const [custoDocumentOptional, setCustoDocumentOptional] = useState(false);
   const [showCustoCreateModal, setShowCustoCreateModal] = useState(false);
   const [showCustoViewModal, setShowCustoViewModal] = useState(false);
   const [showCustoEditModal, setShowCustoEditModal] = useState(false);
