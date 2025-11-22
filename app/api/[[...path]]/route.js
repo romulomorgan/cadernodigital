@@ -379,10 +379,14 @@ export async function POST(request) {
       
       const { custoId, custoData } = await request.json();
       
-      await db.collection('custos').updateOne(
+      console.log('[CUSTOS/UPDATE] Received data:', { custoId, custoData });
+      
+      const updateResult = await db.collection('custos').updateOne(
         { custoId },
         { $set: { ...custoData, updatedAt: getBrazilTime().toISOString() } }
       );
+      
+      console.log('[CUSTOS/UPDATE] Update result:', updateResult);
       
       await db.collection('audit_logs').insertOne({
         logId: crypto.randomUUID(),
