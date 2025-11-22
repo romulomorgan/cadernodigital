@@ -1933,6 +1933,17 @@ export default function App() {
         const data = await res.json();
         let costs = data.costs || [];
         
+        console.log('[FETCH_COSTS] ✅ Custos carregados:', costs.length, 'itens');
+        // Log de sample para verificar status
+        if (costs.length > 0) {
+          console.log('[FETCH_COSTS] Primeiro item:', {
+            costId: costs[0].costId,
+            costTypeName: costs[0].costTypeName,
+            status: costs[0].status,
+            hasStatus: !!costs[0].status
+          });
+        }
+        
         // Filtrar por mês/ano se especificado
         if (filterMonth && filterMonth !== 'ALL' && filterYear) {
           costs = costs.filter(cost => {
@@ -1948,7 +1959,7 @@ export default function App() {
         setCostsList(costs);
       }
     } catch (error) {
-      console.error('Erro ao buscar custos:', error);
+      console.error('[FETCH_COSTS] ❌ Erro:', error);
     }
   };
   
