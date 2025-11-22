@@ -3783,7 +3783,16 @@ export default function App() {
               <div className="text-right">
                 <p className="text-sm font-semibold">{user?.name}</p>
                 <Badge className="bg-yellow-500 text-blue-900 hover:bg-yellow-400">
-                  {user?.role === 'master' ? 'Líder Máximo' : user?.role}
+                  {user?.role === 'master' 
+                    ? 'Líder Máximo' 
+                    : user?.role === 'pastor'
+                      ? 'Pastor(a)'
+                      : user?.role === 'bispo'
+                        ? 'Bispo(a)'
+                        : user?.roleId && allRoles.length > 0
+                          ? allRoles.find(r => r.roleId === user.roleId)?.name || user.role
+                          : user.role
+                  }
                 </Badge>
               </div>
               {user?.role === 'master' && unlockRequests.length > 0 && (
