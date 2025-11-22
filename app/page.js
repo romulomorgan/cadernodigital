@@ -409,6 +409,7 @@ export default function App() {
       fetchAllChurches();
       fetchAllCustos();
       
+      console.log('[AUTH] ========================================');
       console.log('[AUTH] Usuário autenticado:', {
         name: user.name,
         email: user.email,
@@ -417,23 +418,33 @@ export default function App() {
       });
       
       // Definir permissões baseado no role
+      // IMPORTANTE: APENAS Pastor e Bispo têm painel próprio
+      // TODOS os outros (incluindo secretaria, tesoureiro, etc) usam sistema de privacidade
+      
       if (user.role === 'master') {
         // Master tem acesso total (não usa sistema de privacidade)
-        console.log('[AUTH/PERMISSIONS] Master - acesso total');
+        console.log('[AUTH/PERMISSIONS] ✅ MASTER - acesso total ao painel administrativo');
         setUserAllowedTabs(null);
       } else if (user.role === 'pastor' || user.role === 'bispo') {
-        // Pastor e Bispo têm permissões fixas (não usam sistema de privacidade)
-        console.log('[AUTH/PERMISSIONS] Pastor/Bispo - permissões fixas');
+        // APENAS Pastor e Bispo têm painel próprio com permissões fixas
+        console.log('[AUTH/PERMISSIONS] ✅ PASTOR/BISPO - painel próprio com 4 abas fixas');
         setUserAllowedTabs(['calendar', 'dashboard', 'compare', 'costs-pastor']);
-      } else if (user.roleId) {
-        // Outros roles usam sistema de privacidade
-        console.log('[AUTH/PERMISSIONS] Role com sistema de privacidade - buscando config para roleId:', user.roleId);
-        fetchUserAllowedTabs(user.roleId);
       } else {
-        // Usuário sem roleId e não é master/pastor/bispo = sem acesso
-        console.log('[AUTH/PERMISSIONS] ⚠️ Usuário sem roleId e não é role especial - sem permissões');
-        setUserAllowedTabs([]);
+        // TODOS os outros roles (secretaria, tesoureiro, contador, etc.) 
+        // usam sistema de privacidade e se logam no painel do MASTER
+        console.log('[AUTH/PERMISSIONS] 🔐 OUTRO ROLE - usando sistema de privacidade');
+        console.log('[AUTH/PERMISSIONS] Role:', user.role);
+        console.log('[AUTH/PERMISSIONS] RoleId:', user.roleId);
+        
+        if (user.roleId) {
+          console.log('[AUTH/PERMISSIONS] → Buscando configuração de privacidade...');
+          fetchUserAllowedTabs(user.roleId);
+        } else {
+          console.log('[AUTH/PERMISSIONS] ⚠️ SEM roleId - nenhuma aba será exibida');
+          setUserAllowedTabs([]);
+        }
       }
+      console.log('[AUTH] ========================================');
     }
   }, [isAuthenticated, token, user]);
   
