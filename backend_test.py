@@ -61,10 +61,48 @@ class BackendTester:
                 self.log_test("Master Login", "PASS", f"Token obtained successfully")
                 return True
             else:
-                self.log_test("Master Login", "FAIL", f"Status: {response.status_code}, Response: {response.text}")
-                return False
+                self.log_test("Master Login (original credentials)", "FAIL", f"Status: {response.status_code}, Response: {response.text}")
+                # Try to create a test master user
+                return self.create_test_master()
         except Exception as e:
             self.log_test("Master Login", "FAIL", f"Exception: {str(e)}")
+            return False
+
+    def create_test_master(self):
+        """Create a test master user"""
+        try:
+            # Try to register a new master user
+            master_data = {
+                "name": "Master Teste",
+                "email": "master.teste@iudp.org.br",
+                "password": "MasterTeste2025!",
+                "role": "master",
+                "state": "SP",
+                "region": "Região Teste",
+                "isActive": True
+            }
+            
+            response = requests.post(f"{BASE_URL}/auth/register", json=master_data)
+            if response.status_code == 200:
+                # Now try to login with the new master
+                login_response = requests.post(f"{BASE_URL}/auth/login", json={
+                    "email": "master.teste@iudp.org.br",
+                    "password": "MasterTeste2025!"
+                })
+                
+                if login_response.status_code == 200:
+                    data = login_response.json()
+                    self.master_token = data.get('token')
+                    self.log_test("Create and Login Test Master", "PASS", f"Test master created and logged in successfully")
+                    return True
+                else:
+                    self.log_test("Login Test Master", "FAIL", f"Status: {login_response.status_code}, Response: {login_response.text}")
+                    return False
+            else:
+                self.log_test("Create Test Master", "FAIL", f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Create Test Master", "FAIL", f"Exception: {str(e)}")
             return False
 
     def create_pastor_user(self):
