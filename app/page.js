@@ -6510,6 +6510,7 @@ export default function App() {
                     onClick={() => {
                       setShowCustoEditModal(false);
                       setNewCustoName('');
+                      setCustoDocumentOptional(false);
                     }}
                   >
                     Cancelar
