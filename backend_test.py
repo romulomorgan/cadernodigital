@@ -472,10 +472,11 @@ class BackendTester:
             
             # Create cost entry
             cost_entry_data = {
-                "custoId": custos[0]['custoId'],
+                "costTypeId": custos[0]['custoId'],
+                "costTypeName": custos[0]['name'],
                 "description": "Custo para teste de workflow",
                 "value": 250.00,
-                "dueDate": "2025-01-15"  # Changed from 'date' to 'dueDate'
+                "dueDate": "2025-01-15"
             }
             
             create_response = requests.post(f"{BASE_URL}/costs-entries/create", json=cost_entry_data, headers=headers_pastor)
