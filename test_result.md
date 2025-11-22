@@ -822,7 +822,119 @@ test_plan:
     - "Sistema de Upload de Arquivos em Custos" # ✅ COMPLETO - 100% testado  
     - "Fluxo Completo de Custos com Aprovação" # ✅ COMPLETO - 100% testado
 
+  - task: "Corrigir persistência do checkbox 'Conta/Boleto/Orçamento (Opcional)'"
+    implemented: true
+    working: "NA"
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          ✅ CORREÇÃO IMPLEMENTADA - Dez 22, 2025
+          
+          PROBLEMA: Estado custoDocumentOptional não era resetado ao cancelar modais
+          
+          CORREÇÃO APLICADA:
+          - Modal Criar Custo (linha 6377): Adicionado setCustoDocumentOptional(false) no onClick de Cancelar
+          - Modal Editar Custo (linha 6512): Adicionado setCustoDocumentOptional(false) no onClick de Cancelar
+          
+          TESTE NECESSÁRIO:
+          1. Abrir modal de criar custo
+          2. Marcar checkbox "Conta/Boleto/Orçamento (Opcional)"
+          3. Cancelar modal
+          4. Reabrir modal
+          5. Verificar se checkbox está desmarcado
+          6. Repetir para modal de editar custo
+
+  - task: "Verificar dropdown 'Tipo de Custo' vazio para Pastores"
+    implemented: true
+    working: "NA"
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          🔍 INVESTIGAÇÃO INICIADA - Dez 22, 2025
+          
+          ANÁLISE:
+          - fetchAllCustos() é chamado na linha 650 quando Pastor entra na aba costs-pastor
+          - Endpoint /api/custos/list (linha 358 backend) retorna custos para todos usuários autenticados
+          - Logs de debug adicionados para diagnosticar:
+            * Log de início da busca
+            * Log de sucesso com quantidade de itens
+            * Log de detalhes dos custos retornados
+            * Log de erro caso falhe
+          
+          TESTE NECESSÁRIO:
+          1. Fazer login como Pastor
+          2. Entrar na aba "Custos do Pastor"
+          3. Tentar criar novo custo
+          4. Verificar se dropdown "Tipo de Custo" está populado
+          5. Verificar logs do console para diagnóstico
+
+  - task: "Corrigir exibição de status vazio no modal de visualização"
+    implemented: false
+    working: "NA"
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          🔍 INVESTIGAÇÃO INICIADA - Dez 22, 2025
+          
+          ANÁLISE:
+          - Modal de visualização (linha 9349-9355) exibe status corretamente
+          - Possível problema: status pode estar undefined/null no objeto
+          - Logs de debug adicionados em fetchCostsList:
+            * Log de quantidade de custos carregados
+            * Log de sample do primeiro item com status
+          
+          TESTE NECESSÁRIO:
+          1. Fazer login como Pastor
+          2. Criar um custo
+          3. Master aprovar o custo
+          4. Master marcar como pago
+          5. Pastor visualizar o custo
+          6. Verificar se status aparece corretamente
+          7. Verificar logs do console
+
 agent_communication:
+  - agent: "main"
+    message: |
+      🔧 CORREÇÕES DE BUGS - DEZ 22, 2025
+      
+      BUGS CORRIGIDOS:
+      1. ✅ Checkbox "Conta/Boleto/Orçamento (Opcional)" não persistia
+         - Problema: Estado não era resetado ao cancelar modais
+         - Solução: Adicionado setCustoDocumentOptional(false) em ambos botões Cancelar
+      
+      2. 🔍 Dropdown "Tipo de Custo" vazio para Pastores (em investigação)
+         - Adicionados logs de debug para diagnosticar
+         - fetchAllCustos() parece estar implementado corretamente
+         - Precisa testar com usuário Pastor real
+      
+      3. 🔍 Status vazio no modal (em investigação)
+         - Adicionados logs de debug para diagnosticar
+         - Modal renderiza status corretamente se presente no objeto
+         - Precisa verificar se backend retorna status
+      
+      CACHE LIMPO E SERVIDOR REINICIADO:
+      - Removido .next e node_modules/.cache
+      - Servidor Next.js reiniciado com sucesso
+      - Aplicação compilando e rodando normalmente
+      
+      PRÓXIMOS PASSOS:
+      - Testar backend para verificar bugs 2 e 3
+      - Aguardar feedback do usuário ou testar com dados reais
   - agent: "main"
     message: |
       🔧 CORREÇÃO CRÍTICA DOS CÁLCULOS FINANCEIROS - NOV 20, 2025
