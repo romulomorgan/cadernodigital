@@ -5027,11 +5027,11 @@ export default function App() {
                                           );
                                         }
                                         
-                                        // Após 60 min, mostra "Bloqueado"
+                                        // Após 60 min, mostra "Pago por você"
                                         if (remaining <= 0) {
                                           return (
-                                            <span className="text-xs text-gray-500 px-2">
-                                              🔒 Bloqueado
+                                            <span className="text-xs text-green-600 px-2">
+                                              ✅ Pago por você
                                             </span>
                                           );
                                         }
