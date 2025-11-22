@@ -103,7 +103,7 @@ class BackendTester:
                 else:
                     self.log_test("Login Test Master", "FAIL", f"Status: {login_response.status_code}, Response: {login_response.text}")
                     return False
-            elif response.status_code == 400 and "já existe" in response.text:
+            elif response.status_code == 400 and ("já existe" in response.text or "já cadastrado" in response.text):
                 # User already exists, try to login
                 self.log_test("Master User Already Exists", "INFO", "Trying to login with existing user")
                 login_response = requests.post(f"{BASE_URL}/auth/login", json={
