@@ -3445,14 +3445,36 @@ export default function App() {
             <TabsTrigger value="dashboard">📊 Dashboard</TabsTrigger>
             <TabsTrigger value="compare">📈 Comparações</TabsTrigger>
             {user?.role !== 'master' && (
-              <TabsTrigger value="costs-pastor">💰 Custos</TabsTrigger>
+              <TabsTrigger value="costs-pastor">
+                <span className="flex items-center gap-2">
+                  💰 Custos
+                  {(() => {
+                    const statusChangedCount = costsEntriesList.filter(c => 
+                      c.status === 'APPROVED' || c.status === 'PAID' || c.status === 'REJECTED'
+                    ).length;
+                    return statusChangedCount > 0 ? (
+                      <Badge className="ml-1 bg-blue-500 text-white">{statusChangedCount}</Badge>
+                    ) : null;
+                  })()}
+                </span>
+              </TabsTrigger>
             )}
             {user?.role === 'master' && (
               <>
                 <TabsTrigger value="funcoes">📋 Funções</TabsTrigger>
                 <TabsTrigger value="usuarios">👤 Usuários</TabsTrigger>
                 <TabsTrigger value="igrejas">🏛️ Igrejas</TabsTrigger>
-                <TabsTrigger value="custos">💰 Custos</TabsTrigger>
+                <TabsTrigger value="custos">
+                  <span className="flex items-center gap-2">
+                    💰 Custos
+                    {(() => {
+                      const pendingCount = costsEntriesList.filter(c => c.status === 'PENDING').length;
+                      return pendingCount > 0 ? (
+                        <Badge className="ml-1 bg-yellow-500 text-white">{pendingCount}</Badge>
+                      ) : null;
+                    })()}
+                  </span>
+                </TabsTrigger>
                 <TabsTrigger value="estatistica">📊 Estatística</TabsTrigger>
                 <TabsTrigger value="audit">🔍 Auditoria</TabsTrigger>
               </>
