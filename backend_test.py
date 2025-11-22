@@ -287,7 +287,7 @@ class BackendTester:
             response = requests.post(f"{BASE_URL}/costs-entries/create", json=cost_entry_data, headers=headers)
             if response.status_code == 200:
                 data = response.json()
-                cost_id = data.get('cost', {}).get('costId')
+                cost_id = data.get('costEntry', {}).get('costId')  # Fixed: costEntry instead of cost
                 self.log_test("Create Test Cost Entry", "PASS", f"Cost entry created with ID: {cost_id}")
                 return cost_id
             else:
