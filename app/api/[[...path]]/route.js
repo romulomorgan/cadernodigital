@@ -328,7 +328,7 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
       }
       
-      const { name } = await request.json();
+      const { name, documentOptional } = await request.json();
       
       if (!name || !name.trim()) {
         return NextResponse.json({ error: 'Nome do custo é obrigatório' }, { status: 400 });
@@ -337,6 +337,7 @@ export async function POST(request) {
       const custo = {
         custoId: crypto.randomUUID(),
         name: name.trim(),
+        documentOptional: documentOptional || false,
         createdAt: getBrazilTime().toISOString()
       };
       
