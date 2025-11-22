@@ -3206,6 +3206,101 @@ export async function POST(request) {
       });
     }
     
+    // ========== PRIVACIDADE - CONTROLE DE ACESSO POR FUNÇÃO ==========
+    
+    // GET - Buscar configuração de privacidade de uma função
+    if (endpoint === 'privacy/get') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      try {
+        const { roleId } = await request.json();
+        
+        const config = await db.collection('privacy_config').findOne({ roleId });
+        
+        return NextResponse.json({ 
+          config: config || { roleId, allowedTabs: [] }
+        });
+      } catch (error) {
+        console.error('Erro ao buscar configuração de privacidade:', error);
+        return NextResponse.json({ error: 'Erro ao buscar configuração' }, { status: 500 });
+      }
+    }
+    
+    // SAVE - Salvar configuração de privacidade
+    if (endpoint === 'privacy/save') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      try {
+        const { roleId, roleName, allowedTabs } = await request.json();
+        
+        if (!roleId || !roleName) {
+          return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
+        }
+        
+        console.log('[PRIVACY/SAVE] Saving config:', { roleId, roleName, allowedTabs });
+        
+        const configData = {
+          roleId,
+          roleName,
+          allowedTabs: allowedTabs || [],
+          updatedAt: getBrazilTime().toISOString(),
+          updatedBy: user.userId
+        };
+        
+        // Usar upsert para criar ou atualizar
+        const result = await db.collection('privacy_config').updateOne(
+          { roleId },
+          { 
+            $set: configData,
+            $setOnInsert: { createdAt: getBrazilTime().toISOString() }
+          },
+          { upsert: true }
+        );
+        
+        console.log('[PRIVACY/SAVE] Result:', result);
+        
+        // Audit log
+        await db.collection('audit_logs').insertOne({
+          logId: crypto.randomUUID(),
+          action: 'update_privacy_config',
+          userId: user.userId,
+          timestamp: getBrazilTime().toISOString(),
+          details: { roleId, roleName, allowedTabs }
+        });
+        
+        return NextResponse.json({ 
+          success: true, 
+          message: 'Configuração de privacidade salva com sucesso!' 
+        });
+      } catch (error) {
+        console.error('Erro ao salvar configuração de privacidade:', error);
+        return NextResponse.json({ error: 'Erro ao salvar configuração' }, { status: 500 });
+      }
+    }
+    
+    // LIST ALL - Listar todas as configurações
+    if (endpoint === 'privacy/list-all') {
+      const user = verifyToken(request);
+      if (!user || user.role !== 'master') {
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+      }
+      
+      try {
+        const configs = await db.collection('privacy_config').find({}).toArray();
+        
+        return NextResponse.json({ configs });
+      } catch (error) {
+        console.error('Erro ao listar configurações:', error);
+        return NextResponse.json({ error: 'Erro ao listar configurações' }, { status: 500 });
+      }
+    }
+    
     return NextResponse.json({ error: 'Endpoint não encontrado' }, { status: 404 });
     
   } catch (error) {
