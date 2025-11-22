@@ -884,6 +884,20 @@ export default function App() {
     toast.success('👋 Até logo! Sessão encerrada com sucesso.');
   };
   
+  // Função para formatar valor monetário (R$ 1.234,56)
+  const formatCurrency = (value) => {
+    if (!value) return '';
+    const numValue = value.replace(/\D/g, '');
+    const floatValue = (parseFloat(numValue) / 100).toFixed(2);
+    return floatValue.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  };
+  
+  // Função para converter formato BR para número
+  const parseCurrency = (value) => {
+    if (!value) return '';
+    return value.replace(/\./g, '').replace(',', '.');
+  };
+  
   const fetchDashboard = async () => {
     try {
       const res = await fetch('/api/dashboard/data', {
