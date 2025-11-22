@@ -3736,10 +3736,66 @@ export default function App() {
             
             {/* Calendar Grid */}
             <div className="space-y-4">
-              {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
-                const dayTotal = calculateDayTotal(day);
+              {/* Botão de Toggle para dias anteriores */}
+              {(() => {
+                const today = new Date().getDate();
+                const allDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+                const pastDays = allDays.filter(d => d < today);
                 
-                return (
+                if (pastDays.length > 0 && !isCalendarExpanded) {
+                  return (
+                    <Card key="collapse-btn" className="border-2 border-gray-300 bg-gray-50">
+                      <CardContent className="p-4">
+                        <button
+                          onClick={() => setIsCalendarExpanded(true)}
+                          className="w-full flex items-center justify-between hover:bg-gray-100 rounded p-2 transition-colors"
+                        >
+                          <div className="flex items-center gap-2">
+                            <ChevronDown className="w-5 h-5 text-gray-600" />
+                            <span className="text-gray-700 font-medium">
+                              Dias anteriores ocultos ({pastDays.length} dias)
+                            </span>
+                          </div>
+                          <span className="text-sm text-gray-500">Clique para expandir</span>
+                        </button>
+                      </CardContent>
+                    </Card>
+                  );
+                }
+                
+                if (pastDays.length > 0 && isCalendarExpanded) {
+                  return (
+                    <Card key="expand-btn" className="border-2 border-blue-300 bg-blue-50">
+                      <CardContent className="p-4">
+                        <button
+                          onClick={() => setIsCalendarExpanded(false)}
+                          className="w-full flex items-center justify-between hover:bg-blue-100 rounded p-2 transition-colors"
+                        >
+                          <div className="flex items-center gap-2">
+                            <ChevronUp className="w-5 h-5 text-blue-600" />
+                            <span className="text-blue-700 font-medium">
+                              Mostrando todos os dias do mês
+                            </span>
+                          </div>
+                          <span className="text-sm text-blue-500">Clique para colapsar</span>
+                        </button>
+                      </CardContent>
+                    </Card>
+                  );
+                }
+                
+                return null;
+              })()}
+              
+              {(() => {
+                const today = new Date().getDate();
+                const allDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+                const daysToShow = isCalendarExpanded ? allDays : allDays.filter(d => d >= today);
+                
+                return daysToShow.map(day => {
+                  const dayTotal = calculateDayTotal(day);
+                  
+                  return (
                   <Card key={day} className="border-2 border-blue-200 hover:shadow-lg transition-shadow">
                     <CardHeader className="bg-gradient-to-r from-blue-100 to-blue-50 pb-3">
                       <div className="flex items-center justify-between">
