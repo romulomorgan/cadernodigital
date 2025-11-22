@@ -3449,11 +3449,9 @@ export default function App() {
                 <span className="flex items-center gap-2">
                   💰 Custos
                   {(() => {
-                    const statusChangedCount = costsList.filter(c => 
-                      c.status === 'APPROVED' || c.status === 'PAID' || c.status === 'REJECTED'
-                    ).length;
-                    return statusChangedCount > 0 ? (
-                      <Badge className="ml-1 bg-blue-500 text-white">{statusChangedCount}</Badge>
+                    const unpaidCount = costsList.filter(c => c.status !== 'PAID').length;
+                    return unpaidCount > 0 ? (
+                      <Badge className="ml-1 bg-red-500 text-white">{unpaidCount}</Badge>
                     ) : null;
                   })()}
                 </span>
@@ -3468,9 +3466,9 @@ export default function App() {
                   <span className="flex items-center gap-2">
                     💰 Custos
                     {(() => {
-                      const pendingCount = costsList.filter(c => c.status === 'PENDING').length;
-                      return pendingCount > 0 ? (
-                        <Badge className="ml-1 bg-yellow-500 text-white">{pendingCount}</Badge>
+                      const unpaidCount = costsList.filter(c => c.status !== 'PAID').length;
+                      return unpaidCount > 0 ? (
+                        <Badge className="ml-1 bg-red-500 text-white">{unpaidCount}</Badge>
                       ) : null;
                     })()}
                   </span>
