@@ -8781,6 +8781,19 @@ export default function App() {
               />
             </div>
             
+            {/* Campo de Descrição - Apenas para Custos ESPECIAIS */}
+            {costFormData.costTypeName && costFormData.costTypeName.toUpperCase() === 'ESPECIAL' && (
+              <div>
+                <Label>Descrição do Custo *</Label>
+                <textarea
+                  className="w-full border rounded p-2 min-h-[100px]"
+                  placeholder="Descreva detalhadamente o custo especial..."
+                  value={costFormData.description}
+                  onChange={(e) => setCostFormData({...costFormData, description: e.target.value})}
+                />
+              </div>
+            )}
+            
             {/* Campos de Pagamento - DESABILITADOS ao criar */}
             <div className="border-t-2 border-gray-300 pt-4 mt-4">
               <p className="text-sm font-semibold text-gray-600 mb-3">
@@ -8813,7 +8826,11 @@ export default function App() {
             </div>
             
             <div>
-              <Label>Conta/Boleto (Upload) 📎</Label>
+              <Label>
+                {costFormData.costTypeName && costFormData.costTypeName.toUpperCase() === 'ESPECIAL' 
+                  ? 'Orçamento (Upload) 📎' 
+                  : 'Conta/Boleto (Upload) 📎'}
+              </Label>
               <div className="flex gap-2">
                 <Input
                   type="file"
