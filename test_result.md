@@ -2285,3 +2285,150 @@ agent_communication:
       
       🎯 STATUS: AMBAS AS CORREÇÕES IMPLEMENTADAS E FUNCIONANDO
 
+
+  - task: "Calendário Colapsável com Persistência"
+    implemented: true
+    working: true
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    status_history:
+      - working: true
+        agent: "main"
+        comment: |
+          ✅ CALENDÁRIO COLAPSÁVEL IMPLEMENTADO - $(date +%Y-%m-%d)
+          
+          🎯 FUNCIONALIDADE IMPLEMENTADA:
+          
+          **COMPORTAMENTO DO CALENDÁRIO:**
+          1. **Estado Inicial (Colapsado):**
+             - Mostra apenas dias a partir de HOJE para frente
+             - Dias anteriores ficam ocultos
+             - Botão "Dias anteriores ocultos (X dias)" aparece no topo
+          
+          2. **Expandir Calendário:**
+             - Clicar no botão → mostra TODOS os dias do mês
+             - Botão muda para "Mostrando todos os dias do mês"
+             - Dias anteriores ficam visíveis
+          
+          3. **Colapsar Novamente:**
+             - Clicar no botão novamente → volta ao estado colapsado
+             - Mostra apenas de hoje para frente
+          
+          4. **Persistência:**
+             - Atualizar página (F5): **mantém estado** (expandido ou colapsado)
+             - Deslogar e logar novamente: **reseta para colapsado**
+             - Estado salvo em localStorage
+          
+          🔧 IMPLEMENTAÇÕES TÉCNICAS:
+          
+          1. **Estado e Persistência (linha 141-143):**
+             ```javascript
+             const [isCalendarExpanded, setIsCalendarExpanded] = useState(false);
+             
+             // Carregar de localStorage ao montar
+             useEffect(() => {
+               if (isAuthenticated) {
+                 const savedState = localStorage.getItem('calendarExpanded');
+                 if (savedState !== null) {
+                   setIsCalendarExpanded(savedState === 'true');
+                 }
+               }
+             }, [isAuthenticated]);
+             ```
+          
+          2. **Função Toggle com Persistência (linha 894-898):**
+             ```javascript
+             const toggleCalendar = () => {
+               const newState = !isCalendarExpanded;
+               setIsCalendarExpanded(newState);
+               localStorage.setItem('calendarExpanded', newState.toString());
+             };
+             ```
+          
+          3. **Limpeza no Logout (linha 884-892):**
+             ```javascript
+             const confirmLogout = () => {
+               localStorage.removeItem('token');
+               localStorage.removeItem('user');
+               localStorage.removeItem('calendarExpanded'); // Limpa estado do calendário
+               ...
+             };
+             ```
+          
+          4. **Botão de Toggle (linha 3756-3804):**
+             - Botão cinza quando colapsado: "Dias anteriores ocultos (X dias)"
+             - Botão azul quando expandido: "Mostrando todos os dias do mês"
+             - Ícones: ChevronDown (colapsado) e ChevronUp (expandido)
+             - Texto de ajuda: "Clique para expandir" / "Clique para colapsar"
+          
+          5. **Filtro de Dias (linha 3806-3814):**
+             ```javascript
+             const today = getBrazilTime().getDate();
+             const allDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+             
+             // Se colapsado, mostrar apenas dias >= hoje
+             const daysToShow = isCalendarExpanded ? allDays : allDays.filter(d => d >= today);
+             
+             return daysToShow.map(day => {
+               // Renderiza apenas dias filtrados
+             });
+             ```
+          
+          6. **Ícones Importados (linha 24):**
+             - ChevronDown: ícone para expandir
+             - ChevronUp: ícone para colapsar
+          
+          📊 APLICAÇÃO:
+          - ✅ Calendário do Pastor (TabsContent value="calendar")
+          - ✅ Calendário do Master (mesma aba compartilhada)
+          - ✅ Funciona para ambos os perfis
+          
+          🎨 INTERFACE:
+          
+          **Estado Colapsado:**
+          ```
+          ┌─────────────────────────────────────────┐
+          │ [▼] Dias anteriores ocultos (20 dias)  │
+          │     Clique para expandir                │
+          └─────────────────────────────────────────┘
+          
+          ┌─────────────────────────────────────────┐
+          │ Dia 21 - R$ 150,00                      │
+          ├─────────────────────────────────────────┤
+          │ Dia 22 - R$ 200,00                      │
+          ├─────────────────────────────────────────┤
+          │ ...                                     │
+          └─────────────────────────────────────────┘
+          ```
+          
+          **Estado Expandido:**
+          ```
+          ┌─────────────────────────────────────────┐
+          │ [▲] Mostrando todos os dias do mês     │
+          │     Clique para colapsar                │
+          └─────────────────────────────────────────┘
+          
+          ┌─────────────────────────────────────────┐
+          │ Dia 01 - R$ 100,00                      │
+          ├─────────────────────────────────────────┤
+          │ Dia 02 - R$ 120,00                      │
+          ├─────────────────────────────────────────┤
+          │ ...                                     │
+          ├─────────────────────────────────────────┤
+          │ Dia 21 - R$ 150,00 (HOJE)               │
+          ├─────────────────────────────────────────┤
+          │ Dia 22 - R$ 200,00                      │
+          └─────────────────────────────────────────┘
+          ```
+          
+          ✅ BENEFÍCIOS:
+          1. Usuário não precisa rolar até o dia atual
+          2. Dia atual sempre visível no topo
+          3. Acesso rápido aos lançamentos de hoje
+          4. Pode expandir para ver histórico quando necessário
+          5. Estado persistente entre reloads
+          6. Reseta ao fazer novo login
+          
+          🎯 STATUS: TOTALMENTE FUNCIONAL E TESTADO
+
