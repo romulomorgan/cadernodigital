@@ -7877,7 +7877,8 @@ export default function App() {
           )}
           
           {/* ========== ABA PRIVACIDADE ========== */}
-          <TabsContent value="privacy">
+          {user?.role === 'master' && (
+            <TabsContent value="privacy">
             <Card className="border-2 border-purple-200">
               <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100">
                 <CardTitle className="text-2xl flex items-center gap-2">
