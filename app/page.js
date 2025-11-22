@@ -3759,7 +3759,7 @@ export default function App() {
                 const today = getBrazilTime().getDate();
                 const allDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
                 const pastDays = allDays.filter(d => d < today);
-                const hasP astDays = pastDays.length > 0;
+                const hasPastDays = pastDays.length > 0;
                 
                 if (hasPastDays && !isCalendarExpanded) {
                   return (
