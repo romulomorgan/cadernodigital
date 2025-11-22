@@ -119,6 +119,8 @@ export default function App() {
   });
   const [costsFilterStatus, setCostsFilterStatus] = useState('ALL');
   const [costsFilterChurch, setCostsFilterChurch] = useState('ALL');
+  const [costsFilterMonth, setCostsFilterMonth] = useState(new Date().getMonth() + 1); // 1-12
+  const [costsFilterYear, setCostsFilterYear] = useState(new Date().getFullYear());
   
   // Estados para Solicitações de Liberação (Master)
   const [unlockRequestsCount, setUnlockRequestsCount] = useState(0);
