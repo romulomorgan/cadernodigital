@@ -9598,10 +9598,12 @@ export default function App() {
                 <div>
                   <Label>Valor (R$)</Label>
                   <Input
-                    type="number"
-                    step="0.01"
+                    type="text"
                     value={costFormData.value}
-                    onChange={(e) => setCostFormData({...costFormData, value: e.target.value})}
+                    onChange={(e) => {
+                      const formatted = formatCurrency(e.target.value);
+                      setCostFormData({...costFormData, value: formatted});
+                    }}
                   />
                 </div>
                 
@@ -9617,10 +9619,12 @@ export default function App() {
                 <div>
                   <Label>Valor Pago (R$)</Label>
                   <Input
-                    type="number"
-                    step="0.01"
+                    type="text"
                     value={costFormData.valuePaid}
-                    onChange={(e) => setCostFormData({...costFormData, valuePaid: e.target.value})}
+                    onChange={(e) => {
+                      const formatted = formatCurrency(e.target.value);
+                      setCostFormData({...costFormData, valuePaid: formatted});
+                    }}
                   />
                 </div>
                 
