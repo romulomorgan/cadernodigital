@@ -618,14 +618,14 @@ export default function App() {
   useEffect(() => {
     if (isAuthenticated && activeTab === 'custos' && token && user?.role === 'master') {
       fetchAllCustos();
-      fetchCostsList(costsFilterStatus); // Carregar também os lançamentos para aprovação
+      fetchCostsList(costsFilterStatus, costsFilterChurch, costsFilterMonth, costsFilterYear);
     }
   }, [isAuthenticated, activeTab, token]);
   
   // Carregar custos entries quando entrar na aba costs-pastor (Pastores/Bispos)
   useEffect(() => {
     if (isAuthenticated && activeTab === 'costs-pastor' && token && user?.role !== 'master') {
-      fetchCostsList(costsFilterStatus);
+      fetchCostsList(costsFilterStatus, 'ALL', costsFilterMonth, costsFilterYear);
       fetchAllCustos(); // Para popular o dropdown
     }
   }, [isAuthenticated, activeTab, token]);
