@@ -158,6 +158,9 @@ class BackendTester:
                 self.pastor_user_id = data.get('user', {}).get('userId')
                 self.log_test("Create Pastor User", "PASS", f"Pastor user created: {self.pastor_user_id}")
                 return True
+            elif response.status_code == 400 and ("já existe" in response.text or "já cadastrado" in response.text):
+                self.log_test("Pastor User Already Exists", "INFO", "Pastor user already exists, proceeding with login")
+                return True
             else:
                 self.log_test("Create Pastor User", "FAIL", f"Status: {response.status_code}, Response: {response.text}")
                 return False
