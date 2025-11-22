@@ -3781,8 +3781,11 @@ export default function App() {
       <div className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6">
-            <TabsTrigger value="calendar">📅 Calendário</TabsTrigger>
-            {user?.role === 'master' && (
+            {/* Abas com controle de permissão */}
+            {canViewTab('calendar') && (
+              <TabsTrigger value="calendar">📅 Calendário</TabsTrigger>
+            )}
+            {canViewTab('requests') && (
               <TabsTrigger value="requests" className="relative">
                 🔔 Solicitações
                 {unlockRequestsCount > 0 && (
@@ -3792,9 +3795,13 @@ export default function App() {
                 )}
               </TabsTrigger>
             )}
-            <TabsTrigger value="dashboard">📊 Dashboard</TabsTrigger>
-            <TabsTrigger value="compare">📈 Comparações</TabsTrigger>
-            {user?.role !== 'master' && (
+            {canViewTab('dashboard') && (
+              <TabsTrigger value="dashboard">📊 Dashboard</TabsTrigger>
+            )}
+            {canViewTab('compare') && (
+              <TabsTrigger value="compare">📈 Comparações</TabsTrigger>
+            )}
+            {canViewTab('costs-pastor') && user?.role !== 'master' && (
               <TabsTrigger value="costs-pastor">
                 <span className="flex items-center gap-2">
                   💰 Custos
