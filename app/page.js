@@ -4166,7 +4166,8 @@ export default function App() {
                     </CardContent>
                   </Card>
                 );
-              })}
+              });
+              })()}
             </div>
           </TabsContent>
           
