@@ -483,7 +483,7 @@ class BackendTester:
             if create_response.status_code != 200:
                 return None
                 
-            cost_id = create_response.json().get('cost', {}).get('costId')
+            cost_id = create_response.json().get('costEntry', {}).get('costId')  # Fixed: costEntry instead of cost
             
             # Approve as Master
             approve_response = requests.post(f"{BASE_URL}/costs-entries/approve", 
