@@ -8963,6 +8963,13 @@ export default function App() {
                 </div>
               </div>
               
+              {selectedCost.description && (
+                <div className="bg-blue-50 border border-blue-200 rounded p-3">
+                  <Label className="text-sm text-blue-700 font-semibold">📋 Descrição do Custo:</Label>
+                  <p className="text-sm text-gray-900 mt-1 whitespace-pre-wrap">{selectedCost.description}</p>
+                </div>
+              )}
+              
               {selectedCost.rejectionReason && (
                 <div className="bg-red-50 border border-red-200 rounded p-3">
                   <Label className="text-sm text-red-700 font-semibold">Motivo da Reprovação:</Label>
