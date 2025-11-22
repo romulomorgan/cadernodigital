@@ -2448,6 +2448,72 @@ export default function App() {
     }
   };
   
+  // ========== FUNÇÕES - PRIVACIDADE ==========
+  
+  const fetchPrivacyConfig = async (roleId) => {
+    try {
+      const res = await fetch('/api/privacy/get', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ roleId })
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        console.log('[PRIVACY] Config loaded:', data.config);
+        setAllowedTabs(data.config.allowedTabs || []);
+      } else {
+        console.error('[PRIVACY] Error loading config');
+      }
+    } catch (error) {
+      console.error('[PRIVACY] Error:', error);
+    }
+  };
+  
+  const savePrivacyConfig = async () => {
+    if (!selectedRoleForPrivacy) {
+      toast.error('❌ Selecione uma função primeiro');
+      return;
+    }
+    
+    try {
+      const res = await fetch('/api/privacy/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          roleId: selectedRoleForPrivacy.roleId,
+          roleName: selectedRoleForPrivacy.name,
+          allowedTabs
+        })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('✅ ' + data.message);
+      } else {
+        toast.error('❌ ' + data.error);
+      }
+    } catch (error) {
+      toast.error('❌ Erro ao salvar configuração');
+    }
+  };
+  
+  const toggleTab = (tabValue) => {
+    setAllowedTabs(prev => {
+      if (prev.includes(tabValue)) {
+        return prev.filter(t => t !== tabValue);
+      } else {
+        return [...prev, tabValue];
+      }
+    });
+  };
+  
   // ========== FUNÇÕES CRUD - CUSTOS TIPOS ==========
   
   const fetchAllCustos = async () => {
