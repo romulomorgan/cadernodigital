@@ -8813,7 +8813,7 @@ export default function App() {
                     <div className="mt-2">
                       {selectedCost.proofFile.endsWith('.pdf') ? (
                         <iframe 
-                          src={selectedCost.proofFile} 
+                          src={`${selectedCost.proofFile}#toolbar=0`}
                           className="w-full h-32 border rounded"
                           title="Comprovante"
                         />
