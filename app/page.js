@@ -7874,6 +7874,7 @@ export default function App() {
                 </CardContent>
               </Card>
             </TabsContent>
+          )}
           
           {/* ========== ABA PRIVACIDADE ========== */}
           <TabsContent value="privacy">
