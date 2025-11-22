@@ -2559,6 +2559,25 @@ export default function App() {
     });
   };
   
+  // Verificar se usuário tem permissão para ver uma aba
+  const canViewTab = (tabValue) => {
+    // Master sempre pode ver tudo
+    if (user?.role === 'master') return true;
+    
+    // Se userAllowedTabs é null, ainda está carregando ou é um role especial
+    if (userAllowedTabs === null) {
+      // Pastor e Bispo têm abas específicas
+      if (user?.role === 'pastor' || user?.role === 'bispo') {
+        return ['calendar', 'dashboard', 'compare', 'costs-pastor'].includes(tabValue);
+      }
+      // Outros sem configuração não veem nada
+      return false;
+    }
+    
+    // Verificar se está na lista de abas permitidas
+    return userAllowedTabs.includes(tabValue);
+  };
+  
   // Buscar abas permitidas para o usuário logado
   const fetchUserAllowedTabs = async (roleId) => {
     try {
