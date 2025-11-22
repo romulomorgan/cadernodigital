@@ -2513,7 +2513,10 @@ export default function App() {
         },
         body: JSON.stringify({
           custoId: selectedCusto.custoId,
-          custoData: { name: newCustoName.trim() }
+          custoData: { 
+            name: newCustoName.trim(),
+            documentOptional: custoDocumentOptional
+          }
         })
       });
       
@@ -2522,6 +2525,7 @@ export default function App() {
         toast.success('✅ ' + data.message);
         setShowCustoEditModal(false);
         setNewCustoName('');
+        setCustoDocumentOptional(false);
         setSelectedCusto(null);
         await fetchAllCustos();
       } else {
