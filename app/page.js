@@ -3632,6 +3632,7 @@ export default function App() {
                 </TabsTrigger>
                 <TabsTrigger value="estatistica">📊 Estatística</TabsTrigger>
                 <TabsTrigger value="audit">🔍 Auditoria</TabsTrigger>
+                <TabsTrigger value="privacy">🔒 Privacidade</TabsTrigger>
               </>
             )}
           </TabsList>
