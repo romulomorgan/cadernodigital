@@ -2561,16 +2561,28 @@ export default function App() {
   
   // Verificar se usuário tem permissão para ver uma aba
   const canViewTab = (tabValue) => {
-    // Master sempre pode ver tudo
+    // Master sempre pode ver tudo (abas administrativas)
     if (user?.role === 'master') return true;
     
-    // Se userAllowedTabs é null, ainda está carregando ou é um role especial
+    // Abas exclusivas do Master nunca são visíveis para outros
+    const masterOnlyTabs = ['funcoes', 'usuarios', 'igrejas', 'custos', 'estatistica', 'audit', 'privacy', 'requests'];
+    if (masterOnlyTabs.includes(tabValue) && user?.role !== 'master') {
+      return false;
+    }
+    
+    // Pastor e Bispo têm permissões padrão (não usam sistema de privacidade)
+    if (user?.role === 'pastor' || user?.role === 'bispo') {
+      return ['calendar', 'dashboard', 'compare', 'costs-pastor'].includes(tabValue);
+    }
+    
+    // Para outros roles, verificar sistema de privacidade
+    // Se userAllowedTabs é null, ainda está carregando - não mostrar nada
     if (userAllowedTabs === null) {
-      // Pastor e Bispo têm abas específicas
-      if (user?.role === 'pastor' || user?.role === 'bispo') {
-        return ['calendar', 'dashboard', 'compare', 'costs-pastor'].includes(tabValue);
-      }
-      // Outros sem configuração não veem nada
+      return false;
+    }
+    
+    // Se é array vazio, nenhuma aba permitida
+    if (Array.isArray(userAllowedTabs) && userAllowedTabs.length === 0) {
       return false;
     }
     
