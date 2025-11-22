@@ -643,16 +643,6 @@ export default function App() {
     return () => clearInterval(intervalId);
   }, [isAuthenticated, token, activeTab, user?.role, costsFilterStatus, costsFilterChurch]);
   
-  // Carregar estado do calendário do localStorage ao montar
-  useEffect(() => {
-    if (isAuthenticated) {
-      const savedState = localStorage.getItem('calendarExpanded');
-      if (savedState !== null) {
-        setIsCalendarExpanded(savedState === 'true');
-      }
-    }
-  }, [isAuthenticated]);
-  
   // Carregar usuários e igrejas quando entrar na aba usuarios
   useEffect(() => {
     if (isAuthenticated && activeTab === 'usuarios' && token && user?.role === 'master') {
