@@ -4691,117 +4691,119 @@ export default function App() {
                     <CardTitle className="text-base">Filtros</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      {/* Filtro de Ano */}
-                      <div>
-                        <Label className="text-sm">Ano</Label>
-                        <Select 
-                          value={costsFilterYear.toString()}
-                          onValueChange={(value) => {
-                            setCostsFilterYear(parseInt(value));
-                            fetchCostsList(costsFilterStatus, costsFilterChurch, costsFilterMonth, parseInt(value));
-                          }}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {[2024, 2025, 2026].map(year => (
-                              <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      {/* Filtro de Mês */}
-                      <div>
-                        <Label className="text-sm">Mês</Label>
-                        <Select 
-                          value={costsFilterMonth.toString()}
-                          onValueChange={(value) => {
-                            setCostsFilterMonth(value);
-                            fetchCostsList(costsFilterStatus, costsFilterChurch, value, costsFilterYear);
-                          }}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="ALL">Todos os meses</SelectItem>
-                            <SelectItem value="1">Janeiro</SelectItem>
-                            <SelectItem value="2">Fevereiro</SelectItem>
-                            <SelectItem value="3">Março</SelectItem>
-                            <SelectItem value="4">Abril</SelectItem>
-                            <SelectItem value="5">Maio</SelectItem>
-                            <SelectItem value="6">Junho</SelectItem>
-                            <SelectItem value="7">Julho</SelectItem>
-                            <SelectItem value="8">Agosto</SelectItem>
-                            <SelectItem value="9">Setembro</SelectItem>
-                            <SelectItem value="10">Outubro</SelectItem>
-                            <SelectItem value="11">Novembro</SelectItem>
-                            <SelectItem value="12">Dezembro</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      {/* Filtro de Status */}
-                      <div>
-                        <Label className="text-sm">Status</Label>
-                        <div className="flex gap-2 flex-wrap mt-1">
-                          <Button
-                            size="sm"
-                            variant={costsFilterStatus === 'ALL' ? 'default' : 'outline'}
-                            onClick={() => {
-                              setCostsFilterStatus('ALL');
-                              fetchCostsList('ALL', costsFilterChurch, costsFilterMonth, costsFilterYear);
+                    <div className="flex flex-col gap-3">
+                      <div className="flex gap-3 items-end">
+                        {/* Filtro de Ano */}
+                        <div className="w-28">
+                          <Label className="text-sm">Ano</Label>
+                          <Select 
+                            value={costsFilterYear.toString()}
+                            onValueChange={(value) => {
+                              setCostsFilterYear(parseInt(value));
+                              fetchCostsList(costsFilterStatus, costsFilterChurch, costsFilterMonth, parseInt(value));
                             }}
                           >
-                            Todos
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant={costsFilterStatus === 'PENDING' ? 'default' : 'outline'}
-                            onClick={() => {
-                              setCostsFilterStatus('PENDING');
-                              fetchCostsList('PENDING', costsFilterChurch, costsFilterMonth, costsFilterYear);
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {[2024, 2025, 2026].map(year => (
+                                <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        {/* Filtro de Mês */}
+                        <div className="w-44">
+                          <Label className="text-sm">Mês</Label>
+                          <Select 
+                            value={costsFilterMonth.toString()}
+                            onValueChange={(value) => {
+                              setCostsFilterMonth(value);
+                              fetchCostsList(costsFilterStatus, costsFilterChurch, value, costsFilterYear);
                             }}
-                            className="bg-yellow-500 hover:bg-yellow-600"
                           >
-                            Pendente
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant={costsFilterStatus === 'APPROVED' ? 'default' : 'outline'}
-                            onClick={() => {
-                              setCostsFilterStatus('APPROVED');
-                              fetchCostsList('APPROVED', costsFilterChurch, costsFilterMonth, costsFilterYear);
-                            }}
-                            className="bg-green-500 hover:bg-green-600"
-                          >
-                            Aprovado
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant={costsFilterStatus === 'PAID' ? 'default' : 'outline'}
-                            onClick={() => {
-                              setCostsFilterStatus('PAID');
-                              fetchCostsList('PAID', costsFilterChurch, costsFilterMonth, costsFilterYear);
-                            }}
-                            className="bg-emerald-500 hover:bg-emerald-600"
-                          >
-                            Pago
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant={costsFilterStatus === 'REJECTED' ? 'default' : 'outline'}
-                            onClick={() => {
-                              setCostsFilterStatus('REJECTED');
-                              fetchCostsList('REJECTED', costsFilterChurch, costsFilterMonth, costsFilterYear);
-                            }}
-                            className="bg-red-500 hover:bg-red-600"
-                          >
-                            Reprovado
-                          </Button>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="ALL">Todos os meses</SelectItem>
+                              <SelectItem value="1">Janeiro</SelectItem>
+                              <SelectItem value="2">Fevereiro</SelectItem>
+                              <SelectItem value="3">Março</SelectItem>
+                              <SelectItem value="4">Abril</SelectItem>
+                              <SelectItem value="5">Maio</SelectItem>
+                              <SelectItem value="6">Junho</SelectItem>
+                              <SelectItem value="7">Julho</SelectItem>
+                              <SelectItem value="8">Agosto</SelectItem>
+                              <SelectItem value="9">Setembro</SelectItem>
+                              <SelectItem value="10">Outubro</SelectItem>
+                              <SelectItem value="11">Novembro</SelectItem>
+                              <SelectItem value="12">Dezembro</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        {/* Filtro de Status */}
+                        <div className="flex-1">
+                          <Label className="text-sm">Status</Label>
+                          <div className="flex gap-2 mt-1">
+                            <Button
+                              size="sm"
+                              variant={costsFilterStatus === 'ALL' ? 'default' : 'outline'}
+                              onClick={() => {
+                                setCostsFilterStatus('ALL');
+                                fetchCostsList('ALL', costsFilterChurch, costsFilterMonth, costsFilterYear);
+                              }}
+                            >
+                              Todos
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant={costsFilterStatus === 'PENDING' ? 'default' : 'outline'}
+                              onClick={() => {
+                                setCostsFilterStatus('PENDING');
+                                fetchCostsList('PENDING', costsFilterChurch, costsFilterMonth, costsFilterYear);
+                              }}
+                              className="bg-yellow-500 hover:bg-yellow-600"
+                            >
+                              Pendente
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant={costsFilterStatus === 'APPROVED' ? 'default' : 'outline'}
+                              onClick={() => {
+                                setCostsFilterStatus('APPROVED');
+                                fetchCostsList('APPROVED', costsFilterChurch, costsFilterMonth, costsFilterYear);
+                              }}
+                              className="bg-green-500 hover:bg-green-600"
+                            >
+                              Aprovado
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant={costsFilterStatus === 'PAID' ? 'default' : 'outline'}
+                              onClick={() => {
+                                setCostsFilterStatus('PAID');
+                                fetchCostsList('PAID', costsFilterChurch, costsFilterMonth, costsFilterYear);
+                              }}
+                              className="bg-emerald-500 hover:bg-emerald-600"
+                            >
+                              Pago
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant={costsFilterStatus === 'REJECTED' ? 'default' : 'outline'}
+                              onClick={() => {
+                                setCostsFilterStatus('REJECTED');
+                                fetchCostsList('REJECTED', costsFilterChurch, costsFilterMonth, costsFilterYear);
+                              }}
+                              className="bg-red-500 hover:bg-red-600"
+                            >
+                              Reprovado
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
