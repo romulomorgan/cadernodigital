@@ -2559,7 +2559,42 @@ export default function App() {
     });
   };
   
-  // Buscar permissões do usuário logado
+  // Buscar abas permitidas para o usuário logado
+  const fetchUserAllowedTabs = async (roleId) => {
+    try {
+      console.log('[USER_TABS] Fetching allowed tabs for roleId:', roleId);
+      const res = await fetch('/api/privacy/get', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ roleId })
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        console.log('[USER_TABS] ✅ Config loaded:', data.config);
+        
+        if (data.config && data.config.allowedTabs && data.config.allowedTabs.length > 0) {
+          setUserAllowedTabs(data.config.allowedTabs);
+          console.log('[USER_TABS] Setting allowed tabs to:', data.config.allowedTabs);
+        } else {
+          // Se não tem configuração, negar tudo exceto para roles especiais
+          console.log('[USER_TABS] ⚠️ No config found, applying empty permissions');
+          setUserAllowedTabs([]);
+        }
+      } else {
+        console.error('[USER_TABS] ❌ Error - Status:', res.status);
+        setUserAllowedTabs([]);
+      }
+    } catch (error) {
+      console.error('[USER_TABS] ❌ Error:', error);
+      setUserAllowedTabs([]);
+    }
+  };
+  
+  // Buscar permissões do usuário logado (DEPRECATED - manter para compatibilidade)
   const fetchUserPermissions = async (roleId) => {
     try {
       const res = await fetch('/api/privacy/get', {
