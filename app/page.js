@@ -1982,11 +1982,60 @@ export default function App() {
   };
   
   const handlePayCost = async () => {
-    if (!costFormData.paymentDate || !costFormData.valuePaid) {
-      toast.error('❌ Data de pagamento e valor pago são obrigatórios');
+    // Verificar se os campos estão vazios
+    const paymentDateEmpty = !costFormData.paymentDate;
+    const valuePaidEmpty = !costFormData.valuePaid || costFormData.valuePaid === '' || costFormData.valuePaid === '0' || costFormData.valuePaid === '0,00';
+    
+    // Se algum campo estiver vazio, perguntar se quer usar valores padrão
+    if (paymentDateEmpty || valuePaidEmpty) {
+      const useDefaults = window.confirm(
+        '⚠️ Data de pagamento e/ou valor pago não foram preenchidos.\n\n' +
+        'Deseja usar automaticamente:\n' +
+        '• Data de pagamento = Data de vencimento\n' +
+        '• Valor pago = Valor do custo\n\n' +
+        'Clique em "OK" para usar valores padrão ou "Cancelar" para editar manualmente.'
+      );
+      
+      if (!useDefaults) {
+        // Usuário quer editar manualmente
+        return;
+      }
+      
+      // Preencher automaticamente os valores padrão
+      const paymentDate = paymentDateEmpty ? costFormData.dueDate : costFormData.paymentDate;
+      const valuePaid = valuePaidEmpty ? costFormData.value : costFormData.valuePaid;
+      
+      try {
+        const res = await fetch('/api/costs-entries/pay', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            costId: costFormData.costId,
+            paymentDate: paymentDate,
+            valuePaid: parseCurrency(valuePaid),
+            proofFile: costFormData.proofFile
+          })
+        });
+        
+        const data = await res.json();
+        if (res.ok) {
+          toast.success('✅ ' + data.message);
+          setShowCostEditModal(false);
+          setSelectedCost(null);
+          fetchCostsList(costsFilterStatus, costsFilterChurch, costsFilterMonth, costsFilterYear);
+        } else {
+          toast.error('❌ ' + data.error);
+        }
+      } catch (error) {
+        toast.error('❌ Erro ao registrar pagamento');
+      }
       return;
     }
     
+    // Se ambos os campos estão preenchidos, prosseguir normalmente
     try {
       const res = await fetch('/api/costs-entries/pay', {
         method: 'POST',
