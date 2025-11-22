@@ -2165,7 +2165,7 @@ export default function App() {
   const handleUpdateCostEntryMaster = async () => {
     if (!selectedCost) return;
     
-    // Se o status for PAID, validar data de pagamento e valor pago
+    // Se o status for PAID, validar data de pagamento, valor pago e comprovante
     if (costFormData.status === 'PAID') {
       // Verificar se os campos estão vazios
       const paymentDateEmpty = !costFormData.paymentDate;
@@ -2178,7 +2178,7 @@ export default function App() {
           'Deseja usar automaticamente:\n' +
           '• Data de pagamento = Data de vencimento\n' +
           '• Valor pago = Valor do custo\n\n' +
-          'Clique em "OK" para usar valores padrão ou "Cancelar" para editar manualmente.'
+          'Clique em "OK" para preencher automaticamente ou "Cancelar" para editar manualmente.'
         );
         
         if (!useDefaults) {
@@ -2186,13 +2186,22 @@ export default function App() {
           return;
         }
         
-        // Preencher automaticamente
-        if (paymentDateEmpty) {
-          costFormData.paymentDate = costFormData.dueDate;
-        }
-        if (valuePaidEmpty) {
-          costFormData.valuePaid = costFormData.value;
-        }
+        // Preencher automaticamente MAS NÃO SALVAR
+        setCostFormData({
+          ...costFormData,
+          paymentDate: paymentDateEmpty ? costFormData.dueDate : costFormData.paymentDate,
+          valuePaid: valuePaidEmpty ? costFormData.value : costFormData.valuePaid
+        });
+        
+        // Avisar que precisa adicionar comprovante
+        toast.info('ℹ️ Valores preenchidos! Agora adicione o comprovante de pagamento antes de salvar.');
+        return;
+      }
+      
+      // Validar se o comprovante foi anexado
+      if (!costFormData.proofFile || costFormData.proofFile === '') {
+        toast.error('❌ O comprovante de pagamento é obrigatório! Por favor, faça o upload do comprovante.');
+        return;
       }
     }
     
