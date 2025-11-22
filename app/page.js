@@ -2515,6 +2515,28 @@ export default function App() {
     });
   };
   
+  // Buscar permissões do usuário logado
+  const fetchUserPermissions = async (roleId) => {
+    try {
+      const res = await fetch('/api/privacy/get', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ roleId })
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        console.log('[USER PERMISSIONS] Loaded:', data.config);
+        setUserAllowedTabs(data.config.allowedTabs || []);
+      }
+    } catch (error) {
+      console.error('[USER PERMISSIONS] Error:', error);
+    }
+  };
+  
   // ========== FUNÇÕES CRUD - CUSTOS TIPOS ==========
   
   const fetchAllCustos = async () => {
