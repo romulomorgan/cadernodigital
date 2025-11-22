@@ -3807,7 +3807,7 @@ export default function App() {
               })()}
               
               {(() => {
-                const today = getBrazilTime().getDate();
+                const today = currentDate.getDate();
                 const allDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
                 
                 // Se colapsado, mostrar apenas dias >= hoje
