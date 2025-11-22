@@ -884,11 +884,19 @@ export default function App() {
   const confirmLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('calendarExpanded'); // Limpar estado do calendário no logout
     setToken(null);
     setUser(null);
     setIsAuthenticated(false);
     setShowLogoutConfirm(false);
     toast.success('👋 Até logo! Sessão encerrada com sucesso.');
+  };
+  
+  // Função para toggle do calendário
+  const toggleCalendar = () => {
+    const newState = !isCalendarExpanded;
+    setIsCalendarExpanded(newState);
+    localStorage.setItem('calendarExpanded', newState.toString());
   };
   
   const fetchDashboard = async () => {
