@@ -79,10 +79,15 @@ class BackendTester:
                 "role": "master",
                 "state": "SP",
                 "region": "Região Teste",
-                "isActive": True
+                "church": "",
+                "cidade": "São Paulo",
+                "pais": "Brasil"
             }
             
+            print(f"Attempting to register master user: {master_data['email']}")
             response = requests.post(f"{BASE_URL}/auth/register", json=master_data)
+            print(f"Register response: {response.status_code} - {response.text}")
+            
             if response.status_code == 200:
                 # Now try to login with the new master
                 login_response = requests.post(f"{BASE_URL}/auth/login", json={
@@ -97,6 +102,22 @@ class BackendTester:
                     return True
                 else:
                     self.log_test("Login Test Master", "FAIL", f"Status: {login_response.status_code}, Response: {login_response.text}")
+                    return False
+            elif response.status_code == 400 and "já existe" in response.text:
+                # User already exists, try to login
+                self.log_test("Master User Already Exists", "INFO", "Trying to login with existing user")
+                login_response = requests.post(f"{BASE_URL}/auth/login", json={
+                    "email": "master.teste@iudp.org.br",
+                    "password": "MasterTeste2025!"
+                })
+                
+                if login_response.status_code == 200:
+                    data = login_response.json()
+                    self.master_token = data.get('token')
+                    self.log_test("Login Existing Test Master", "PASS", f"Logged in with existing test master")
+                    return True
+                else:
+                    self.log_test("Login Existing Test Master", "FAIL", f"Status: {login_response.status_code}, Response: {login_response.text}")
                     return False
             else:
                 self.log_test("Create Test Master", "FAIL", f"Status: {response.status_code}, Response: {response.text}")
