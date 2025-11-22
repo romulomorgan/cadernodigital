@@ -898,6 +898,15 @@ export default function App() {
     return value.replace(/\./g, '').replace(',', '.');
   };
   
+  // Função para formatar número do banco para exibição
+  const formatCurrencyFromNumber = (value) => {
+    if (!value || value === 0) return '';
+    const numStr = value.toString().replace('.', ',');
+    const parts = numStr.split(',');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return parts.join(',');
+  };
+  
   const fetchDashboard = async () => {
     try {
       const res = await fetch('/api/dashboard/data', {
