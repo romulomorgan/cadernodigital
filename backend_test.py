@@ -277,11 +277,11 @@ class BackendTester:
             
             # Create a cost entry
             cost_entry_data = {
-                "custoId": custos[0]['custoId'],  # Use first available cost type
+                "costTypeId": custos[0]['custoId'],  # Use first available cost type
+                "costTypeName": custos[0]['name'],   # Include cost type name
                 "description": "Teste de custo com status",
                 "value": 100.50,
-                "dueDate": "2025-01-15",  # Changed from 'date' to 'dueDate'
-                "status": "PENDING"  # This should be set by default
+                "dueDate": "2025-01-15"
             }
             
             response = requests.post(f"{BASE_URL}/costs-entries/create", json=cost_entry_data, headers=headers)
