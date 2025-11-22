@@ -6300,6 +6300,14 @@ export default function App() {
                       <p className="font-mono text-sm">{selectedCusto.custoId}</p>
                     </div>
                     
+                    {selectedCusto.documentOptional && (
+                      <div className="bg-blue-50 border border-blue-200 rounded p-2">
+                        <p className="text-sm text-blue-700">
+                          ℹ️ Documento (Conta/Boleto/Orçamento) é <strong>opcional</strong> neste tipo de custo
+                        </p>
+                      </div>
+                    )}
+                    
                     <div>
                       <Label className="text-gray-500 text-sm">Data de Criação</Label>
                       <p className="font-medium">
