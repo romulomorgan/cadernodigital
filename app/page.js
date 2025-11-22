@@ -9068,7 +9068,7 @@ export default function App() {
       
       {/* Modal Editar/Pagar Custo */}
       <Dialog open={showCostEditModal} onOpenChange={setShowCostEditModal}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {costFormData.status === 'APPROVED' ? '💰 Registrar Pagamento' : '✏️ Editar Custo'}
