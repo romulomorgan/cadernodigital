@@ -2477,7 +2477,10 @@ export default function App() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ name: newCustoName.trim() })
+        body: JSON.stringify({ 
+          name: newCustoName.trim(),
+          documentOptional: custoDocumentOptional
+        })
       });
       
       const data = await res.json();
@@ -2485,6 +2488,7 @@ export default function App() {
         toast.success('✅ ' + data.message);
         setShowCustoCreateModal(false);
         setNewCustoName('');
+        setCustoDocumentOptional(false);
         await fetchAllCustos();
       } else {
         toast.error('❌ ' + data.error);
