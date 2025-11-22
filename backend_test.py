@@ -277,7 +277,7 @@ class BackendTester:
                 "custoId": custos[0]['custoId'],  # Use first available cost type
                 "description": "Teste de custo com status",
                 "value": 100.50,
-                "date": "2025-01-15",
+                "dueDate": "2025-01-15",  # Changed from 'date' to 'dueDate'
                 "status": "PENDING"  # This should be set by default
             }
             
