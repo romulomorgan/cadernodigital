@@ -6357,6 +6357,22 @@ export default function App() {
                   />
                 </div>
                 
+                <div className="flex items-center space-x-2 border rounded-lg p-3 bg-blue-50">
+                  <input
+                    type="checkbox"
+                    id="edit-document-optional"
+                    checked={custoDocumentOptional}
+                    onChange={(e) => setCustoDocumentOptional(e.target.checked)}
+                    className="w-4 h-4 rounded border-gray-300"
+                  />
+                  <Label htmlFor="edit-document-optional" className="cursor-pointer text-sm font-normal">
+                    ☑️ Conta/Boleto/Orçamento <span className="font-semibold">(Opcional)</span>
+                    <p className="text-xs text-gray-600 mt-1">
+                      Ao marcar, o documento não será obrigatório ao lançar este tipo de custo
+                    </p>
+                  </Label>
+                </div>
+                
                 <div className="flex gap-3 justify-end pt-2">
                   <Button 
                     variant="outline" 
