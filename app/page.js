@@ -1933,8 +1933,26 @@ export default function App() {
   };
   
   const handleCreateCost = async () => {
+    // Validar campos obrigatórios básicos
     if (!costFormData.costTypeId || !costFormData.dueDate || !costFormData.value) {
       toast.error('❌ Preencha os campos obrigatórios: tipo, vencimento e valor');
+      return;
+    }
+    
+    // Validar se é custo especial e tem descrição
+    if (costFormData.costTypeName && costFormData.costTypeName.toUpperCase() === 'ESPECIAL') {
+      if (!costFormData.description || costFormData.description.trim() === '') {
+        toast.error('❌ Para custos especiais, a descrição é obrigatória!');
+        return;
+      }
+    }
+    
+    // Validar se o documento (conta/boleto ou orçamento) foi anexado
+    if (!costFormData.billFile || costFormData.billFile === '') {
+      const docName = costFormData.costTypeName && costFormData.costTypeName.toUpperCase() === 'ESPECIAL' 
+        ? 'orçamento' 
+        : 'conta/boleto';
+      toast.error(`❌ O documento (${docName}) é obrigatório! Por favor, faça o upload antes de salvar.`);
       return;
     }
     
