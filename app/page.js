@@ -2026,10 +2026,10 @@ export default function App() {
             costTypeId: costFormData.costTypeId,
             costTypeName: costFormData.costTypeName,
             dueDate: costFormData.dueDate,
-            value: costFormData.value,
+            value: parseCurrency(costFormData.value),
             billFile: costFormData.billFile,
             paymentDate: costFormData.paymentDate,
-            valuePaid: costFormData.valuePaid,
+            valuePaid: parseCurrency(costFormData.valuePaid),
             proofFile: costFormData.proofFile
           }
         })
