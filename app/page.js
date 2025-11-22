@@ -21,7 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Clock, Lock, Unlock, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, Bell, Upload, Download, Users, FileText, TrendingUp, TrendingDown, BarChart3, Eye, EyeOff, LockIcon, LockOpen, Save, X, ArrowLeft, ArrowRight, Printer, Edit, Trash2, MessageCircle, FileUser, MapPin, Power, DollarSign, XCircle, Plus, User, Church, Calendar } from 'lucide-react';
+import { Clock, Lock, Unlock, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, AlertCircle, CheckCircle, Bell, Upload, Download, Users, FileText, TrendingUp, TrendingDown, BarChart3, Eye, EyeOff, LockIcon, LockOpen, Save, X, ArrowLeft, ArrowRight, Printer, Edit, Trash2, MessageCircle, FileUser, MapPin, Power, DollarSign, XCircle, Plus, User, Church, Calendar } from 'lucide-react';
 import { format, addMonths, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
