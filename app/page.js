@@ -115,7 +115,8 @@ export default function App() {
     valuePaid: '',
     proofFile: '',
     status: '',
-    paidAt: null
+    paidAt: null,
+    description: '' // Para custos especiais
   });
   const [costsFilterStatus, setCostsFilterStatus] = useState('ALL');
   const [costsFilterChurch, setCostsFilterChurch] = useState('ALL');
