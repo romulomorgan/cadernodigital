@@ -6665,23 +6665,63 @@ export default function App() {
                     </div>
                     
                     {/* Filtros */}
-                    <div className="flex gap-3 items-center">
-                      {/* Filtro por Igreja */}
-                      <select
-                        className="border rounded p-2 text-sm"
-                        value={costsFilterChurch}
-                        onChange={(e) => {
-                          setCostsFilterChurch(e.target.value);
-                          fetchCostsList(costsFilterStatus, e.target.value);
-                        }}
-                      >
-                        <option value="ALL">🏛️ Todas as Igrejas</option>
-                        {churches.map(church => (
-                          <option key={church.churchId} value={church.churchId}>
-                            {church.name}
-                          </option>
-                        ))}
-                      </select>
+                    <div className="space-y-3">
+                      <div className="flex gap-3 items-center">
+                        {/* Filtro de Ano */}
+                        <select
+                          className="border rounded p-2 text-sm"
+                          value={costsFilterYear}
+                          onChange={(e) => {
+                            setCostsFilterYear(parseInt(e.target.value));
+                            fetchCostsList(costsFilterStatus, costsFilterChurch, costsFilterMonth, parseInt(e.target.value));
+                          }}
+                        >
+                          {[2024, 2025, 2026].map(year => (
+                            <option key={year} value={year}>{year}</option>
+                          ))}
+                        </select>
+                        
+                        {/* Filtro de Mês */}
+                        <select
+                          className="border rounded p-2 text-sm"
+                          value={costsFilterMonth}
+                          onChange={(e) => {
+                            setCostsFilterMonth(e.target.value);
+                            fetchCostsList(costsFilterStatus, costsFilterChurch, e.target.value, costsFilterYear);
+                          }}
+                        >
+                          <option value="ALL">Todos os meses</option>
+                          <option value="1">Janeiro</option>
+                          <option value="2">Fevereiro</option>
+                          <option value="3">Março</option>
+                          <option value="4">Abril</option>
+                          <option value="5">Maio</option>
+                          <option value="6">Junho</option>
+                          <option value="7">Julho</option>
+                          <option value="8">Agosto</option>
+                          <option value="9">Setembro</option>
+                          <option value="10">Outubro</option>
+                          <option value="11">Novembro</option>
+                          <option value="12">Dezembro</option>
+                        </select>
+                        
+                        {/* Filtro por Igreja */}
+                        <select
+                          className="border rounded p-2 text-sm"
+                          value={costsFilterChurch}
+                          onChange={(e) => {
+                            setCostsFilterChurch(e.target.value);
+                            fetchCostsList(costsFilterStatus, e.target.value, costsFilterMonth, costsFilterYear);
+                          }}
+                        >
+                          <option value="ALL">🏛️ Todas as Igrejas</option>
+                          {churches.map(church => (
+                            <option key={church.churchId} value={church.churchId}>
+                              {church.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                       
                       {/* Filtros de Status */}
                       <div className="flex gap-2">
@@ -6690,7 +6730,7 @@ export default function App() {
                           variant={costsFilterStatus === 'ALL' ? 'default' : 'outline'}
                           onClick={() => {
                             setCostsFilterStatus('ALL');
-                            fetchCostsList('ALL', costsFilterChurch);
+                            fetchCostsList('ALL', costsFilterChurch, costsFilterMonth, costsFilterYear);
                           }}
                         >
                           Todos
@@ -6700,7 +6740,7 @@ export default function App() {
                           variant={costsFilterStatus === 'PENDING' ? 'default' : 'outline'}
                           onClick={() => {
                             setCostsFilterStatus('PENDING');
-                            fetchCostsList('PENDING', costsFilterChurch);
+                            fetchCostsList('PENDING', costsFilterChurch, costsFilterMonth, costsFilterYear);
                           }}
                           className="bg-yellow-600 hover:bg-yellow-700"
                         >
@@ -6711,7 +6751,7 @@ export default function App() {
                           variant={costsFilterStatus === 'APPROVED' ? 'default' : 'outline'}
                           onClick={() => {
                             setCostsFilterStatus('APPROVED');
-                            fetchCostsList('APPROVED', costsFilterChurch);
+                            fetchCostsList('APPROVED', costsFilterChurch, costsFilterMonth, costsFilterYear);
                           }}
                           className="bg-green-600 hover:bg-green-700"
                         >
@@ -6722,7 +6762,7 @@ export default function App() {
                           variant={costsFilterStatus === 'PAID' ? 'default' : 'outline'}
                           onClick={() => {
                             setCostsFilterStatus('PAID');
-                            fetchCostsList('PAID', costsFilterChurch);
+                            fetchCostsList('PAID', costsFilterChurch, costsFilterMonth, costsFilterYear);
                           }}
                           className="bg-emerald-600 hover:bg-emerald-700"
                         >
@@ -6733,7 +6773,7 @@ export default function App() {
                           variant={costsFilterStatus === 'REJECTED' ? 'default' : 'outline'}
                           onClick={() => {
                             setCostsFilterStatus('REJECTED');
-                            fetchCostsList('REJECTED', costsFilterChurch);
+                            fetchCostsList('REJECTED', costsFilterChurch, costsFilterMonth, costsFilterYear);
                           }}
                           className="bg-red-600 hover:bg-red-700"
                         >
