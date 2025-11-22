@@ -409,20 +409,30 @@ export default function App() {
       fetchAllChurches();
       fetchAllCustos();
       
-      // Buscar permissões do sistema de privacidade
-      if (user.roleId) {
-        console.log('[AUTH] Buscando permissões para roleId:', user.roleId);
+      console.log('[AUTH] Usuário autenticado:', {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        roleId: user.roleId
+      });
+      
+      // Definir permissões baseado no role
+      if (user.role === 'master') {
+        // Master tem acesso total (não usa sistema de privacidade)
+        console.log('[AUTH/PERMISSIONS] Master - acesso total');
+        setUserAllowedTabs(null);
+      } else if (user.role === 'pastor' || user.role === 'bispo') {
+        // Pastor e Bispo têm permissões fixas (não usam sistema de privacidade)
+        console.log('[AUTH/PERMISSIONS] Pastor/Bispo - permissões fixas');
+        setUserAllowedTabs(['calendar', 'dashboard', 'compare', 'costs-pastor']);
+      } else if (user.roleId) {
+        // Outros roles usam sistema de privacidade
+        console.log('[AUTH/PERMISSIONS] Role com sistema de privacidade - buscando config para roleId:', user.roleId);
         fetchUserAllowedTabs(user.roleId);
       } else {
-        console.log('[AUTH] Usuário sem roleId, aplicando permissões padrão baseado no role:', user.role);
-        // Se não tem roleId, aplicar permissões padrão baseado no role
-        if (user.role === 'master') {
-          setUserAllowedTabs(null); // Master tem acesso total
-        } else if (user.role === 'pastor' || user.role === 'bispo') {
-          setUserAllowedTabs(['calendar', 'dashboard', 'compare', 'costs-pastor']);
-        } else {
-          setUserAllowedTabs([]); // Outros precisam de configuração
-        }
+        // Usuário sem roleId e não é master/pastor/bispo = sem acesso
+        console.log('[AUTH/PERMISSIONS] ⚠️ Usuário sem roleId e não é role especial - sem permissões');
+        setUserAllowedTabs([]);
       }
     }
   }, [isAuthenticated, token, user]);
