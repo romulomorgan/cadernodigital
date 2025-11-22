@@ -2508,6 +2508,12 @@ export default function App() {
       return;
     }
     
+    console.log('[DEBUG] Updating custo:', {
+      custoId: selectedCusto.custoId,
+      name: newCustoName.trim(),
+      documentOptional: custoDocumentOptional
+    });
+    
     try {
       const res = await fetch('/api/custos/update', {
         method: 'POST',
