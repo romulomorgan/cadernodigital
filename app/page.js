@@ -138,6 +138,9 @@ export default function App() {
   const [showBillFile, setShowBillFile] = useState(null);
   const [showProofFile, setShowProofFile] = useState(null);
   
+  // Calendar collapse state
+  const [isCalendarExpanded, setIsCalendarExpanded] = useState(false);
+  
   // Confirmation dialogs
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   
