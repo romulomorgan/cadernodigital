@@ -409,9 +409,20 @@ export default function App() {
       fetchAllChurches();
       fetchAllCustos();
       
-      // Buscar permissões se não for Master, Pastor ou Bispo
-      if (user.role !== 'master' && user.role !== 'pastor' && user.role !== 'bispo') {
-        fetchUserPermissions(user.roleId);
+      // Buscar permissões do sistema de privacidade
+      if (user.roleId) {
+        console.log('[AUTH] Buscando permissões para roleId:', user.roleId);
+        fetchUserAllowedTabs(user.roleId);
+      } else {
+        console.log('[AUTH] Usuário sem roleId, aplicando permissões padrão baseado no role:', user.role);
+        // Se não tem roleId, aplicar permissões padrão baseado no role
+        if (user.role === 'master') {
+          setUserAllowedTabs(null); // Master tem acesso total
+        } else if (user.role === 'pastor' || user.role === 'bispo') {
+          setUserAllowedTabs(['calendar', 'dashboard', 'compare', 'costs-pastor']);
+        } else {
+          setUserAllowedTabs([]); // Outros precisam de configuração
+        }
       }
     }
   }, [isAuthenticated, token, user]);
