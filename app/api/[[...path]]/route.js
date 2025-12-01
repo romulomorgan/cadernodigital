@@ -1664,6 +1664,28 @@ export async function POST(request) {
       return NextResponse.json({ success: true });
     }
     
+    // GET - Buscar observação do mês
+    if (endpoint === 'observations/month/get') {
+      const user = verifyToken(request);
+      if (!user) {
+        return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      }
+      
+      try {
+        const { month, year } = await request.json();
+        const obsId = `${year}-${String(month).padStart(2, '0')}`;
+        
+        const observation = await db.collection('month_observations').findOne({ obsId });
+        
+        return NextResponse.json({ 
+          observation: observation || null
+        });
+      } catch (error) {
+        console.error('Erro ao buscar observação:', error);
+        return NextResponse.json({ error: 'Erro ao buscar' }, { status: 500 });
+      }
+    }
+    
     // SAVE MONTH OBSERVATION (APENAS MASTER)
     if (endpoint === 'observations/month') {
       const user = verifyToken(request);
