@@ -1122,6 +1122,7 @@ export default function App() {
       // Limpar localmente
       setMonthObservation('');
       setMonthObservationActive(false);
+      setIsEditingObservation(false);
       
       // Limpar no servidor
       const res = await fetch('/api/observations/month', {
