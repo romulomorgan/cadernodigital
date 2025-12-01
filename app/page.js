@@ -546,8 +546,19 @@ export default function App() {
         const localBackup = localStorage.getItem(backupKey);
         
         if (data.monthObservation) {
-          setMonthObservation(data.monthObservation.observation || data.monthObservation);
-          setMonthObservationActive(data.monthObservation.active || false);
+          // CORREÇÃO: Usar tipo de verificação adequado
+          const obs = data.monthObservation.observation !== undefined 
+            ? data.monthObservation.observation 
+            : (typeof data.monthObservation === 'string' ? data.monthObservation : '');
+          
+          setMonthObservation(obs);
+          setMonthObservationActive(data.monthObservation.active === true);
+          
+          console.log('[MONTH_OBS] Carregado:', {
+            observation: obs.substring(0, 50) + '...',
+            active: data.monthObservation.active,
+            tipo: typeof data.monthObservation
+          });
         } else if (localBackup) {
           setMonthObservation(localBackup);
           setMonthObservationActive(false);
