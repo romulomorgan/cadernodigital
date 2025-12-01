@@ -1682,16 +1682,31 @@ export async function POST(request) {
       
       const obsId = `${year}-${String(month).padStart(2, '0')}`;
       
-      console.log('[OBSERVATION] Salvando:', { obsId, active, length: observation?.length });
+      // GARANTIR QUE observation É STRING
+      let observationText = '';
+      if (typeof observation === 'string') {
+        observationText = observation;
+      } else if (observation && typeof observation === 'object') {
+        // Se for objeto, tentar extrair campo observation
+        observationText = observation.observation || '';
+        console.warn('[OBSERVATION] ⚠️ Recebido objeto, extraindo campo observation');
+      }
+      
+      console.log('[OBSERVATION] Salvando:', { 
+        obsId, 
+        active, 
+        length: observationText.length,
+        tipo: typeof observationText 
+      });
       
       await db.collection('month_observations').updateOne(
         { obsId },
         { 
           $set: { 
             obsId,
-            month,
-            year,
-            observation: observation || '',
+            month: parseInt(month),
+            year: parseInt(year),
+            observation: observationText,
             active: active === true, // Force boolean
             updatedBy: user.userId,
             updatedAt: getBrazilTime().toISOString()
