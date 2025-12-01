@@ -1080,10 +1080,8 @@ export default function App() {
         const data = await res.json();
         toast.success(data.message || '✅ Observação salva com sucesso!');
         localStorage.removeItem(backupKey);
-        // Resetar flag de edição
-        setIsEditingObservation(false);
-        // Recarregar entries para atualizar observação
-        setTimeout(() => fetchEntries(), 500);
+        // Recarregar entries para atualizar observação para pastores/bispos
+        fetchEntries();
       } else {
         const error = await res.json();
         toast.error(`❌ ${error.error || 'Erro ao salvar'}`);
