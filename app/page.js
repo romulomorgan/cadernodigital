@@ -1054,12 +1054,7 @@ export default function App() {
   };
   
   const handleSaveMonthObservation = async () => {
-    if (monthObservation.length > MAX_OBSERVATION_LENGTH) {
-      toast.error(`❌ Texto muito longo (${monthObservation.length}/${MAX_OBSERVATION_LENGTH})`);
-      return;
-    }
-    
-    console.log('[SAVE OBS] Salvando:', { 
+    console.log('[SAVE OBS] Salvando observação:', { 
       length: monthObservation.length, 
       active: monthObservationActive 
     });
