@@ -2690,6 +2690,49 @@ export default function App() {
     return hasPermission;
   };
   
+  // Carregar observação do mês (chamado APENAS ao trocar de mês)
+  const loadMonthObservation = async (month, year) => {
+    const backupKey = `obs_${year}_${month}`;
+    const localBackup = localStorage.getItem(backupKey);
+    
+    try {
+      const res = await fetch('/api/observations/month/get', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ month, year })
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        if (data.observation) {
+          const obs = typeof data.observation.observation === 'string' 
+            ? data.observation.observation 
+            : '';
+          setMonthObservation(obs);
+          setMonthObservationActive(data.observation.active === true);
+          console.log('[LOAD_OBS] Carregada observação do banco');
+        } else if (localBackup) {
+          setMonthObservation(localBackup);
+          setMonthObservationActive(false);
+          console.log('[LOAD_OBS] Carregada observação do backup local');
+        } else {
+          setMonthObservation('');
+          setMonthObservationActive(false);
+          console.log('[LOAD_OBS] Nenhuma observação encontrada');
+        }
+      }
+    } catch (error) {
+      console.error('[LOAD_OBS] Erro:', error);
+      if (localBackup) {
+        setMonthObservation(localBackup);
+        setMonthObservationActive(false);
+      }
+    }
+  };
+
   // Buscar abas permitidas para o usuário logado
   const fetchUserAllowedTabs = async (roleId) => {
     try {
