@@ -244,7 +244,6 @@ export default function App() {
   const [privacyConfigs, setPrivacyConfigs] = useState([]); // Lista de todas as configurações
   const [showPrivacyEditModal, setShowPrivacyEditModal] = useState(false); // Modal de edição
   const [editingPrivacyRole, setEditingPrivacyRole] = useState(null); // Função sendo editada
-  const [isEditingObservation, setIsEditingObservation] = useState(false); // Flag para prevenir override
   const [showCustoCreateModal, setShowCustoCreateModal] = useState(false);
   const [showCustoViewModal, setShowCustoViewModal] = useState(false);
   const [showCustoEditModal, setShowCustoEditModal] = useState(false);
