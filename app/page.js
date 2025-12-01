@@ -4213,7 +4213,7 @@ export default function App() {
                           </div>
                         </div>
                         <div className="text-xs text-gray-500 text-right">
-                          {monthObservation.length} / {MAX_OBSERVATION_LENGTH} caracteres
+                          {monthObservation.length} caracteres
                         </div>
                       </>
                     ) : (
