@@ -546,29 +546,34 @@ export default function App() {
         const backupKey = `obs_${currentDate.getFullYear()}_${currentDate.getMonth() + 1}`;
         const localBackup = localStorage.getItem(backupKey);
         
-        if (data.monthObservation) {
-          // CORREÇÃO: Usar tipo de verificação adequado
-          const obs = data.monthObservation.observation !== undefined 
-            ? data.monthObservation.observation 
-            : (typeof data.monthObservation === 'string' ? data.monthObservation : '');
-          
-          setMonthObservation(obs);
-          setMonthObservationActive(data.monthObservation.active === true);
-          
-          console.log('[MONTH_OBS] Carregado:', {
-            observation: obs.substring(0, 50) + '...',
-            active: data.monthObservation.active,
-            tipo: typeof data.monthObservation
-          });
-        } else if (localBackup) {
-          setMonthObservation(localBackup);
-          setMonthObservationActive(false);
-          toast.info('📝 Rascunho local restaurado', {
-            description: 'Clique em Salvar para sincronizar'
-          });
+        // IMPORTANTE: Só atualizar observação se usuário NÃO estiver editando
+        if (!isEditingObservation) {
+          if (data.monthObservation) {
+            // CORREÇÃO: Usar tipo de verificação adequado
+            const obs = data.monthObservation.observation !== undefined 
+              ? data.monthObservation.observation 
+              : (typeof data.monthObservation === 'string' ? data.monthObservation : '');
+            
+            setMonthObservation(obs);
+            setMonthObservationActive(data.monthObservation.active === true);
+            
+            console.log('[MONTH_OBS] Carregado:', {
+              observation: obs.substring(0, 50) + '...',
+              active: data.monthObservation.active,
+              tipo: typeof data.monthObservation
+            });
+          } else if (localBackup) {
+            setMonthObservation(localBackup);
+            setMonthObservationActive(false);
+            toast.info('📝 Rascunho local restaurado', {
+              description: 'Clique em Salvar para sincronizar'
+            });
+          } else {
+            setMonthObservation('');
+            setMonthObservationActive(false);
+          }
         } else {
-          setMonthObservation('');
-          setMonthObservationActive(false);
+          console.log('[MONTH_OBS] ⏭️ Usuário editando, não sobrescrever');
         }
       }
     } catch (error) {
