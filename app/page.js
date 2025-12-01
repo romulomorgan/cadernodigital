@@ -1099,8 +1099,10 @@ export default function App() {
         const data = await res.json();
         toast.success(data.message || '✅ Observação salva com sucesso!');
         localStorage.removeItem(backupKey);
+        // Resetar flag de edição
+        setIsEditingObservation(false);
         // Recarregar entries para atualizar observação
-        fetchEntries();
+        setTimeout(() => fetchEntries(), 500);
       } else {
         const error = await res.json();
         toast.error(`❌ ${error.error || 'Erro ao salvar'}`);
