@@ -4195,9 +4195,8 @@ export default function App() {
                             value={monthObservation}
                             onChange={(e) => setMonthObservation(e.target.value)}
                             placeholder="Digite a mensagem que aparecerá como letreiro digital para todos os usuários..."
-                            rows={3}
-                            className="flex-1"
-                            maxLength={MAX_OBSERVATION_LENGTH}
+                            rows={6}
+                            className="flex-1 resize-y min-h-[100px]"
                           />
                           <div className="flex flex-col gap-2">
                             <Button 
