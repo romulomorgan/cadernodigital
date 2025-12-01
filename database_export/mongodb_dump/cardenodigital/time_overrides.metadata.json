@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"0ddd32b1c44942478cbd45efe1dc477a","collectionName":"time_overrides","type":"collection"}

@@ -1,0 +1,28 @@
+CADERNO DIGITAL IUDP - DATABASE EXPORT
+==========================================
+Data: 2025-12-01 10:19:50
+Banco: cardenodigital
+Servidor: MongoDB (localhost:27017)
+
+ESTATÍSTICAS:
+  time_overrides: 12 documentos
+  users: 12 documentos
+  costs_entries: 5 documentos
+  custos: 22 documentos
+  churches: 3 documentos
+  privacy_config: 2 documentos
+  audit_logs: 676 documentos
+  roles: 7 documentos
+  month_status: 5 documentos
+  day_observations: 2 documentos
+  month_observations: 3 documentos
+  unlock_requests: 20 documentos
+  entries: 11 documentos
+
+ARQUIVOS INCLUÍDOS:
+  - mongodb_dump/ (formato BSON nativo)
+  - json/ (formato JSON legível)
+  - structure.sql (schema SQL)
+  - RESTORE_MONGODB.sh (script de restauração)
+  - README.md (documentação)
+  - MANIFEST.txt (este arquivo)
