@@ -780,6 +780,15 @@ export default function App() {
       return () => clearInterval(interval);
     }
   }, [isAuthenticated, token, user?.role]);
+  
+  // Carregar observação do mês quando trocar de mês
+  useEffect(() => {
+    if (isAuthenticated && token && user?.role === 'master') {
+      const month = currentDate.getMonth() + 1;
+      const year = currentDate.getFullYear();
+      loadMonthObservation(month, year);
+    }
+  }, [currentDate, isAuthenticated, token]);
 
   // Buscar igrejas e roles públicas para o formulário de registro (sem autenticação)
   useEffect(() => {
