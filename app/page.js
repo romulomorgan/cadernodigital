@@ -4205,7 +4205,14 @@ export default function App() {
                           <Textarea
                             id="month-obs"
                             value={monthObservation}
-                            onChange={(e) => setMonthObservation(e.target.value)}
+                            onChange={(e) => {
+                              setMonthObservation(e.target.value);
+                              setIsEditingObservation(true);
+                            }}
+                            onBlur={() => {
+                              // Ao sair do campo, resetar flag após 2 segundos
+                              setTimeout(() => setIsEditingObservation(false), 2000);
+                            }}
                             placeholder="Digite a mensagem que aparecerá como letreiro digital para todos os usuários..."
                             rows={6}
                             className="flex-1 resize-y min-h-[100px]"
